@@ -41,7 +41,7 @@ clear all; close all;
 
 
 % Header informatoin
-filename='mec4_beta.yml';
+filename='simple3sector.yml';
 gridHeight=100;
 gridWidth=21; %must be odd
 %Note: No carriage return at the end of the description

@@ -43,7 +43,7 @@ clear all; close all;
 %% Header informatoin
 filename='2DTomography.yml';
 gridHeight=100;
-gridWidth=7; %must be odd
+gridWidth=5; % <------------  Dorsal Ventral Segments! (must be odd )
 description= sprintf('This protocol consists of a crude rasterscan. It divides the worms up into a %d by %d grid.', gridHeight, gridWidth);
 
 
@@ -51,7 +51,7 @@ description= sprintf('This protocol consists of a crude rasterscan. It divides t
 
 %% Fundamental Sprite
 xprim=gridWidth; %% do the anterior/posterior band first
-yprim=10;
+yprim=33;%   <------ Anterior-posterior height of segments! 
 
 
 %% Guts

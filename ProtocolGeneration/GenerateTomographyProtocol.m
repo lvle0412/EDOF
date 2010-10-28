@@ -101,6 +101,7 @@ for j=1:round(gridHeight/yprim)
 end
 
 
+protocol{end+1} = rect( -(gridWidth+1)/2, 0, (gridWidth+1)/2, gridHeight-1);
 
 
 figure;

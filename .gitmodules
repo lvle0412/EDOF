@@ -1,3 +1,6 @@
 [submodule "AccessUtils/MATLAB"]
 	path = AccessUtils/MATLAB
 	url = git@github.com:samuellab/MindControlAccessUtils.git
+[submodule "3rdPartyLibs/InterProcess"]
+	path = 3rdPartyLibs/InterProcess
+	url = git@github.com:samuellab/InterProcess.git

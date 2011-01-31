@@ -49,13 +49,6 @@
 # 
 #
 # This makefile creates a number of different executables:
-#
-# Deprecated:
-#  ClosedLoop.exe  		  -	Older version of the MindControl software designed to work 
-#							with the ImagingSource USB camera.
-#  CalibrateApparatus.exe - Older version of the calibration routine. Calibrates 
-#							the DLP and Camera for an ImagingSource camera.
-#
 # Current
 #  VirtualMC.exe 		  -	"Virtual MindControl" This is a stand-alone piece of software that simulates 
 #							the functionality of the MindControl suite for setups that have no camera or
@@ -72,15 +65,15 @@
 #
 # There are four make targets in this makefile:
 # 	make all			  -	This assumes the presence of all libraries that the system has every worked with: 
-#							including OpenCV, git, awk, ImagingSource Libraries, MATLAB, BitFlow
+#							including OpenCV, git, awk MATLAB, BitFlow
 #							FrameGrabber libraries, and the DLP libraries
 #
 # 	make FGandDLP		  - This is the make target to use if you have the DLP and FrameGrabber installed. 
 #							it also requires OpenCV, git, awk and MATLAB. 
 #
 #	make farmegrabberonly - This is the make target to use if you have the BitFlow Framegrabber installed
-#							as well as OpenCV, git and awk, but not MATLAB, the DLP libraries or the 
-#							imagingsource librares.
+#							as well as OpenCV, git and awk, but not MATLAB, or the DLP libraries.
+#							
 #	
 #	make virtual		  - This is the make target to use if you have no special hardware. It requires only 
 #							openCV, git and awk. 
@@ -120,7 +113,7 @@ openCVincludes = -I$(CVdir)/cxcore/include -I$(CVdir)/otherlibs/highgui -I$(CVdi
 # e.g. Objects that depend on nothing go left.
 #Objects that depend on other objects go right.
 
-mylibraries=  version.o AndysComputations.o Talk2DLP.o Talk2Camera.o Talk2FrameGrabber.o AndysOpenCVLib.o Talk2Matlab.o TransformLib.o IllumWormProtocol.o
+mylibraries=  version.o AndysComputations.o  Talk2DLP.o Talk2Camera.o Talk2FrameGrabber.o AndysOpenCVLib.o Talk2Matlab.o TransformLib.o IllumWormProtocol.o
 WormSpecificLibs= WormAnalysis.o WriteOutWorm.o experiment.o 
 
 bin/mc_api.dll
@@ -141,7 +134,7 @@ BFObj = $(BFLibDir)/BFD.lib   $(BFLibDir)/BFDiskIO.lib $(BFLibDir)/BFDrv.lib $(B
 
 #All Library Objects 
 objects= $(mylibraries) $(WormSpecificLibs) $(3rdpartyobjects) $(BFObj) $(CVlibs)  $(MatlabLibs)
-calib_objects= calibrate.o $(objects)
+
 
 #Hardware Independent objects
 hw_ind= version.o AndysComputations.o AndysOpenCVLib.o TransformLib.o IllumWormProtocol.o  $(WormSpecificLibs) $(TimerLibrary) $(CVlibs)
@@ -154,7 +147,7 @@ virtual_hardware =DontTalk2DLP.o DontTalk2Camera.o DontTalk2FrameGrabber.o Talk2
 ## NOTE: depending on what hardware libraries you have installed, you should choose
 ## Different targets of your make command
 ##
-## For example, if you have installed: OpenCV, MATLAB, the FrameGrabber, Imaging Source, and the DLP,
+## For example, if you have installed: OpenCV, MATLAB, the FrameGrabber,and the DLP,
 ## Then go head and and "make all"
 ## If you only have installed the framegrabber & OpenCV, but not the DLP or matlab or anything else, then
 ## use "make framegrabberonly"
@@ -162,7 +155,7 @@ virtual_hardware =DontTalk2DLP.o DontTalk2Camera.o DontTalk2FrameGrabber.o Talk2
 ## If you only: MATLAB, OpenCV, the DLP and FrameGrabber use "make FGandDLP"
 
 
-all : $(targetDir)/ClosedLoop.exe $(targetDir)/CalibrateApparatus.exe FGandDLP  virtual
+all: FGandDLP  virtual
 
 FGandDLP : framegrabberonly $(targetDir)/FG_DLP.exe  $(targetDir)/calibrateFG_DLP.exe version.o $(targetDir)/Test.exe
 
@@ -170,17 +163,6 @@ framegrabberonly :  $(targetDir)/FGMindControl.exe version.o $(targetDir)/Test.e
 
 virtual: $(targetDir)/VirtualMC.exe version.o $(targetDir)/Test.exe
 
-
-
-$(targetDir)/CalibrateApparatus.exe : $(calib_objects) Talk2Stage.o
-	$(CXX) -o $(targetDir)/CalibrateApparatus.exe $(calib_objects) Talk2Stage.o $(LinkerWinAPILibObj) $(TailOpts)
-
-calibrate.o : calibrate.c $(3rdPartyLibs)/tisgrabber.h $(3rdPartyLibs)/TISGrabberGlobalDefs.h $(MyLibs)/Talk2DLP.h $(MyLibs)/Talk2Camera.h $(MatlabIncDir)/engine.h
-	$(CXX) $(CXXFLAGS) calibrate.c -I"inc" -I$(MyLibs) $(openCVincludes) $(TailOpts) 
-
-$(targetDir)/ClosedLoop.exe : main.o $(objects) Talk2Stage.o
-	$(CXX) -o $(targetDir)/ClosedLoop.exe main.o $(objects) Talk2Stage.o $(LinkerWinAPILibObj) $(TailOpts)
-	
 	
 main.o : main.cpp  $(MyLibs)/Talk2DLP.h $(MyLibs)/Talk2Camera.h \
 $(MyLibs)/TransformLib.h $(MyLibs)/Talk2Camera.h $(MyLibs)/AndysOpenCVLib.h $(MyLibs)/Talk2FrameGrabber.h \
@@ -328,30 +310,6 @@ clean:
 #alp4basic.dll DLL control library for the DLP
 
 
-#IMAGING SOURCE SOFTWARE to talk to Camera
-#Tisgrabber.lib ImagingSource Statically Linked Library to Control Camera
-#tisgrabber.h ImagingSource C wrapper Library header file
-#tisgrabberGlobalDefs.h Imaging Source C wrpaper Global Definitions file
-#tisgrabber.dll Imgaing Source Dynamically Linked Library
-
-#### DLL's from Imaging Source
-#DemoFilters.ftf
-#ICFilterContainer.dll
-#TIS_DShowLib07_vc71.dll
-#TIS_UDSHL07_vc6.dll
-#TIS_UDSHL07_vc6.lib
-#TIS_UDSHL07_vc71.dll
-#TIS_UDSHL07_vc71.lib
-#TIS_UDSHL07_vc8.dll
-#TIS_UDSHL07_vc8.lib
-#dvdevice.vda
-#mjpeg.tca
-#stdfilters.ftf
-#tisdcam.vda
-#tisgrabber.dll
-#tisgrabber.lib
-#uvc_driver.vda
-#vcc_vp.vda
 
 
 

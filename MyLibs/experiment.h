@@ -176,7 +176,7 @@ typedef struct ExperimentStruct{
 	int stageIsTurningOff; //1 indicates stage is turning off. 0 indicates stage is on or off.
 
 	/** MindControl API **/
-	SharedMemory_t sm;
+	SharedMemory_handle sm;
 
 	/** Error Handling **/
 	int e;

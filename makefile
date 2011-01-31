@@ -112,6 +112,7 @@ openCVincludes = -I$(CVdir)/cxcore/include -I$(CVdir)/otherlibs/highgui -I$(CVdi
 
 # MindControl API
 API_DLL_dir=bin
+API_Linker_Command= -Lbin -lmc_api
 
 
 # objects that I have written, in order of dependency. 
@@ -254,8 +255,8 @@ $(MyLibs)/WriteOutWorm.c :  $(MyLibs)/version.h
 
 #FG_DLP.exe
 FG_DLP_objs=  Talk2FrameGrabber.o $(BFObj)  Talk2DLP.o Talk2Stage.o  DontTalk2Camera.o $(3rdPartyLibs)/alp4basic.lib $(hw_ind) 
-$(targetDir)/FG_DLP.exe : FG_DLP.o $(FG_DLP_objs)
-	$(CXX) -o $(targetDir)/FG_DLP.exe FG_DLP.o $(FG_DLP_objs) $(LinkerWinAPILibObj) $(TailOpts) 
+$(targetDir)/FG_DLP.exe : FG_DLP.o $(FG_DLP_objs) $(API_DLL_dir)/mc_api.dll
+	$(CXX) -o $(targetDir)/FG_DLP.exe FG_DLP.o $(FG_DLP_objs) $(LinkerWinAPILibObj) $(API_Linker_Command) $(TailOpts) 
 
 FG_DLP.o : main.cpp  
 	$(CXX) $(CXXFLAGS) main.cpp -oFG_DLP.o -I$(MyLibs) -I$(bfIncDir) $(openCVincludes) $(TailOpts)
@@ -269,8 +270,8 @@ calibrateFG_DLP.o : calibrateFG.cpp
 
 
 ## framegrabberonly FGMindControl.exe
-$(targetDir)/FGMindControl.exe : FGMindControl.o DontTalk2DLP.o DontTalk2Camera.o Talk2FrameGrabber.o Talk2Stage.o  $(hw_ind) 
-	$(CXX) -o $(targetDir)/FGMindControl.exe FGMindControl.o Talk2FrameGrabber.o $(BFObj)    DontTalk2DLP.o DontTalk2Camera.o Talk2Stage.o $(hw_ind) $(LinkerWinAPILibObj) $(TailOpts) 
+$(targetDir)/FGMindControl.exe : FGMindControl.o DontTalk2DLP.o DontTalk2Camera.o Talk2FrameGrabber.o Talk2Stage.o $(API_DLL_dir)/mc_api.dll $(hw_ind) 
+	$(CXX) -o $(targetDir)/FGMindControl.exe FGMindControl.o Talk2FrameGrabber.o $(BFObj)    DontTalk2DLP.o DontTalk2Camera.o Talk2Stage.o $(hw_ind) $(LinkerWinAPILibObj) $(API_Linker_Command) $(TailOpts) 
 
 FGMindControl.o : main.cpp $(myOpenCVlibraries) $(WormSpecificLibs) 
 	$(CXX) $(CXXFLAGS) main.cpp -oFGMindControl.o -I$(MyLibs) -I$(bfIncDir) $(openCVincludes) $(TailOpts)
@@ -279,8 +280,8 @@ FGMindControl.o : main.cpp $(myOpenCVlibraries) $(WormSpecificLibs)
 ###### VirtualMC.exe
 # This is the software suite that does not depend on any hardware. It is hardware independent.
 #Write a DontTalk2FrameGrabber.h
-$(targetDir)/VirtualMC.exe : VirtualMC.o $(virtual_hardware) $(hw_ind) 
-	$(CXX) -o $(targetDir)/VirtualMC.exe VirtualMC.o $(virtual_hardware) $(hw_ind)   $(LinkerWinAPILibObj) $(TailOpts) 
+$(targetDir)/VirtualMC.exe : VirtualMC.o $(virtual_hardware) $(API_DLL_dir)/mc_api.dll $(hw_ind) 
+	$(CXX) -o $(targetDir)/VirtualMC.exe VirtualMC.o $(virtual_hardware) $(hw_ind)   $(LinkerWinAPILibObj) $(API_Linker_Command) $(TailOpts) 
 
 VirtualMC.o : main.cpp $(myOpenCVlibraries) $(WormSpecificLibs) 
 	$(CXX) $(CXXFLAGS) main.cpp -oVirtualMC.o -I$(MyLibs) -I$(bfIncDir) $(openCVincludes) $(TailOpts)
@@ -310,7 +311,7 @@ API/bin/mc_api.dll: API/makefile
 .PHONY: clean	
 clean:
 	rm -rfv *.o
-	rm  $(API_DLL_dir)/mc_api.dll
+	rm -fv 	$(API_DLL_dir)/mc_api.dll
 	
 	
 

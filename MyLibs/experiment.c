@@ -68,7 +68,7 @@
 #include "TransformLib.h"
 #include "WriteOutWorm.h"
 #include "version.h"
-#include "API/mc_api_dll.h"
+#include "../API/mc_api_dll.h"
 
 #include "experiment.h"
 

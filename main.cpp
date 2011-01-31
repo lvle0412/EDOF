@@ -83,6 +83,7 @@ using namespace std;
 #include "MyLibs/WriteOutWorm.h"
 #include "MyLibs/IllumWormProtocol.h"
 #include "MyLibs/TransformLib.h"
+#include "API/mc_api_dll.h"
 #include "MyLibs/experiment.h"
 
 

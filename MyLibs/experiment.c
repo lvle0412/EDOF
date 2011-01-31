@@ -68,7 +68,7 @@
 #include "TransformLib.h"
 #include "WriteOutWorm.h"
 #include "version.h"
-
+#include "API/mc_api_dll.h"
 
 #include "experiment.h"
 
@@ -184,6 +184,9 @@ Experiment* CreateExperimentStruct() {
 	/** Macros **/
 	exp->RECORDVID = 0;
 	exp->RECORDDATA = 0;
+
+	/** MindControl API **/
+	exp->sm=NULL;
 
 	/** Error Handling **/
 	exp->e = 0;
@@ -812,6 +815,9 @@ void InitializeExperiment(Experiment* exp) {
 	WormGeom* PrevWorm = CreateWormGeom();
 	exp->PrevWorm = PrevWorm;
 
+	/** Create MindControl API Shared Memory **/
+	exp->sm=MC_API_StartServer();
+
 }
 
 /*
@@ -827,6 +833,13 @@ void ReleaseExperiment(Experiment* exp) {
 		DestroyFrame(&(exp->forDLP));
 	if (exp->IlluminationFrame != NULL)
 		DestroyFrame(&(exp->IlluminationFrame));
+
+	/** Stop MindControl API Shared Memory Server **/
+	if (exp->sm!=NULL){
+		MC_API_StopServer(exp->sm);
+		exp->sm=NULL;
+	}
+
 
 	/** Free up Strings **/
 	exp->dirname = NULL;
@@ -1398,8 +1411,12 @@ void DoWriteToDisk(Experiment* exp) {
 	if (exp->RECORDDATA && exp->Params->Record) {
 		TICTOC::timer().tic("AppendWormFrameToDisk");
 		AppendWormFrameToDisk(exp->Worm, exp->Params, exp->DataWriter);
-TICTOC	::timer().toc("AppendWormFrameToDisk");
-}
+		TICTOC	::timer().toc("AppendWormFrameToDisk");
+	}
+
+	/** Write out to the MindControl API **/
+	MC_API_SetCurrentFrame(exp->sm, exp->Worm->frameNum);
+	MC_API_SetDLPOnOff(exp->sm,exp->Params->DLPOn);
 }
 
 /*

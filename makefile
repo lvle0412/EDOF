@@ -109,14 +109,19 @@ MatlabLibsDir= C:/Progra~1/MATLAB/R2009a/extern/lib/win32/microsoft/
 openCVincludes = -I$(CVdir)/cxcore/include -I$(CVdir)/otherlibs/highgui -I$(CVdir)/cv/include
 
 
+
+# MindControl API
+API_DLL_dir=bin
+
+
 # objects that I have written, in order of dependency. 
 # e.g. Objects that depend on nothing go left.
-#Objects that depend on other objects go right.
+	#Objects that depend on other objects go right.
 
-mylibraries=  version.o AndysComputations.o  Talk2DLP.o Talk2Camera.o Talk2FrameGrabber.o AndysOpenCVLib.o Talk2Matlab.o TransformLib.o IllumWormProtocol.o
+mylibraries=  version.o AndysComputations.o $(API_DLL_dir)/mc_api.dll Talk2DLP.o Talk2Camera.o Talk2FrameGrabber.o AndysOpenCVLib.o Talk2Matlab.o TransformLib.o IllumWormProtocol.o
 WormSpecificLibs= WormAnalysis.o WriteOutWorm.o experiment.o 
 
-bin/mc_api.dll
+
 
 #3rd party statically linked objects
 CVlibs=$(CVdir)/lib/cv.lib $(CVdir)/lib/highgui.lib $(CVdir)/lib/cxcore.lib
@@ -295,14 +300,19 @@ Talk2FrameGrabber.o: $(MyLibs)/Talk2FrameGrabber.cpp $(MyLibs)/Talk2FrameGrabber
 	$(CXX) $(CXXFLAGS) $(MyLibs)/Talk2FrameGrabber.cpp -I$(bfIncDir)
 	
 
+## Mind Control API
+$(API_DLL_dir)/mc_api.dll: API/bin/mc_api.dll
+	cp API/bin/mc_api.dll $(API_DLL_dir)/mc_api.dll
+
+API/bin/mc_api.dll: API/makefile
+	cd API && make clean && make all && cd ..
 
 .PHONY: clean	
 clean:
-	rm -rf *.o 
+	rm -rfv *.o
+	rm  $(API_DLL_dir)/mc_api.dll
 	
 	
-#Partial File List
-#### DLP
 
 #OpenCV Libraries have to be available on the environment path.
 

@@ -65,6 +65,10 @@
 #ifndef ANDYSOPENCVLIB_H_
  #error "#include AndysOpenCVLib.h" must appear in source files before "#include experiment.h"
 #endif
+#ifndef MC_API_DLL_H_
+ #error "#include API/mc_api_dll.h" must appear in source files before "#include experiment.h"
+#endif
+
 
 
 #define EXP_ERROR -1
@@ -170,6 +174,9 @@ typedef struct ExperimentStruct{
 	CvPoint stageCenter; // Point indicating center of stage.
 	CvPoint stageFeedbackTargetOffset; //Target of the stage feedback loop as a delta distance in pixels from the center of the image
 	int stageIsTurningOff; //1 indicates stage is turning off. 0 indicates stage is on or off.
+
+	/** MindControl API **/
+	SharedMemory_t sm;
 
 	/** Error Handling **/
 	int e;

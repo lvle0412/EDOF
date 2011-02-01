@@ -287,6 +287,10 @@ WormAnalysisParam* CreateWormAnalysisParam(){
 	ParamPtr->IllumSegCenter=25;
 	ParamPtr->IllumFloodEverything=0;
 
+	/** Laser Power **/
+	ParamPtr->GreenLaser=-1;
+	ParamPtr->BlueLaser=-1;
+
 	/** Illum Head-Tail Sweep **/
 	ParamPtr->IllumSweepHT = 1;
 	ParamPtr->IllumSweepOn=0;

@@ -105,6 +105,10 @@ typedef struct WormAnalysisParamStruct{
 	int ProtocolStep;
 	int ProtocolTotalSteps;
 
+	/** Laser Power **/
+	int GreenLaser;
+	int BlueLaser;
+
 	/** Stage Control Parameters **/
 	int stageTrackingOn;
 	int stageSpeedFactor;

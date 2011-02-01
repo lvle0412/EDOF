@@ -52,7 +52,7 @@
 #include <cv.h>
 #include <cxcore.h>
 
-//Timer Lib
+//Timer Libray
 #include "../3rdPartyLibs/tictoc.h"
 
 //Andy's Personal Headers
@@ -1374,11 +1374,39 @@ int HandleKeyStroke(int c, Experiment* exp) {
 	return 0;
 }
 
+
+/*
+ * Write out current values to MindControl API and read in
+ * values set by external processes.
+ *
+ * At the moment, MindControl writes out the current frame and the
+ * status of the DLP. It reads in the laser power values.
+ */
+void SyncAPI(Experiment* exp){
+
+	/** Write out to the MindControl API **/
+	MC_API_SetCurrentFrame(exp->sm, exp->Worm->frameNum);
+	MC_API_SetDLPOnOff(exp->sm,exp->Params->DLPOn);
+
+	/** Load in Info From Laser Controller **/
+	if (MC_API_isLaserControllerPresent(exp->sm)) {
+		exp->Params->GreenLaser=MC_API_GetGreenLaserPower(sm);
+		exp->Params->BlueLaser=MC_API_GetBlueLaserPower(sm);
+	} else {
+		exp->Params->GreenLaser=-1;
+		exp->Params->BlueLaser=-1;
+	}
+
+	return;
+
+}
+
 /*
  * Write video and data to Disk
  *
  */
 void DoWriteToDisk(Experiment* exp) {
+
 
 	/** Throw error if the user has asked to record, but the system is not in record mode **/
 	if (exp->Params->Record && (exp->RECORDVID!=1)  ){
@@ -1414,9 +1442,6 @@ void DoWriteToDisk(Experiment* exp) {
 		TICTOC	::timer().toc("AppendWormFrameToDisk");
 	}
 
-	/** Write out to the MindControl API **/
-	MC_API_SetCurrentFrame(exp->sm, exp->Worm->frameNum);
-	MC_API_SetDLPOnOff(exp->sm,exp->Params->DLPOn);
 }
 
 /*

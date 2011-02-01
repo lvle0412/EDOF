@@ -175,6 +175,7 @@ typedef struct ExperimentStruct{
 	CvPoint stageFeedbackTargetOffset; //Target of the stage feedback loop as a delta distance in pixels from the center of the image
 	int stageIsTurningOff; //1 indicates stage is turning off. 0 indicates stage is on or off.
 
+
 	/** MindControl API **/
 	SharedMemory_handle sm;
 

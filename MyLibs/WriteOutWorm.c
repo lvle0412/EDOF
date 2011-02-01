@@ -275,6 +275,11 @@ int AppendWormFrameToDisk(WormAnalysisData* Worm, WormAnalysisParam* Params, Wri
 			cvEndWriteStruct(fs);
 		}
 
+		cvStartWriteStruct(fs,"LaserPower",CV_NODE_MAP,NULL);
+			cvWriteInt(fs,"Green",Params->GreenLaser);
+			cvWriteInt(fs,"Blue",Params->BlueLaser);
+		cvEndWriteStruct(fs);
+
 		/** Protocol Information **/
 
 		cvWriteInt(fs,"ProtocolIsOn",Params->ProtocolUse);

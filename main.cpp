@@ -305,9 +305,17 @@ int main (int argc, char** argv){
 
 
 			if (exp->e == 0) {
+
+				/** Send and Receive Values from API / Shared Memory **/
+				TICTOC::timer().tic("SyncAPI");
+				SyncAPI(exp);
+				TICTOC::timer().tic("SyncAPI");
+
+				/** Write Values to Disk **/
 				TICTOC::timer().tic("DoWriteToDisk()");
 				DoWriteToDisk(exp);
 				TICTOC::timer().toc("DoWriteToDisk()");
+
 			}
 
 

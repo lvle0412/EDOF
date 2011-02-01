@@ -1390,8 +1390,8 @@ void SyncAPI(Experiment* exp){
 
 	/** Load in Info From Laser Controller **/
 	if (MC_API_isLaserControllerPresent(exp->sm)) {
-		exp->Params->GreenLaser=MC_API_GetGreenLaserPower(sm);
-		exp->Params->BlueLaser=MC_API_GetBlueLaserPower(sm);
+		exp->Params->GreenLaser=MC_API_GetGreenLaserPower(exp->sm);
+		exp->Params->BlueLaser=MC_API_GetBlueLaserPower(exp->sm);
 	} else {
 		exp->Params->GreenLaser=-1;
 		exp->Params->BlueLaser=-1;

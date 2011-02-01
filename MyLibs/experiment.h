@@ -403,6 +403,16 @@ void InvertIllumination(Experiment* exp);
 int HandleKeyStroke(int c, Experiment* exp);
 
 /*
+ * Write out current values to MindControl API and read in
+ * values set by external processes.
+ *
+ * At the moment, MindControl writes out the current frame and the
+ * status of the DLP. It reads in the laser power values.
+ */
+void SyncAPI(Experiment* exp);
+
+
+/*
  * Write video and data to Disk
  *
  */

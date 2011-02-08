@@ -625,9 +625,12 @@ void SetupGUI(Experiment* exp) {
 	if (exp->pflag) {
 		cvCreateTrackbar("Protocol", exp->WinCon2, &(exp->Params->ProtocolUse),
 				1, (int) NULL);
-		cvCreateTrackbar("ProtoStep", exp->WinCon2,
-				&(exp->Params->ProtocolStep), exp->p->Steps->total - 1,
-				(int) NULL);
+
+		if (exp->p->Steps->total > 1){
+			cvCreateTrackbar("ProtoStep", exp->WinCon2,
+					&(exp->Params->ProtocolStep), exp->p->Steps->total - 1,
+					(int) NULL);
+		}
 	}
 
 	if (exp->stageIsPresent){
@@ -675,8 +678,11 @@ void UpdateGUI(Experiment* exp) {
 		/** If we have loaded a protocol, update protocol specific sliders **/
 		if (exp->pflag) {
 			cvSetTrackbarPos("Protocol", exp->WinCon2, exp->Params->ProtocolUse);
-			cvSetTrackbarPos("ProtoStep", exp->WinCon2,
-					(exp->Params->ProtocolStep));
+
+			if (exp->p->Steps->total > 1){
+				cvSetTrackbarPos("ProtoStep", exp->WinCon2,
+						(exp->Params->ProtocolStep));
+			}
 		}
 
 		/** Floodlight **/

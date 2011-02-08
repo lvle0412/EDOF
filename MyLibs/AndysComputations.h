@@ -118,4 +118,20 @@ void Decrement(int* x, int min);
 void Increment (int* x, int max);
 
 
+
+/*
+ * Returns the larger of either a or b.
+ * If a and b are equal, returns a.
+ */
+int LargerOf(int a, int b);
+
+
+/*
+ * Returns the smaller of either a or b.
+ * If a and b are equal, returns a.
+ */
+int SmallerOf(int a, int b);
+
+
+
 #endif /* ANDYSCOMPUTATIONS_H_ */

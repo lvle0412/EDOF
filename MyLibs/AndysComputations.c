@@ -158,4 +158,31 @@ void Increment (int* x, int max){
 	return;
 }
 
+/*
+ * Returns the larger of either a or b.
+ * If a and b are equal, returns a.
+ */
+int LargerOf(int a, int b){
+	if (a==b) return a;
+	if (a>b){
+		return a;
+	} else {
+		return b;
+	}
+}
+
+
+/*
+ * Returns the smaller of either a or b.
+ * If a and b are equal, returns a.
+ */
+int SmallerOf(int a, int b){
+	if (a==b) return a;
+	if (a<b){
+		return a;
+	} else {
+		return b;
+	}
+
+}
 

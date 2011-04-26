@@ -212,6 +212,19 @@ int HandleCommandLineArguments(Experiment* exp);
  */
 int HandleIlluminationSweep(Experiment* exp);
 
+
+/*
+ * Calculate the Mean Curvature of the Head and Analyze the Phase of the
+ * worm's sinusoidal body motions.
+ *
+ * Put this is in a buffer that includes prior curvatures over the last 20 frames or so.
+ *
+ * If we are trigging based on the phase of the worm's motion, turn the DLP on if we are
+ * in the triggering region.
+ *
+ */
+int HandleCurvaturePhaseAnalysis(Experiment* exp);
+
 /** Handle Transient Illumination Timing **/
 int HandleIlluminationTiming(Experiment* exp);
 

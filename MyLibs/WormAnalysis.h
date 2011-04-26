@@ -101,6 +101,7 @@ typedef struct WormAnalysisParamStruct{
 	int IllumDuration; // in tenthsOfSeconds
 	int DLPOnFlash;
 
+	/** Use Protocols? **/
 	int ProtocolUse;
 	int ProtocolStep;
 	int ProtocolTotalSteps;
@@ -108,6 +109,15 @@ typedef struct WormAnalysisParamStruct{
 	/** Laser Power **/
 	int GreenLaser;
 	int BlueLaser;
+
+	/** Real Time Curvature Analysis **/
+	int CurvatureAnalyzeOn;
+
+	/** Trigger Illumination Based on Phase of Curvature **/
+	int CurvaturePhaseTriggerOn;
+	int CurvaturePhaseThresholdMax;
+	int CurvaturePhaseThresholdMin;
+
 
 	/** Stage Control Parameters **/
 	int stageTrackingOn;

@@ -351,15 +351,11 @@ void LongestContour(CvSeq* contours, CvSeq** ContourOfInterest){
  */
 int PointCross(CvPoint* VecA, CvPoint* VecB){
 	return (VecA->x)*(VecB->y) - (VecA->y)*(VecB->x);
-
 }
-
-
 
 
 /*
  * Takes the dot product of two vectors representated in cartesian coordinates as CvPoint (x,y)
- *
  */
 int PointDot(CvPoint* VecA, CvPoint* VecB){
 	return (VecA->x)*(VecB->x) + (VecA->y)*(VecB->y);
@@ -384,8 +380,8 @@ float NormPointCross(CvPoint* VecA, CvPoint* VecB){
 
 
 /*
- * Normalizes two vectors representated in cartesian coordinates as CvPoint (x,y) and returns their dot ptorduct.
- *
+ * Normalizes two vectors representated in cartesian coordinates as
+ *  CvPoint (x,y) and returns their dot ptorduct.
  */
 float NormPointDot(CvPoint* VecA, CvPoint* VecB){
 	float Ax = (float) VecA->x;
@@ -400,11 +396,10 @@ float NormPointDot(CvPoint* VecA, CvPoint* VecB){
 
 
 
-/* Function Draws a Sequence of CvPoint's with little cirlces.
+/* Function Draws a Sequence of CvPoint's with little circles.
  * This function uses only a sequence and an image.
- *
- */
 
+ */
 void DrawSequence(IplImage** image, CvSeq* Seq) {
 	int i;
 	for (i = 0; i < Seq->total; i++) {
@@ -692,7 +687,6 @@ float dist(CvPoint a, CvPoint b){
 }
 
 /*
- * WHOA!! THIS FUNCTION IS ALL SCREWED UP AND CAUSING PROBLEMS!!
  *
  * Given two points a and b , and a sequence of CvPoints
  * this function will find the points that walk the line
@@ -700,6 +694,9 @@ float dist(CvPoint a, CvPoint b){
  * the end of the sequence
  *
  * Note that the output  includes point a, but not point b.
+ *
+ * See my StackOverflow Question:
+ * http://stackoverflow.com/q/1959551/200688
  */
 int GetLineFromEndPts(CvPoint a, CvPoint b, CvSeq* contour){
 	if (contour==NULL) {

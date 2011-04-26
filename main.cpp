@@ -215,12 +215,15 @@ int main (int argc, char** argv){
 				continue;
 			}
 
+			/**** Functions to decide if Illumination Should be on Or Off ***/
 			/** Handle Transient Illumination Timing **/
 			HandleIlluminationTiming(exp);
 
 			/** Handle head-tail illumination sweep **/
 			HandleIlluminationSweep(exp);
 
+			/** Real-Time Curvature Phase Analysis, and phase induced illumination **//
+			HandleCurvaturePhaseAnalysis(exp);
 
 			/** If the DLP is not displaying right now, than turn off the mirrors */
 			ClearDLPifNotDisplayingNow(exp);
@@ -242,8 +245,11 @@ int main (int argc, char** argv){
 			}
 			TICTOC::timer().toc("TransformSegWormCam2DLP");
 
-			/*** Do Some Illumination ***/
 
+
+
+
+			/*** Do Some Illumination ***/
 			if (exp->e == 0) {
 				/** Clear the illumination pattern **/
 				SetFrame(exp->forDLP,0);

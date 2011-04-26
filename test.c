@@ -27,8 +27,12 @@
  */
 
 /*
- * This is a test program that performs some basic tests of the mindcontrol software.
- * It is mostly useful for debugging.
+ * This is a test program that includes the underlying
+ * AndysOpenCVLib.h and AndysComputation.h libraries
+ * amongst others.
+ *
+ * This is a great place to test out and debug underlying functions.
+ *
  */
 
 //Standard C headers
@@ -160,6 +164,7 @@ int main(){
 	//char* name = (char*) malloc(sizeof(char)*50);
 
 
+	printf("Let's test curvature extraction.");
 
 	printf(copyString("Hello you World\n"));
 

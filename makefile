@@ -161,13 +161,15 @@ virtual_hardware =DontTalk2DLP.o DontTalk2Camera.o DontTalk2FrameGrabber.o Talk2
 ## If you only: MATLAB, OpenCV, the DLP and FrameGrabber use "make FGandDLP"
 
 
-all: FGandDLP  virtual
+all: FGandDLP  virtual test
 
 FGandDLP : framegrabberonly $(targetDir)/FG_DLP.exe  $(targetDir)/calibrateFG_DLP.exe version.o $(targetDir)/Test.exe
 
 framegrabberonly :  $(targetDir)/FGMindControl.exe version.o $(targetDir)/Test.exe
 
 virtual: $(targetDir)/VirtualMC.exe version.o $(targetDir)/Test.exe
+
+test: $(targetDir)/Test.exe
 
 	
 main.o : main.cpp  $(MyLibs)/Talk2DLP.h $(MyLibs)/Talk2Camera.h \

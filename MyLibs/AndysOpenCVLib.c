@@ -926,21 +926,61 @@ void FindCenterline(CvSeq* NBoundA, CvSeq* NBoundB, CvSeq* centerline) {
  *
  * Find curvature at each point.
  *
- * seq is sequence of points.
- * k is a sequence of doubles.
+ * seq is sequence of points, CvPoint (int)
+ * k is an array of doubles. with two less element than CvPoint.
  *
  * Defined as difference in angle between adjacent tangent vectors.
  * The curvature sequence has one less element than the original sequence.
  *
+ * Sigma is the size of the gaussian kernal.
+ *
  */
-int extractCurvatureOfSeq(CvSeq* seq, CvSeq* k){
-	if (seq== NULL || k== NULL) return A_ERROR;
-	CvSeqReader reader;
-	CvSeqWriter writer;
-	cvStartReadSeq(seq, &reader, 0);
-	cvStartAppendToSeq(k, &writer);
+int extractCurvatureOfSeq(const CvSeq* seq, double* curvature, double sigma,CvMemStorage* mem){
 
 
+	if (seq== NULL || curvature == NULL) return A_ERROR;
+	if (seq->elem_size!=sizeof(CvPoint)) return A_ERROR;
+
+	/** Smooth the sequence **/
+	CvSeq* sseq=smoothPtSequenceIntToFloat(seq, sigma, mem);
+
+	int N=sseq->total;
+
+	double *x = (double *) malloc (N * sizeof(double));
+	double *y = (double *) malloc (N * sizeof(double));
+
+	double *diff_x = (double *) malloc( (N-1) * sizeof(double));  /* difference of adjacent x coordinate */
+	double *diff_y = (double *) malloc( (N-1)* sizeof(double)); /* difference of adjacent y coordinate */
+	double *theta = (double *) malloc( (N-1) * sizeof(double)); /* angle of the tangent vector */
+
+
+	double *k= (double *) malloc( (N-2) * sizeof(double));
+
+
+	/** Generate array of floats from inputs **/
+	int j;
+	for (j = 0; j < N; j++) {
+		x[j] = (double) ((CvPoint2D32f *) cvGetSeqElem(sseq, j))->x;
+		y[j] = (double) ((CvPoint2D32f *) cvGetSeqElem(sseq, j))->y;
+	}
+
+	/** Calculate tangent vectors **/
+     int i;
+	 for (i=0;i< N-1;i++){
+		 *(diff_x+i) = *(x+i+1)-*(x+i);
+		 *(diff_y+i) = *(y+i+1)-*(y+i);
+		 *(theta+i) = atan2(-*(diff_y+i),*(diff_x+i)); /* calculate the angle of tangent vector */
+		 }
+
+	 for (i=0; i<N-2; i++){
+		 *(k+i)=*(theta+i+1)-*(theta+i); /* calculate the curvature */
+	 }
+
+	memcpy ((void*) curvature ,(void*) k, sizeof( (N-2)*sizeof(double) ));
+
+	free(k);
+	free(x);
+	free(y);
 	return A_OK;
 }
 
@@ -1189,7 +1229,8 @@ void ConvolveInt1D (const int *src, int *dst, int length, int *kernel, int kleng
  */
 void ConvolveFloat1D (const float *src, float *dst, int length, int *kernel, int klength, int normfactor) {
 	int j, k, ind;
-	float anchor, sum;
+	int anchor;
+	float sum;
 	anchor = klength/2;
 	for (j = 0; j < length; j++) {
 		sum = 0;
@@ -1321,7 +1362,7 @@ CvSeq *smoothPtSequenceIntToFloat (const CvSeq *src, double sigma, CvMemStorage 
 	int *kernel, klength, normfactor;
 	CvSeq *dst = cvCreateSeq(CV_SEQ_ELTYPE_POINT, sizeof(CvSeq), sizeof(CvPoint2D32f), mem);
 	CreateGaussianKernel(sigma, &kernel, &klength, &normfactor);
-	ConvolveCvPtSeq(src, dst, kernel, klength, normfactor);
+	ConvolveCvPtSeqInt2Float(src, dst, kernel, klength, normfactor);
 	free(kernel);
 	return dst;
 }

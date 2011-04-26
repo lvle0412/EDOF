@@ -188,6 +188,8 @@ Experiment* CreateExperimentStruct() {
 	/** MindControl API **/
 	exp->sm=NULL;
 
+	exp->scratchMem =cvCreateMemStorage(0);
+
 	/** Error Handling **/
 	exp->e = 0;
 
@@ -920,6 +922,7 @@ void ReleaseExperiment(Experiment* exp) {
  * To be run after ReleaseExperiment()
  */
 void DestroyExperiment(Experiment** exp) {
+	cvReleaseMemStorage( &((*exp)->scratchMem));
 	free(*exp);
 	*exp = NULL;
 }

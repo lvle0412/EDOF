@@ -179,6 +179,9 @@ typedef struct ExperimentStruct{
 	/** MindControl API **/
 	SharedMemory_handle sm;
 
+	/** Scratch CvMemoryStorage **/
+	CvMemStorage* scratchMem;
+
 	/** Error Handling **/
 	int e;
 

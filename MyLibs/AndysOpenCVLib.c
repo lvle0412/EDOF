@@ -290,6 +290,36 @@ void DisplayOpenCVInstall(){
 	printf("Libraries: %s\nModules: %s\n", libraries, modules);
 }
 
+
+
+/*
+ * A cvSeq can be used as a buffer. This function allows one to push an element
+ * onto the front of a cvSeq buffer.
+ *
+ * If the buffer is full, it automatically tosses the oldest
+ * element in the buffer.
+ */
+int cvSeqBufferPush(CvSeq* seq, void* element, int MaxBuffSize){
+	if (seq==0 || element==0 || MaxBuffSize==0) return A_error;
+
+	/** push the value on **/
+	cvSeqPushFront(seq, element);
+
+	/** if full, pop off the last value **/
+	void* popped_pt;
+    if(seq->total > MaxBuffSize){
+    	cvSeqPop(seq, popped_pt);
+    }
+	return A_OK;
+}
+
+
+
+
+/*******************************************************************************/
+/**************************** Working with Sequences of Points *****************/
+/*******************************************************************************/
+
 /*
  *
  * Given a sequence of x,y CvPoints, this function returns a point
@@ -322,77 +352,6 @@ CvPoint  GetMedianOfPoints(CvSeq* seq){
 		xmed=pt->x;
 		return cvPoint(xmed,ymed);
 }
-
-
-
-/*
- * Given a list of contours, this finds the contour with the longest perimiter and points ContourOfInterst to this contour.
- *
- * Note this uses the same memory storage for the contourOfInterst, as that of the contour.
-*/
-void LongestContour(CvSeq* contours, CvSeq** ContourOfInterest){
-	CvSeq* biggestContour;
-	//printf("---Finding Longest Contour---\n");
-	int biggest=0;
-		for (contours; contours!=NULL; contours=contours->h_next){
-		//printf("%d elements\n",contours->total);
-		if (contours->total > biggest){
-			biggest=contours->total;
-			biggestContour=contours;
-			//printf("Currently the biggest!\n");
-		}
-	}
-	*ContourOfInterest=cvCloneSeq(biggestContour);
-}
-
-/*
- * Takes the cross product of two vectors representated in cartesian coordinates as CvPoint (x,y)
- *
- */
-int PointCross(CvPoint* VecA, CvPoint* VecB){
-	return (VecA->x)*(VecB->y) - (VecA->y)*(VecB->x);
-}
-
-
-/*
- * Takes the dot product of two vectors representated in cartesian coordinates as CvPoint (x,y)
- */
-int PointDot(CvPoint* VecA, CvPoint* VecB){
-	return (VecA->x)*(VecB->x) + (VecA->y)*(VecB->y);
-
-}
-
-
-/*
- * Normalizes vectors representated in cartesian coordinates as CvPoint (x,y) and takes the cross product.
- *
- */
-float NormPointCross(CvPoint* VecA, CvPoint* VecB){
-	float Ax = (float) VecA->x;
-	float Ay = (float) VecA->y;
-	float Bx = (float) VecB->x;
-	float By = (float) VecB->y;
-	return (Ax*By -  Ay*Bx) / ( cvSqrt(Ax*Ax+Ay*Ay)*cvSqrt(Bx*Bx+By*By) ) ;
-
-}
-
-
-
-
-/*
- * Normalizes two vectors representated in cartesian coordinates as
- *  CvPoint (x,y) and returns their dot ptorduct.
- */
-float NormPointDot(CvPoint* VecA, CvPoint* VecB){
-	float Ax = (float) VecA->x;
-	float Ay = (float) VecA->y;
-	float Bx = (float) VecB->x;
-	float By = (float) VecB->y;
-
-	return ( (Ax*Bx+Ay*By) /  ( cvSqrt(Ax*Ax+Ay*Ay)*cvSqrt(Bx*Bx+By*By) ) );
-
-}
-
 
 
 
@@ -667,6 +626,59 @@ void resampleSeq(CvSeq* sequence, CvSeq* ResampledSeq, int Numsegments) {
 
 
 
+/*******************************************************************************/
+/**************************** Working with Points ******************************/
+/*******************************************************************************/
+
+
+
+/*
+ * Takes the cross product of two vectors representated in cartesian coordinates as CvPoint (x,y)
+ *
+ */
+int PointCross(CvPoint* VecA, CvPoint* VecB){
+	return (VecA->x)*(VecB->y) - (VecA->y)*(VecB->x);
+}
+
+
+/*
+ * Takes the dot product of two vectors representated in cartesian coordinates as CvPoint (x,y)
+ */
+int PointDot(CvPoint* VecA, CvPoint* VecB){
+	return (VecA->x)*(VecB->x) + (VecA->y)*(VecB->y);
+
+}
+
+
+/*
+ * Normalizes vectors representated in cartesian coordinates as CvPoint (x,y) and takes the cross product.
+ *
+ */
+float NormPointCross(CvPoint* VecA, CvPoint* VecB){
+	float Ax = (float) VecA->x;
+	float Ay = (float) VecA->y;
+	float Bx = (float) VecB->x;
+	float By = (float) VecB->y;
+	return (Ax*By -  Ay*Bx) / ( cvSqrt(Ax*Ax+Ay*Ay)*cvSqrt(Bx*Bx+By*By) ) ;
+
+}
+
+
+
+
+/*
+ * Normalizes two vectors representated in cartesian coordinates as
+ *  CvPoint (x,y) and returns their dot ptorduct.
+ */
+float NormPointDot(CvPoint* VecA, CvPoint* VecB){
+	float Ax = (float) VecA->x;
+	float Ay = (float) VecA->y;
+	float Bx = (float) VecB->x;
+	float By = (float) VecB->y;
+
+	return ( (Ax*Bx+Ay*By) /  ( cvSqrt(Ax*Ax+Ay*Ay)*cvSqrt(Bx*Bx+By*By) ) );
+
+}
 
 /*
  *
@@ -685,6 +697,45 @@ int sqDist(CvPoint pta, CvPoint ptb){
 float dist(CvPoint a, CvPoint b){
 	return ( sqrt( (float) sqDist(a,b))  );
 }
+
+
+
+
+
+/*******************************************************************************/
+/**************************** Working with cvContours ****************************/
+/*******************************************************************************/
+
+
+
+/*
+ * Given a list of contours, this finds the contour with the longest perimiter and points ContourOfInterst to this contour.
+ *
+ * Note this uses the same memory storage for the contourOfInterst, as that of the contour.
+*/
+void LongestContour(CvSeq* contours, CvSeq** ContourOfInterest){
+	CvSeq* biggestContour;
+	//printf("---Finding Longest Contour---\n");
+	int biggest=0;
+		for (contours; contours!=NULL; contours=contours->h_next){
+		//printf("%d elements\n",contours->total);
+		if (contours->total > biggest){
+			biggest=contours->total;
+			biggestContour=contours;
+			//printf("Currently the biggest!\n");
+		}
+	}
+	*ContourOfInterest=cvCloneSeq(biggestContour);
+}
+
+
+
+
+/*******************************************************************************/
+/**************************** Working with Polygon Contours****************************/
+/*******************************************************************************/
+
+
 
 /*
  *
@@ -816,6 +867,11 @@ int CvtPolySeq2ContourSeq(CvSeq* polygon, CvSeq* contour ){
 }
 
 
+/*******************************************************************************/
+/*******  Higher Level Feature Extraction with Sequence of Pts *****************/
+/*******************************************************************************/
+
+
 
 
 /*
@@ -929,10 +985,10 @@ CvPoint FindNormalPt(CvPoint* Centerline, CvPoint* CenterVec, CvSeq* Contour){
 
 
 
-/*
+/*********************************************************************
  *
  * Marc's Functions
- *
+ ***********************************************************************
  */
 
 /*void SegmentSides (const CvSeq *contourA, const CvSeq *contourB, const CvSeq *centerline, CvSeq *segmentedA, CvSeq *segmentedB) {
@@ -1156,7 +1212,7 @@ CvSeq *smoothPtSequence (const CvSeq *src, double sigma, CvMemStorage *mem) {
 
 
 
-/*** Testing Functions ***/
+/*** Testing Functions ****************************************************/
 /*
  * Check's to see if sequence exists
  * Exists=nonzero

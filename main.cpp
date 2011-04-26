@@ -222,7 +222,7 @@ int main (int argc, char** argv){
 			/** Handle head-tail illumination sweep **/
 			HandleIlluminationSweep(exp);
 
-			/** Real-Time Curvature Phase Analysis, and phase induced illumination **//
+			/** Real-Time Curvature Phase Analysis, and phase induced illumination **/
 			HandleCurvaturePhaseAnalysis(exp);
 
 			/** If the DLP is not displaying right now, than turn off the mirrors */

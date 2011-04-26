@@ -128,6 +128,7 @@ typedef struct WormAnalysisParamStruct{
 
 } WormAnalysisParam;
 
+/** These are computed and segmented information about the worm **/
 typedef struct SegmentedWormStruct{
 	CvSeq* Centerline;
 	CvSeq* LeftBound;
@@ -143,6 +144,8 @@ typedef struct SegmentedWormStruct{
 
 
 
+
+/** This is the image and the extracted data related to a worm at a single frame in time **/
 typedef struct WormImageAnalysisStruct{
 	CvSize SizeOfImage;
 
@@ -179,6 +182,15 @@ typedef struct WormImageAnalysisStruct{
 
 	//WormIlluminationData* Illum;
 }WormAnalysisData;
+
+
+
+typedef struct WormTimeEvolutionStruct{
+	/** Phase and Curvature Analysis **/
+	CvSeq* MeanHeadCurvatureBuffer;
+	double derivativeOfCurvature;
+	CvMemStorage* MemTimeEvolutionStorage;
+}WormTimeEvolution;
 
 
 

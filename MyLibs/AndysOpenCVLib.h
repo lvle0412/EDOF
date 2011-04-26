@@ -37,6 +37,9 @@
 #ifndef ANDYSOPENCVLIB_H_
 #define ANDYSOPENCVLIB_H_
 
+#define A_OK 0
+#define A_ERROR -1
+
 
 /*
  *
@@ -413,6 +416,14 @@ bool IntExists(int MyInt);
 int CropNumber(int max, int min, int x);
 
 
+/*
+ * A cvSeq can be used as a buffer. This function allows one to push an element
+ * onto the front of a cvSeq buffer.
+ *
+ * If the buffer is full, it automatically tosses the oldest
+ * element in the buffer.
+ */
+int cvSeqBufferPush(CvSeq* seq, void* element, int MaxBuffSize);
 
 #endif /* ANDYSOPENCVLIB_H_ */
 

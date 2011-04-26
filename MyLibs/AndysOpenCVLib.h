@@ -373,15 +373,15 @@ void RemoveSequentialDuplicatePoints (CvSeq *seq);
 
 
 //Marc's functions for convolution
-void ConvolveInt1D (const int *src, int *dst, int length, int *kernel, int klength, int normfactor);
-
-void ConvolveCvPtSeq (const CvSeq *src, CvSeq *dst, int *kernel, int klength, int normfactor);
-
-void CreateGaussianKernel (double sigma, int **kernel, int *klength, int *normfactor);
-
 
 CvSeq *smoothPtSequence (const CvSeq *src, double sigma, CvMemStorage *mem);
 
+
+/*
+ * Do a gaussian smooth on a CvSeq of CvPoints (int) and return a CvSeq of floats
+ * So that we can use non-integer values.
+ */
+CvSeq *smoothPtSequenceIntToFloat (const CvSeq *src, double sigma, CvMemStorage *mem);
 
 
 /**** Testing Functions ****/

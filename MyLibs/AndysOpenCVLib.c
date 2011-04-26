@@ -35,6 +35,8 @@
  *      Author: Andy
  */
 
+#include <math.h>
+
 #include <highgui.h>
 #include <cxcore.h>
 #include <stdio.h>
@@ -300,7 +302,7 @@ void DisplayOpenCVInstall(){
  * element in the buffer.
  */
 int cvSeqBufferPush(CvSeq* seq, void* element, int MaxBuffSize){
-	if (seq==0 || element==0 || MaxBuffSize==0) return A_error;
+	if (seq==0 || element==0 || MaxBuffSize==0) return A_ERROR;
 
 	/** push the value on **/
 	cvSeqPushFront(seq, element);
@@ -626,6 +628,8 @@ void resampleSeq(CvSeq* sequence, CvSeq* ResampledSeq, int Numsegments) {
 
 
 
+
+
 /*******************************************************************************/
 /**************************** Working with Points ******************************/
 /*******************************************************************************/
@@ -916,6 +920,31 @@ void FindCenterline(CvSeq* NBoundA, CvSeq* NBoundB, CvSeq* centerline) {
 
 }
 
+/*
+ * extractCurvatureOfSeq
+ *
+ *
+ * Find curvature at each point.
+ *
+ * seq is sequence of points.
+ * k is a sequence of doubles.
+ *
+ * Defined as difference in angle between adjacent tangent vectors.
+ * The curvature sequence has one less element than the original sequence.
+ *
+ */
+int extractCurvatureOfSeq(CvSeq* seq, CvSeq* k){
+	if (seq== NULL || k== NULL) return A_ERROR;
+	CvSeqReader reader;
+	CvSeqWriter writer;
+	cvStartReadSeq(seq, &reader, 0);
+	cvStartAppendToSeq(k, &writer);
+
+
+	return A_OK;
+}
+
+
 
 
 /*
@@ -1153,6 +1182,28 @@ void ConvolveInt1D (const int *src, int *dst, int length, int *kernel, int kleng
 	}
 }
 
+
+
+/* Does a 1D convolution
+ * on floats.
+ */
+void ConvolveFloat1D (const float *src, float *dst, int length, int *kernel, int klength, int normfactor) {
+	int j, k, ind;
+	float anchor, sum;
+	anchor = klength/2;
+	for (j = 0; j < length; j++) {
+		sum = 0;
+		for (k = 0; k < klength; k++) {
+			ind = j + k - anchor;
+			ind = ind > 0 ? ind : 0;
+			ind = ind < length ? ind : (length - 1);
+			sum = sum + src[ind]*kernel[k];
+		}
+		dst[j] = (float) (1.0*sum/normfactor + 0.5);
+	}
+}
+
+/* See ConvolveCvPtSeq32f for floats **/
 void ConvolveCvPtSeq (const CvSeq *src, CvSeq *dst, int *kernel, int klength, int normfactor) {
 	int j, *x, *y, *xc, *yc;
 	CvPoint pt;
@@ -1169,6 +1220,57 @@ void ConvolveCvPtSeq (const CvSeq *src, CvSeq *dst, int *kernel, int klength, in
 	ConvolveInt1D(x, xc, src->total, kernel, klength, normfactor);
 	ConvolveInt1D(y, yc, src->total, kernel, klength, normfactor);
 
+	for (j = 0; j < src->total; j++) {
+		pt.x = xc[j];
+		pt.y = yc[j];
+		cvSeqPush(dst, &pt);
+	}
+
+	free(x);
+	free(y);
+	free(xc);
+	free(yc);
+}
+
+/*
+ *  PRIVATE FUNCTION
+ * Convolves a CvPoint Sequence with a kernel.
+ *
+ *  Expects input CvSeq *src to have element type CvPoint (int).
+ *  Output is to CvSeq *dst which must have element type CvPoint2d32f (float).
+ */
+int ConvolveCvPtSeqInt2Float (const CvSeq *src, CvSeq *dst, int *kernel, int klength, int normfactor) {
+	if ( src==NULL || dst==NULL) return A_ERROR;
+	if (dst->elem_size != sizeof(CvPoint2D32f) ){
+		printf("Error in ConvolveCvPtSeqInt2Float. Destination CvSeq should have elements of size CvPoint2D32f");
+		return A_ERROR;
+	}
+
+	if (src->elem_size != sizeof(CvPoint) ){
+		printf("Error in ConvolveCvPtSeqInt2Float. Source CvSeq should have elements of size CvPoint");
+		return A_ERROR;
+	}
+
+
+	int j;
+	float *x, *y, *xc, *yc;
+	CvPoint2D32f pt;
+
+	x = (float *) malloc (src->total * sizeof(float));
+	y = (float *) malloc (src->total * sizeof(float));
+	xc = (float *) malloc (src->total * sizeof(float));
+	yc = (float *) malloc (src->total * sizeof(float));
+
+	/** Generate array of floats from inputs **/
+	for (j = 0; j < src->total; j++) {
+		x[j] = (float) ((CvPoint *) cvGetSeqElem(src, j))->x;
+		y[j] = (float) ((CvPoint *) cvGetSeqElem(src, j))->y;
+	}
+	/** Do convolution **/
+	ConvolveFloat1D(x, xc, src->total, kernel, klength, normfactor);
+	ConvolveFloat1D(y, yc, src->total, kernel, klength, normfactor);
+
+	/** Push result from convolution onto destination **/
 	for (j = 0; j < src->total; j++) {
 		pt.x = xc[j];
 		pt.y = yc[j];
@@ -1209,6 +1311,21 @@ CvSeq *smoothPtSequence (const CvSeq *src, double sigma, CvMemStorage *mem) {
 	free(kernel);
 	return dst;
 }
+
+
+/*
+ * Do a gaussian smooth on a CvSeq of CvPoints (int) and return a CvSeq of floats
+ * So that we can use non-integer values.
+ */
+CvSeq *smoothPtSequenceIntToFloat (const CvSeq *src, double sigma, CvMemStorage *mem) {
+	int *kernel, klength, normfactor;
+	CvSeq *dst = cvCreateSeq(CV_SEQ_ELTYPE_POINT, sizeof(CvSeq), sizeof(CvPoint2D32f), mem);
+	CreateGaussianKernel(sigma, &kernel, &klength, &normfactor);
+	ConvolveCvPtSeq(src, dst, kernel, klength, normfactor);
+	free(kernel);
+	return dst;
+}
+
 
 
 

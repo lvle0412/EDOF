@@ -944,6 +944,7 @@ int extractCurvatureOfSeq(const CvSeq* seq, double* curvature, double sigma,CvMe
 	/** Smooth the sequence **/
 	CvSeq* sseq=smoothPtSequenceIntToFloat(seq, sigma, mem);
 
+
 	int N=sseq->total;
 
 	double *x = (double *) malloc (N * sizeof(double));

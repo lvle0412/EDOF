@@ -165,13 +165,54 @@ int main(){
 
 
 	printf("Let's test curvature extraction.");
+	CvMemStorage* mem= cvCreateMemStorage();
 
-	printf(copyString("Hello you World\n"));
+
+	CvSeq* test=cvCreateSeq(CV_SEQ_ELTYPE_POINT, sizeof(CvSeq), sizeof(CvPoint),mem);
+
+	printf("Let's populate our test vector. \n");
+
+	cvSeqPush(test,(void*) &cvPoint(24,94));
+	cvSeqPush(test,(void*) &cvPoint(19,85));
+	cvSeqPush(test,(void*) &cvPoint(15,71));
+	cvSeqPush(test,(void*) &cvPoint(14,61));
+	cvSeqPush(test,(void*) &cvPoint(12,41));
+	cvSeqPush(test,(void*) &cvPoint(13,32));
+	cvSeqPush(test,(void*) &cvPoint(16,26));
+	cvSeqPush(test,(void*) &cvPoint(21,21));
+	cvSeqPush(test,(void*) &cvPoint(27,15));
+	cvSeqPush(test,(void*) &cvPoint(35,13));
+	cvSeqPush(test,(void*) &cvPoint(46,12));
+	cvSeqPush(test,(void*) &cvPoint(54,14));
+	cvSeqPush(test,(void*) &cvPoint(60,18));
+	cvSeqPush(test,(void*) &cvPoint(64,21));
+	cvSeqPush(test,(void*) &cvPoint(75,31));
+	cvSeqPush(test,(void*) &cvPoint(81,37));
+
+	printf("test->total=%d\n",test->total);
+	double* curvature= (double*) malloc((test->total - 2)* (sizeof(double)));
+
+	double sigma=0.5;
+	extractCurvatureOfSeq(test,curvature,sigma,mem);
+
+
+	int k=0;
+	for (k=0; k< test->total - 2; k++){
+		printf("curvature[%d] = %f\n",k,curvature[k]);
+	}
+
+	printf("yo");
+
+
+	return 0;
+
+
+
 
 	printf("Points between line test\n");
-	CvMemStorage* mem= cvCreateMemStorage();
-	CvSeq* test=cvCreateSeq(CV_SEQ_ELTYPE_POINT, sizeof(CvSeq), sizeof(CvPoint),mem);
-	GetLineFromEndPts(cvPoint(0,0),cvPoint(10,15),test);
+//	CvMemStorage* mem= cvCreateMemStorage();
+//	CvSeq* test=cvCreateSeq(CV_SEQ_ELTYPE_POINT, sizeof(CvSeq), sizeof(CvPoint),mem);
+//	GetLineFromEndPts(cvPoint(0,0),cvPoint(10,15),test);
 	return 0;
 
 	CvMemStorage* MyMem= cvCreateMemStorage();
@@ -214,7 +255,7 @@ int main(){
 	printf("ShowImage\n");
 	cvNamedWindow("RectWorm");
 	cvShowImage("RectWorm",rectWorm);
-	int k;
+//	int k;
 	for (k = 0; k < protocol2->Steps->total; ++k) {
 		printf("====Step Number %d====\n",k);
 		cvZero(rectWorm);

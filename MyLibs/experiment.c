@@ -468,7 +468,7 @@ int HandleCurvaturePhaseAnalysis(Experiment* exp){
 	/** Otherwise Let's Calculate the Mean Curvature of the Head**/
 
 	/** Smoothing parameter**/
-	double sigma=0.5;
+	double sigma=5;
 
 	/** Define the head in worm coordinates **/
 	int HEAD_BEGIN=10;
@@ -478,6 +478,11 @@ int HandleCurvaturePhaseAnalysis(Experiment* exp){
 	CvSeq* headcent=cvSeqSlice(exp->Worm->Segmented->Centerline,cvSlice(HEAD_BEGIN,HEAD_END));
 	int N=headcent->total - 2;
 
+	printf("Whole Centerline :\n");
+	printSeq(exp->Worm->Segmented->Centerline);
+	printf("Just the Head:\n");
+	printSeq(headcent);
+
 	/** Extract the curvature of the head **/
 	double* curvature= (double*) malloc(N* (sizeof(double)));
 	RefreshWormMemStorage(exp->Worm);
@@ -486,15 +491,20 @@ int HandleCurvaturePhaseAnalysis(Experiment* exp){
 
 	printDoubleArr(curvature,N);
 
-	/** Calculate Mean Curvature **/
-	printf("sum of curvature N=%d: %f\n",N,SumDoubleArray(curvature, N));
+	/** Calculate Median Curvature **/
 
 
-	double mean_curvature=SumDoubleArray(curvature, N) / ((double) N);
-	printf("mean_curvature*100=%f\n",mean_curvature* (double) 100);
+
+	double median_curvature=MedianOfDoubleArr(curvature,N);
+	printf("median_curvature*100=%f\n",median_curvature* (double) 100);
+
+
+	return A_OK;
+	/***************** IGNORED *********************/
 	printf("About to add the mean head curvature to the buffer.\n");
 	/** Store Mean head curvature in buffer that includes mean head curvatures from previous 20 frames**/
-	AddMeanHeadCurvature(exp->Worm->TimeEvolution,mean_curvature,exp->Params);
+	AddMeanHeadCurvature(exp->Worm->TimeEvolution,median_curvature,exp->Params);
+
 
 	printf("About to calculate the derivative of the mean head curvature.\n");
 	/** Calculate the derivative of the mean head curvature with respect to time **/

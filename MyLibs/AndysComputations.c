@@ -45,6 +45,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 
 #include "AndysComputations.h"
@@ -220,6 +221,29 @@ void mean_derivative(double *x, double *x_dot, int n)
     delta=n*s_xx-s_x*s_x;
     *x_dot=(n*s_xy-s_x*s_y)/delta;  /*using linear fit to find the slope x_dot */
 
+}
+
+/*
+ * Simple comparer for finding median
+ */
+int compareDouble (const void * a, const void * b)
+{
+  return (int) ( *(double*)a - *(double*)b );
+}
+
+
+/*
+ *get the median of an array of doubles
+ *uses qsort under the hood
+ */
+double MedianOfDoubleArr(const double* arr, int N){
+
+	double* temp=(double*) malloc(N*sizeof(double));
+	memcpy(temp,arr,N*sizeof(double));
+	qsort(temp, N, sizeof(arr[0]), compareDouble);
+	double result= temp[N/2];
+	free(temp);
+	return result;
 }
 
 

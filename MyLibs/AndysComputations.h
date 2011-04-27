@@ -150,4 +150,10 @@ void mean_derivative(double *x, double *x_dot, int n);
  * with N elements
  */
 void printDoubleArr(const double* arr, int N);
+
+/*
+ *get the median of an array of doubles
+ *uses qsort under the hood
+ */
+double MedianOfDoubleArr(const double* arr, int N);
 #endif /* ANDYSCOMPUTATIONS_H_ */

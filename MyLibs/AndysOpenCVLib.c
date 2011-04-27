@@ -371,6 +371,18 @@ void printSeq(CvSeq* Seq){
 }
 
 /*
+ * Print sequences of double points (CvPoint2D64f)
+ */
+void printSeqDouble(CvSeq* Seq){
+	int i;
+	for (i = 0; i < Seq->total; i++) {
+		CvPoint2D64f* tempPt = (CvPoint2D64f*) cvGetSeqElem(Seq, i);
+		printf("%d: ( %f, %f)\n",i,tempPt->x,tempPt->y);
+	}
+}
+
+
+/*
  * Converts a CvSeq of doubles into an array.
  * Allocates memory for the array.
  */
@@ -947,6 +959,74 @@ void FindCenterline(CvSeq* NBoundA, CvSeq* NBoundB, CvSeq* centerline) {
 
 }
 
+
+/*
+ * extractCurvatureOfSeq
+ *
+ * No Smoothing.
+ * Find curvature at each point.
+ *
+ * seq is sequence of double points, CvPoint2D64f (double)
+ * k is an array of doubles. with two less element than CvPoint.
+ *
+ * Defined as difference in angle between adjacent tangent vectors.
+ * The curvature sequence has one less element than the original sequence.
+ *
+ * Sigma is the size of the gaussian kernal.
+ *
+ */
+int extractCurvatureOfSeqDouble(const CvSeq* seq, double* curvature, double sigma,CvMemStorage* mem){
+
+	int DEBUG_FLAG=1;
+
+	if (seq== NULL || curvature == NULL) return A_ERROR;
+
+	/** Smooth the sequence **/
+//	CvSeq* sseq=smoothPtSequenceIntToDouble(seq, sigma, mem);
+	const CvSeq* sseq= seq;
+	int N=sseq->total;
+
+	double *x = (double *) malloc (N * sizeof(double));
+	double *y = (double *) malloc (N * sizeof(double));
+
+	double *diff_x = (double *) malloc( (N-1) * sizeof(double));  /* difference of adjacent x coordinate */
+	double *diff_y = (double *) malloc( (N-1)* sizeof(double)); /* difference of adjacent y coordinate */
+	double *theta = (double *) malloc( (N-1) * sizeof(double)); /* angle of the tangent vector */
+
+
+	double *k= (double *) malloc( (N-2) * sizeof(double));
+
+
+	/** Generate array of floats from inputs **/
+	int j;
+	for (j = 0; j < N; j++) {
+		x[j] = (double) ((CvPoint2D64f *) cvGetSeqElem(sseq, j))->x;
+		y[j] = (double) ((CvPoint2D64f *) cvGetSeqElem(sseq, j))->y;
+		if (DEBUG_FLAG) printf("Double %d: ( %f , %f)\n",j,x[j],y[j]);
+	}
+
+	/** Calculate tangent vectors **/
+     int i;
+	 for (i=0;i< N-1;i++){
+		 *(diff_x+i) = *(x+i+1)-*(x+i);
+		 *(diff_y+i) = *(y+i+1)-*(y+i);
+		 if (DEBUG_FLAG) printf("Diff %d: %f, %f\n",i, *(diff_x+i), *(diff_y+i));
+		 *(theta+i) = atan2(-*(diff_y+i),*(diff_x+i)); /* calculate the angle of tangent vector */
+		 }
+
+	 for (i=0; i<N-2; i++){
+		 *(k+i)=*(theta+i+1)-*(theta+i); /* calculate the curvature */
+		 if (DEBUG_FLAG) printf("k[%d] = %f\n",i,k[i]);
+	 }
+
+	memcpy((void*) curvature ,(const void*) k, (N-2)*sizeof(double) );
+
+	free(k);
+	free(x);
+	free(y);
+	return A_OK;
+}
+
 /*
  * extractCurvatureOfSeq
  *
@@ -969,10 +1049,12 @@ int extractCurvatureOfSeq(const CvSeq* seq, double* curvature, double sigma,CvMe
 	if (seq== NULL || curvature == NULL) return A_ERROR;
 	if (seq->elem_size!=sizeof(CvPoint)) return A_ERROR;
 
+	printf("Before smoothing:\n");
+	printSeq((CvSeq*)seq);
 	/** Smooth the sequence **/
-	CvSeq* sseq=smoothPtSequenceIntToFloat(seq, sigma, mem);
-
-
+	CvSeq* sseq=smoothPtSequenceIntToDouble(seq, sigma, mem);
+	printf("After smoothing:\n");
+	printSeqDouble(sseq);
 	int N=sseq->total;
 
 	double *x = (double *) malloc (N * sizeof(double));
@@ -989,8 +1071,8 @@ int extractCurvatureOfSeq(const CvSeq* seq, double* curvature, double sigma,CvMe
 	/** Generate array of floats from inputs **/
 	int j;
 	for (j = 0; j < N; j++) {
-		x[j] = (double) ((CvPoint2D32f *) cvGetSeqElem(sseq, j))->x;
-		y[j] = (double) ((CvPoint2D32f *) cvGetSeqElem(sseq, j))->y;
+		x[j] = (double) ((CvPoint2D64f *) cvGetSeqElem(sseq, j))->x;
+		y[j] = (double) ((CvPoint2D64f *) cvGetSeqElem(sseq, j))->y;
 		if (DEBUG_FLAG) printf("Double %d: ( %f , %f)\n",j,x[j],y[j]);
 	}
 
@@ -1276,6 +1358,27 @@ void ConvolveFloat1D (const float *src, float *dst, int length, int *kernel, int
 	}
 }
 
+/* Does a 1D convolution
+ * on doubles.
+ */
+void ConvolveDouble1D (const double *src, double *dst, int length, int *kernel, int klength, int normfactor) {
+	int j, k, ind;
+	int anchor;
+	double sum;
+	anchor = klength/2;
+	for (j = 0; j < length; j++) {
+		sum = 0;
+		for (k = 0; k < klength; k++) {
+			ind = j + k - anchor;
+			ind = ind > 0 ? ind : 0;
+			ind = ind < length ? ind : (length - 1);
+			sum = sum + src[ind]*kernel[k];
+		}
+		dst[j] = (double) (1.0*sum/normfactor + 0.5);
+	}
+}
+
+
 /* See ConvolveCvPtSeq32f for floats **/
 void ConvolveCvPtSeq (const CvSeq *src, CvSeq *dst, int *kernel, int klength, int normfactor) {
 	int j, *x, *y, *xc, *yc;
@@ -1312,36 +1415,36 @@ void ConvolveCvPtSeq (const CvSeq *src, CvSeq *dst, int *kernel, int klength, in
  *  Expects input CvSeq *src to have element type CvPoint (int).
  *  Output is to CvSeq *dst which must have element type CvPoint2d32f (float).
  */
-int ConvolveCvPtSeqInt2Float (const CvSeq *src, CvSeq *dst, int *kernel, int klength, int normfactor) {
+int ConvolveCvPtSeqInt2Double (const CvSeq *src, CvSeq *dst, int *kernel, int klength, int normfactor) {
 	if ( src==NULL || dst==NULL) return A_ERROR;
-	if (dst->elem_size != sizeof(CvPoint2D32f) ){
-		printf("Error in ConvolveCvPtSeqInt2Float. Destination CvSeq should have elements of size CvPoint2D32f");
+	if (dst->elem_size != sizeof(CvPoint2D64f) ){
+		printf("Error in ConvolveCvPtSeqInt2Double. Destination CvSeq should have elements of size CvPoint2D32f");
 		return A_ERROR;
 	}
 
 	if (src->elem_size != sizeof(CvPoint) ){
-		printf("Error in ConvolveCvPtSeqInt2Float. Source CvSeq should have elements of size CvPoint");
+		printf("Error in ConvolveCvPtSeqInt2Double. Source CvSeq should have elements of size CvPoint");
 		return A_ERROR;
 	}
 
 
 	int j;
-	float *x, *y, *xc, *yc;
-	CvPoint2D32f pt;
+	double *x, *y, *xc, *yc;
+	CvPoint2D64f pt;
 
-	x = (float *) malloc (src->total * sizeof(float));
-	y = (float *) malloc (src->total * sizeof(float));
-	xc = (float *) malloc (src->total * sizeof(float));
-	yc = (float *) malloc (src->total * sizeof(float));
+	x = (double*) malloc (src->total * sizeof(double));
+	y = (double *) malloc (src->total * sizeof(double));
+	xc = (double *) malloc (src->total * sizeof(double));
+	yc = (double *) malloc (src->total * sizeof(double));
 
 	/** Generate array of floats from inputs **/
 	for (j = 0; j < src->total; j++) {
-		x[j] = (float) ((CvPoint *) cvGetSeqElem(src, j))->x;
-		y[j] = (float) ((CvPoint *) cvGetSeqElem(src, j))->y;
+		x[j] = (double) ((CvPoint *) cvGetSeqElem(src, j))->x;
+		y[j] = (double) ((CvPoint *) cvGetSeqElem(src, j))->y;
 	}
 	/** Do convolution **/
-	ConvolveFloat1D(x, xc, src->total, kernel, klength, normfactor);
-	ConvolveFloat1D(y, yc, src->total, kernel, klength, normfactor);
+	ConvolveDouble1D(x, xc, src->total, kernel, klength, normfactor);
+	ConvolveDouble1D(y, yc, src->total, kernel, klength, normfactor);
 
 	/** Push result from convolution onto destination **/
 	for (j = 0; j < src->total; j++) {
@@ -1387,18 +1490,17 @@ CvSeq *smoothPtSequence (const CvSeq *src, double sigma, CvMemStorage *mem) {
 
 
 /*
- * Do a gaussian smooth on a CvSeq of CvPoints (int) and return a CvSeq of floats
+ * Do a gaussian smooth on a CvSeq of CvPoints (int) and return a CvSeq of 64 bit floats (doubles)
  * So that we can use non-integer values.
  */
-CvSeq *smoothPtSequenceIntToFloat (const CvSeq *src, double sigma, CvMemStorage *mem) {
+CvSeq *smoothPtSequenceIntToDouble (const CvSeq *src, double sigma, CvMemStorage *mem) {
 	int *kernel, klength, normfactor;
-	CvSeq *dst = cvCreateSeq(CV_SEQ_ELTYPE_POINT, sizeof(CvSeq), sizeof(CvPoint2D32f), mem);
+	CvSeq *dst = cvCreateSeq(0, sizeof(CvSeq), sizeof(CvPoint2D64f), mem);
 	CreateGaussianKernel(sigma, &kernel, &klength, &normfactor);
-	ConvolveCvPtSeqInt2Float(src, dst, kernel, klength, normfactor);
+	ConvolveCvPtSeqInt2Double(src, dst, kernel, klength, normfactor);
 	free(kernel);
 	return dst;
 }
-
 
 
 

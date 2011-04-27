@@ -381,7 +381,7 @@ CvSeq *smoothPtSequence (const CvSeq *src, double sigma, CvMemStorage *mem);
  * Do a gaussian smooth on a CvSeq of CvPoints (int) and return a CvSeq of floats
  * So that we can use non-integer values.
  */
-CvSeq *smoothPtSequenceIntToFloat (const CvSeq *src, double sigma, CvMemStorage *mem);
+CvSeq *smoothPtSequenceIntToDouble(const CvSeq *src, double sigma, CvMemStorage *mem);
 
 
 
@@ -403,6 +403,22 @@ CvSeq *smoothPtSequenceIntToFloat (const CvSeq *src, double sigma, CvMemStorage 
 int extractCurvatureOfSeq(const CvSeq* seq, double* curvature, double sigma,CvMemStorage* mem);
 
 
+/*
+ * extractCurvatureOfSeq
+ *
+ *
+ * Find curvature at each point.
+ *
+ * seq is sequence of double points, CvPoint2D64f (double)
+ * k is an array of doubles. with two less element than CvPoint.
+ *
+ * Defined as difference in angle between adjacent tangent vectors.
+ * The curvature sequence has one less element than the original sequence.
+ *
+ * Sigma is the size of the gaussian kernal.
+ *
+ */
+int extractCurvatureOfSeqDouble(const CvSeq* seq, double* curvature, double sigma,CvMemStorage* mem);
 
 /**** Testing Functions ****/
 
@@ -451,6 +467,11 @@ int PushToSeqBuffer(CvSeq* seq, void* element, int MaxBuffSize);
  */
 
 void printSeq(CvSeq* Seq);
+
+/*
+ * Print sequences of double points (CvPoint2D64f)
+ */
+void printSeqDouble(CvSeq* Seq);
 
 /*
  * Converts a CvSeq of doubles into an array.

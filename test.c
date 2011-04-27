@@ -60,6 +60,7 @@ using namespace std;
 
 //Andy's Headers
 #include "MyLibs/AndysOpenCvLib.h"
+#include "MyLibs/AndysComputations.h"
 #include "MyLibs/WormAnalysis.h"
 #include "MyLibs/IllumWormProtocol.h"
 #include "MyLibs/version.h"
@@ -158,55 +159,70 @@ Protocol* CreateTestProtocol(char* name){
 
 
 
+CvPoint2D64f cvPointDouble(double x, double y){
+	CvPoint2D64f p;
+	p.x=x;
+	p.y=y;
+	return p;
+
+}
+
 
 int main(){
 
 	//char* name = (char*) malloc(sizeof(char)*50);
 
+	printf("test our median function\n");
+
+	double arr[]={5, 5, 5, 10, 4, 6, 34, 3, 2, 5};
+
+	double med=MedianOfDoubleArr(arr,10);
+	printf("med=%f\n",med);
 
 	printf("Let's test curvature extraction.");
 	CvMemStorage* mem= cvCreateMemStorage();
 
 
-	CvSeq* test=cvCreateSeq(CV_SEQ_ELTYPE_POINT, sizeof(CvSeq), sizeof(CvPoint),mem);
+	CvSeq* test=cvCreateSeq(0, sizeof(CvSeq), sizeof(CvPoint2D64f),mem);
 
 	printf("Let's populate our test vector. \n");
 
-	cvSeqPush(test,(void*) &cvPoint(18,85));
-	cvSeqPush(test,(void*) &cvPoint(21,87));
-	cvSeqPush(test,(void*) &cvPoint(25,88));
-	cvSeqPush(test,(void*) &cvPoint(28,88));
-	cvSeqPush(test,(void*) &cvPoint(30,88));
-	cvSeqPush(test,(void*) &cvPoint(32,87));
-	cvSeqPush(test,(void*) &cvPoint(35,86));
-	cvSeqPush(test,(void*) &cvPoint(37,84));
-	cvSeqPush(test,(void*) &cvPoint(38,82));
-	cvSeqPush(test,(void*) &cvPoint(38,81));
-	cvSeqPush(test,(void*) &cvPoint(38,81));
-	cvSeqPush(test,(void*) &cvPoint(39,77));
-	cvSeqPush(test,(void*) &cvPoint(39,77));
-	cvSeqPush(test,(void*) &cvPoint(40,75));
-	cvSeqPush(test,(void*) &cvPoint(42,74));
-	cvSeqPush(test,(void*) &cvPoint(43,72));
-	cvSeqPush(test,(void*) &cvPoint(45,70));
-	cvSeqPush(test,(void*) &cvPoint(47,68));
-	cvSeqPush(test,(void*) &cvPoint(48,66));
-	cvSeqPush(test,(void*) &cvPoint(50,63));
-	cvSeqPush(test,(void*) &cvPoint(51,62));
-	cvSeqPush(test,(void*) &cvPoint(54,58));
-	cvSeqPush(test,(void*) &cvPoint(56,55));
-	cvSeqPush(test,(void*) &cvPoint(59,52));
-	cvSeqPush(test,(void*) &cvPoint(61,48));
-	cvSeqPush(test,(void*) &cvPoint(63,46));
+	cvSeqPush(test,(void*) &cvPointDouble((double)446.222200,(double) 443.888900));
+	cvSeqPush(test,(void*) &cvPointDouble(449.333300,444.333300));
+	cvSeqPush(test,(void*) &cvPointDouble(452.444400,444.555600));
+	cvSeqPush(test,(void*) &cvPointDouble(455.555600,444.888900));
+	cvSeqPush(test,(void*) &cvPointDouble(458.666700,445.111100));
+	cvSeqPush(test,(void*) &cvPointDouble(461.777800,445.222200));
+	cvSeqPush(test,(void*) &cvPointDouble(464.888900,445.333300));
+	cvSeqPush(test,(void*) &cvPointDouble(468.000000,445.222200));
+	cvSeqPush(test,(void*) &cvPointDouble(471.000000,445.000000));
+	cvSeqPush(test,(void*) &cvPointDouble(474.000000,444.555600));
+	cvSeqPush(test,(void*) &cvPointDouble(477.000000,444.000000));
+	cvSeqPush(test,(void*) &cvPointDouble(480.000000,443.444400));
+	cvSeqPush(test,(void*) &cvPointDouble(482.888900,442.555600));
+	cvSeqPush(test,(void*) &cvPointDouble(485.777800,441.555600));
+	cvSeqPush(test,(void*) &cvPointDouble(488.555600,440.333300));
+	cvSeqPush(test,(void*) &cvPointDouble(491.333300,438.777800));
+	cvSeqPush(test,(void*) &cvPointDouble(494.000000,437.111100));
+	cvSeqPush(test,(void*) &cvPointDouble(496.555600,435.333300));
+	cvSeqPush(test,(void*) &cvPointDouble(499.000000,433.444400));
+	cvSeqPush(test,(void*) &cvPointDouble(501.333300,431.333300));
+	cvSeqPush(test,(void*) &cvPointDouble(503.555600,429.111100));
 
-	printSeq(test);
+	printSeqDouble(test);
 
 	printf("test->total=%d\n",test->total);
-	double* curvature= (double*) malloc((test->total - 2)* (sizeof(double)));
-
+	int N=test->total-2;
+	double* curvature= (double*) malloc(N* (sizeof(double)));
 	double sigma=0.5;
-	extractCurvatureOfSeq(test,curvature,sigma,mem);
+	printf("Extracting Curvature\n");
+	extractCurvatureOfSeqDouble(test,curvature,sigma,mem);
 
+	printf("Curvature array:\n");
+	printDoubleArr(curvature,N);
+
+	double mean_curvature= SumDoubleArray((const double*) curvature, N) / ((double) N);
+	printf("Mean Curvature=%f",mean_curvature);
 
 	int k=0;
 

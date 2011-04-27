@@ -121,7 +121,7 @@ API_Linker_Command= -Lbin -lmc_api
 
 mylibraries=  version.o AndysComputations.o $(API_DLL_dir)/mc_api.dll Talk2DLP.o Talk2Camera.o Talk2FrameGrabber.o AndysOpenCVLib.o Talk2Matlab.o TransformLib.o IllumWormProtocol.o
 WormSpecificLibs= WormAnalysis.o WriteOutWorm.o experiment.o 
-
+myOpenCVlibraries=AndysComputations.o AndysOpenCVLib.o WormAnalysis.o
 
 
 #3rd party statically linked objects

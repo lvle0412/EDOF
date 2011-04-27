@@ -356,6 +356,18 @@ CvPoint  GetMedianOfPoints(CvSeq* seq){
 }
 
 
+/*
+ * Print out a sequence of CvPoints to stdout
+ * expects int's
+ */
+
+void printSeq(CvSeq* Seq){
+	int i;
+	for (i = 0; i < Seq->total; i++) {
+		CvPoint* tempPt = (CvPoint*) cvGetSeqElem(Seq, i);
+		printf("%d: ( %d, %d)\n",i,tempPt->x,tempPt->y);
+	}
+}
 
 /* Function Draws a Sequence of CvPoint's with little circles.
  * This function uses only a sequence and an image.
@@ -937,6 +949,7 @@ void FindCenterline(CvSeq* NBoundA, CvSeq* NBoundB, CvSeq* centerline) {
  */
 int extractCurvatureOfSeq(const CvSeq* seq, double* curvature, double sigma,CvMemStorage* mem){
 
+	int DEBUG_FLAG=1;
 
 	if (seq== NULL || curvature == NULL) return A_ERROR;
 	if (seq->elem_size!=sizeof(CvPoint)) return A_ERROR;
@@ -963,6 +976,7 @@ int extractCurvatureOfSeq(const CvSeq* seq, double* curvature, double sigma,CvMe
 	for (j = 0; j < N; j++) {
 		x[j] = (double) ((CvPoint2D32f *) cvGetSeqElem(sseq, j))->x;
 		y[j] = (double) ((CvPoint2D32f *) cvGetSeqElem(sseq, j))->y;
+		if (DEBUG_FLAG) printf("Double %d: ( %f , %f)\n",j,x[j],y[j]);
 	}
 
 	/** Calculate tangent vectors **/
@@ -970,11 +984,13 @@ int extractCurvatureOfSeq(const CvSeq* seq, double* curvature, double sigma,CvMe
 	 for (i=0;i< N-1;i++){
 		 *(diff_x+i) = *(x+i+1)-*(x+i);
 		 *(diff_y+i) = *(y+i+1)-*(y+i);
+		 if (DEBUG_FLAG) printf("Diff %d: %f, %f\n",i, *(diff_x+i), *(diff_y+i));
 		 *(theta+i) = atan2(-*(diff_y+i),*(diff_x+i)); /* calculate the angle of tangent vector */
 		 }
 
 	 for (i=0; i<N-2; i++){
 		 *(k+i)=*(theta+i+1)-*(theta+i); /* calculate the curvature */
+		 if (DEBUG_FLAG) printf("k[%d] = %f\n",i,k[i]);
 	 }
 
 	memcpy ((void*) curvature ,(void*) k, sizeof( (N-2)*sizeof(double) ));

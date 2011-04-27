@@ -189,6 +189,8 @@ int main(){
 	cvSeqPush(test,(void*) &cvPoint(75,31));
 	cvSeqPush(test,(void*) &cvPoint(81,37));
 
+	printSeq(test);
+
 	printf("test->total=%d\n",test->total);
 	double* curvature= (double*) malloc((test->total - 2)* (sizeof(double)));
 
@@ -197,6 +199,7 @@ int main(){
 
 
 	int k=0;
+
 	for (k=0; k< test->total - 2; k++){
 		printf("curvature[%d] = %f\n",k,curvature[k]);
 	}

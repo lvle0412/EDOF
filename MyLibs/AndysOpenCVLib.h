@@ -445,6 +445,13 @@ int CropNumber(int max, int min, int x);
  */
 int cvSeqBufferPush(CvSeq* seq, void* element, int MaxBuffSize);
 
+/*
+ * Print out a sequence of CvPoints to stdout
+ * expects int's
+ */
+
+void printSeq(CvSeq* Seq);
+
 #endif /* ANDYSOPENCVLIB_H_ */
 
 

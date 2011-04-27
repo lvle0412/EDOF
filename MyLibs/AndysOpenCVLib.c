@@ -302,16 +302,17 @@ void DisplayOpenCVInstall(){
  * element in the buffer.
  */
 int PushToSeqBuffer(CvSeq* seq, void* element, int MaxBuffSize){
-	if (seq==0 || element==0 || MaxBuffSize==0) return A_ERROR;
+	if (seq==0 || element==0 || MaxBuffSize<1) return A_ERROR;
 
 	/** push the value on **/
 	cvSeqPushFront(seq, element);
 
 	/** if full, pop off the last value **/
 	void* popped_pt;
-    if(seq->total > MaxBuffSize){
-    	cvSeqPop(seq, popped_pt);
-    }
+	do {
+		cvSeqPop(seq, popped_pt);
+	} while (seq->total > MaxBuffSize);
+
 	return A_OK;
 }
 

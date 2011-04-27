@@ -458,7 +458,15 @@ int DestroyWormTimeEvolution(WormTimeEvolution** TimeEvolution){
 
 int AddMeanHeadCurvature(WormTimeEvolution* TimeEvolution, double CurrHeadCurvature, WormAnalysisParam* AnalysisParam){
 	if (TimeEvolution==NULL || AnalysisParam==NULL) return A_ERROR;
-	PushToSeqBuffer(TimeEvolution->MeanHeadCurvatureBuffer,(void*) &CurrHeadCurvature,AnalysisParam->CurvaturePhaseNumFrames);
+
+	int MaxBuff;
+	if (AnalysisParam->CurvaturePhaseNumFrames>0){
+		MaxBuff=AnalysisParam->CurvaturePhaseNumFrames;
+	}else{
+		MaxBuff=1;
+	}
+
+	PushToSeqBuffer(TimeEvolution->MeanHeadCurvatureBuffer,(void*) &CurrHeadCurvature,MaxBuff);
 	return A_OK;
 }
 

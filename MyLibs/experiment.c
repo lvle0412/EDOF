@@ -484,13 +484,19 @@ int HandleCurvaturePhaseAnalysis(Experiment* exp){
 	if (extractCurvatureOfSeq( headcent,curvature,sigma,exp->Worm->MemScratchStorage)< 0) return EXP_ERROR;
 	RefreshWormMemStorage(exp->Worm);
 
+	printDoubleArr(curvature,N);
 
 	/** Calculate Mean Curvature **/
-	double mean_curvature=SumDoubleArray(curvature, N) / ((double) N);
+	printf("mean curv N=%d: %f\n",N-1,SumDoubleArray(curvature, N-1));
 
+
+	double mean_curvature=SumDoubleArray(curvature, N) / ((double) N);
+	printf("mean_curvature=%f\n",mean_curvature);
+	printf("About to add the mean head curvature to the buffer.\n");
 	/** Store Mean head curvature in buffer that includes mean head curvatures from previous 20 frames**/
 	AddMeanHeadCurvature(exp->Worm->TimeEvolution,mean_curvature,exp->Params);
 
+	printf("About to calculate the derivative of the mean head curvature.\n");
 	/** Calculate the derivative of the mean head curvature with respect to time **/
 	double* headPhaseBuff=NULL;
 	SeqDoublesToArr(exp->Worm->TimeEvolution->MeanHeadCurvatureBuffer,headPhaseBuff);

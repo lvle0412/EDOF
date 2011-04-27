@@ -187,11 +187,11 @@ int SmallerOf(int a, int b){
 }
 
 /* Sum over an array of N doubles */
-double SumDoubleArray(double* arr,int N){
+double SumDoubleArray(const double* arr,int N){
 	int k;
-	double s;
+	double s=0;
 	for (k = 0; k < N; ++k) {
-		s=s+arr[k];
+		s+=arr[k];
 	}
 	return s;
 }
@@ -220,4 +220,16 @@ void mean_derivative(double *x, double *x_dot, int n)
     delta=n*s_xx-s_x*s_x;
     *x_dot=(n*s_xy-s_x*s_y)/delta;  /*using linear fit to find the slope x_dot */
 
+}
+
+
+/*
+ * Print out the values of a double array
+ * with N elements
+ */
+void printDoubleArr(const double* arr, int N){
+	int i;
+	for (i = 0; i < N; ++i) {
+		printf("%d: %f\n",i,arr[i]);
+	}
 }

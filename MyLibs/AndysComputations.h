@@ -133,7 +133,7 @@ int LargerOf(int a, int b);
 int SmallerOf(int a, int b);
 
 /* Sum over an array of N doubles */
-double SumDoubleArray(double* arr,int N);
+double SumDoubleArray(const double* arr,int N);
 
 /*
  * Returns the mean derivative of a series of values in buffer x
@@ -144,4 +144,10 @@ double SumDoubleArray(double* arr,int N);
  * Written by Quan Wen
  */
 void mean_derivative(double *x, double *x_dot, int n);
+
+/*
+ * Print out the values of a double array
+ * with N elements
+ */
+void printDoubleArr(const double* arr, int N);
 #endif /* ANDYSCOMPUTATIONS_H_ */

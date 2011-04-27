@@ -296,7 +296,7 @@ WormAnalysisParam* CreateWormAnalysisParam(){
 	ParamPtr->BlueLaser=-1;
 
 	/** Real Time Curvature Analysis **/
-	ParamPtr->CurvatureAnalyzeOn = 0;
+	ParamPtr->CurvatureAnalyzeOn = 1;
 
 	/** Trigger Illumination Based on Phase of Curvature **/
 	int CurvaturePhaseTriggerOn = 0;
@@ -446,9 +446,7 @@ WormTimeEvolution* CreateWormTimeEvolution(){
 
 	/*** Setup Memory storage ***/
 	TimeEv->MemTimeEvolutionStorage=cvCreateMemStorage(0);
-	printf("ping!\n");
 	TimeEv->MeanHeadCurvatureBuffer=cvCreateSeq(0,sizeof(CvSeq),sizeof(double),TimeEv->MemTimeEvolutionStorage);
-	printf("pong!\n");
 	TimeEv->derivativeOfHeadCurvature=0;
 
 	return TimeEv;

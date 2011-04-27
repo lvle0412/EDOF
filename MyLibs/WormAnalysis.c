@@ -111,6 +111,9 @@ WormAnalysisData* CreateWormAnalysisDataStruct(){
 	/*** Create Segmented Worm Object ***/
 	WormPtr->Segmented= CreateSegmentedWormStruct();
 
+	/** Create Time Evolution Worm Object **/
+	WormPtr->TimeEvolution= CreateWormTimeEvolution();
+
 	/** Position on plate information **/
 	WormPtr->stageVelocity=cvPoint(0,0);
 
@@ -132,6 +135,7 @@ void DestroyWormAnalysisDataStruct(WormAnalysisData* Worm){
 	cvReleaseMemStorage(&((Worm)->MemScratchStorage));
 	cvReleaseMemStorage(&((Worm)->MemStorage));
 	free((Worm)->Segmented);
+	DestroyWormTimeEvolution(&(Worm->TimeEvolution));
 	free(Worm);
 	Worm=NULL;
 }

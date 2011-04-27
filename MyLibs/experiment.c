@@ -487,11 +487,11 @@ int HandleCurvaturePhaseAnalysis(Experiment* exp){
 	printDoubleArr(curvature,N);
 
 	/** Calculate Mean Curvature **/
-	printf("mean curv N=%d: %f\n",N-1,SumDoubleArray(curvature, N-1));
+	printf("sum of curvature N=%d: %f\n",N,SumDoubleArray(curvature, N));
 
 
 	double mean_curvature=SumDoubleArray(curvature, N) / ((double) N);
-	printf("mean_curvature=%f\n",mean_curvature);
+	printf("mean_curvature*100=%f\n",mean_curvature* (double) 100);
 	printf("About to add the mean head curvature to the buffer.\n");
 	/** Store Mean head curvature in buffer that includes mean head curvatures from previous 20 frames**/
 	AddMeanHeadCurvature(exp->Worm->TimeEvolution,mean_curvature,exp->Params);

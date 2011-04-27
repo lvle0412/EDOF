@@ -132,6 +132,7 @@ int LargerOf(int a, int b);
  */
 int SmallerOf(int a, int b);
 
-
+/* Sum over an array of N doubles */
+double SumDoubleArray(double* arr,int N);
 
 #endif /* ANDYSCOMPUTATIONS_H_ */

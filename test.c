@@ -172,22 +172,32 @@ int main(){
 
 	printf("Let's populate our test vector. \n");
 
-	cvSeqPush(test,(void*) &cvPoint(24,94));
-	cvSeqPush(test,(void*) &cvPoint(19,85));
-	cvSeqPush(test,(void*) &cvPoint(15,71));
-	cvSeqPush(test,(void*) &cvPoint(14,61));
-	cvSeqPush(test,(void*) &cvPoint(12,41));
-	cvSeqPush(test,(void*) &cvPoint(13,32));
-	cvSeqPush(test,(void*) &cvPoint(16,26));
-	cvSeqPush(test,(void*) &cvPoint(21,21));
-	cvSeqPush(test,(void*) &cvPoint(27,15));
-	cvSeqPush(test,(void*) &cvPoint(35,13));
-	cvSeqPush(test,(void*) &cvPoint(46,12));
-	cvSeqPush(test,(void*) &cvPoint(54,14));
-	cvSeqPush(test,(void*) &cvPoint(60,18));
-	cvSeqPush(test,(void*) &cvPoint(64,21));
-	cvSeqPush(test,(void*) &cvPoint(75,31));
-	cvSeqPush(test,(void*) &cvPoint(81,37));
+	cvSeqPush(test,(void*) &cvPoint(18,85));
+	cvSeqPush(test,(void*) &cvPoint(21,87));
+	cvSeqPush(test,(void*) &cvPoint(25,88));
+	cvSeqPush(test,(void*) &cvPoint(28,88));
+	cvSeqPush(test,(void*) &cvPoint(30,88));
+	cvSeqPush(test,(void*) &cvPoint(32,87));
+	cvSeqPush(test,(void*) &cvPoint(35,86));
+	cvSeqPush(test,(void*) &cvPoint(37,84));
+	cvSeqPush(test,(void*) &cvPoint(38,82));
+	cvSeqPush(test,(void*) &cvPoint(38,81));
+	cvSeqPush(test,(void*) &cvPoint(38,81));
+	cvSeqPush(test,(void*) &cvPoint(39,77));
+	cvSeqPush(test,(void*) &cvPoint(39,77));
+	cvSeqPush(test,(void*) &cvPoint(40,75));
+	cvSeqPush(test,(void*) &cvPoint(42,74));
+	cvSeqPush(test,(void*) &cvPoint(43,72));
+	cvSeqPush(test,(void*) &cvPoint(45,70));
+	cvSeqPush(test,(void*) &cvPoint(47,68));
+	cvSeqPush(test,(void*) &cvPoint(48,66));
+	cvSeqPush(test,(void*) &cvPoint(50,63));
+	cvSeqPush(test,(void*) &cvPoint(51,62));
+	cvSeqPush(test,(void*) &cvPoint(54,58));
+	cvSeqPush(test,(void*) &cvPoint(56,55));
+	cvSeqPush(test,(void*) &cvPoint(59,52));
+	cvSeqPush(test,(void*) &cvPoint(61,48));
+	cvSeqPush(test,(void*) &cvPoint(63,46));
 
 	printSeq(test);
 

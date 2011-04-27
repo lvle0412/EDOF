@@ -186,3 +186,13 @@ int SmallerOf(int a, int b){
 
 }
 
+/* Sum over an array of N doubles */
+double SumDoubleArray(double* arr,int N){
+	int k;
+	double s;
+	for (k = 0; k < N; ++k) {
+		s=s+arr[k];
+	}
+	return s;
+}
+

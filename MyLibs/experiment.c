@@ -485,14 +485,19 @@ int HandleCurvaturePhaseAnalysis(Experiment* exp){
 	RefreshWormMemStorage(exp->Worm);
 
 
+	/** Calculate Mean Curvature **/
 	double mean_curvature=SumDoubleArray(curvature, N) / ((double) N);
 
 	/** Store Mean head curvature in buffer that includes mean head curvatures from previous 20 frames**/
-
-
+	AddMeanHeadCurvature(exp->Worm->TimeEvolution,mean_curvature,exp->Params);
 
 	/** Calculate the derivative of the mean head curvature with respect to time **/
 
+	// ANDY!!!!!! REDO THIS by wrapping it in a function that converts the CvSeq MeanHeadCurvatureBuffer into
+	// an actual double array.
+	mean_derivative(exp->Worm->TimeEvolution->MeanHeadCurvatureBuffer,exp->Worm->TimeEvolution->derivativeOfHeadCurvature,exp->Params->CurvaturePhaseNumFrames);
+
+	printf("Derivative of Head Curvature: %f\n",exp->Worm->TimeEvolution->derivativeOfHeadCurvature);
 	/** If triggering based on phase is turned off, return **/
 
 	/** Otherwise turn the DLP on if phase is within the region we are triggering over **/

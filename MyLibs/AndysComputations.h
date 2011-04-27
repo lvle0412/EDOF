@@ -135,4 +135,13 @@ int SmallerOf(int a, int b);
 /* Sum over an array of N doubles */
 double SumDoubleArray(double* arr,int N);
 
+/*
+ * Returns the mean derivative of a series of values in buffer x
+ * Written by Quan Wen
+ */
+/*
+ * Returns the mean derivative of a series of n values in buffer x
+ * Written by Quan Wen
+ */
+void mean_derivative(double *x, double *x_dot, int n);
 #endif /* ANDYSCOMPUTATIONS_H_ */

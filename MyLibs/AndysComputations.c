@@ -196,3 +196,28 @@ double SumDoubleArray(double* arr,int N){
 	return s;
 }
 
+
+/*
+ * Returns the mean derivative of a series of n values in buffer x
+ * Written by Quan Wen
+ */
+void mean_derivative(double *x, double *x_dot, int n)
+{
+    int i;
+    double s_xx, s_xy, s_x, s_y, delta;
+
+    s_y=0;
+    s_xy=0;
+    s_xx=0;
+    s_x=n*(n-1)/2;
+
+    for (i=0;i<n;i++){
+        s_xx+=i*i;
+        s_y+=*(x+i);
+        s_xy+=(*(x+i))*i;
+    }
+
+    delta=n*s_xx-s_x*s_x;
+    *x_dot=(n*s_xy-s_x*s_y)/delta;  /*using linear fit to find the slope x_dot */
+
+}

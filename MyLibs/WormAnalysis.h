@@ -362,7 +362,7 @@ WormTimeEvolution* CreateWormTimeEvolution();
 
 int DestroyWormTimeEvolution(WormTimeEvolution** TimeEvolution);
 
-int AddMeanHeadCurvature(WormTimeEvolution* TimeEvolution);
+int AddMeanHeadCurvature(WormTimeEvolution* TimeEvolution, double CurrHeadCurvature, WormAnalysisParam* AnalysisParam);
 
 
 

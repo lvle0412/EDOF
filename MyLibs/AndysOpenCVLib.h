@@ -443,7 +443,7 @@ int CropNumber(int max, int min, int x);
  * If the buffer is full, it automatically tosses the oldest
  * element in the buffer.
  */
-int cvSeqBufferPush(CvSeq* seq, void* element, int MaxBuffSize);
+int PushToSeqBuffer(CvSeq* seq, void* element, int MaxBuffSize);
 
 /*
  * Print out a sequence of CvPoints to stdout

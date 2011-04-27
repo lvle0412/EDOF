@@ -301,7 +301,7 @@ void DisplayOpenCVInstall(){
  * If the buffer is full, it automatically tosses the oldest
  * element in the buffer.
  */
-int cvSeqBufferPush(CvSeq* seq, void* element, int MaxBuffSize){
+int PushToSeqBuffer(CvSeq* seq, void* element, int MaxBuffSize){
 	if (seq==0 || element==0 || MaxBuffSize==0) return A_ERROR;
 
 	/** push the value on **/

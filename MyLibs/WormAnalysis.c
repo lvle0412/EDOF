@@ -298,6 +298,7 @@ WormAnalysisParam* CreateWormAnalysisParam(){
 	int CurvaturePhaseTriggerOn = 0;
 	int CurvaturePhaseThresholdMax = 0;
 	int CurvaturePhaseThresholdMin = 0;
+	int CurvaturePhaseNumFrames = 20;
 
 	/** Illum Head-Tail Sweep **/
 	ParamPtr->IllumSweepHT = 1;
@@ -420,6 +421,45 @@ void ClearSegmentedInfo(SegmentedWorm* SegWorm){
 		}
 
 
+}
+
+
+/************************************************************/
+/* Creating, Destroying and updating SegmentedWormStruct	*/
+/*  					 									*/
+/*															*/
+/************************************************************/
+
+/*
+ * Creates and allocates memory for a WormTimeEvolution Structure
+ * (which contains information about the worm that extends in time
+ * beyond just this frame, e.g. the mean haead curvature of the past
+ * few frames )
+ */
+WormTimeEvolution* CreateWormTimeEvolution(){
+	WormTimeEvolution* TimeEv;
+	TimeEv= (WormTimeEvolution*) malloc(sizeof(WormTimeEvolution));
+
+	/*** Setup Memory storage ***/
+	TimeEv->MemTimeEvolutionStorage=cvCreateMemStorage(0);
+
+	TimeEv->MeanHeadCurvatureBuffer=cvCreateSeq(CV_32FC1,sizeof(CvSeq),sizeof(double),TimeEv->MemTimeEvolutionStorage);
+	TimeEv->derivativeOfHeadCurvature=0;
+
+	return TimeEv;
+}
+
+int DestroyWormTimeEvolution(WormTimeEvolution** TimeEvolution){
+	(*TimeEvolution)->MeanHeadCurvatureBuffer=NULL;
+	cvReleaseMemStorage(&( (*TimeEvolution)->MemTimeEvolutionStorage ));
+	free(*TimeEvolution);
+	*TimeEvolution=NULL;
+}
+
+int AddMeanHeadCurvature(WormTimeEvolution* TimeEvolution, double CurrHeadCurvature, WormAnalysisParam* AnalysisParam){
+	if (TimeEvolution==NULL || AnalysisParam==NULL) return A_ERROR;
+	PushToSeqBuffer(TimeEvolution->MeanHeadCurvatureBuffer,(void*) &CurrHeadCurvature,AnalysisParam->CurvaturePhaseNumFrames);
+	return A_OK;
 }
 
 

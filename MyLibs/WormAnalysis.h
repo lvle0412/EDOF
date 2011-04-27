@@ -117,6 +117,7 @@ typedef struct WormAnalysisParamStruct{
 	int CurvaturePhaseTriggerOn;
 	int CurvaturePhaseThresholdMax;
 	int CurvaturePhaseThresholdMin;
+	int CurvaturePhaseNumFrames; // Number of frames back (in time) to store
 
 
 	/** Stage Control Parameters **/
@@ -142,6 +143,12 @@ typedef struct SegmentedWormStruct{
 
 
 
+typedef struct WormTimeEvolutionStruct{
+	/** Phase and Curvature Analysis **/
+	CvSeq* MeanHeadCurvatureBuffer;
+	double derivativeOfHeadCurvature;
+	CvMemStorage* MemTimeEvolutionStorage;
+}WormTimeEvolution;
 
 
 
@@ -176,6 +183,9 @@ typedef struct WormImageAnalysisStruct{
 	/** Segmented Worm **/
 	SegmentedWorm* Segmented;
 
+	/** Time Evolution Structure **/
+	WormTimeEvolution* TimeEvolution;
+
 	/** Information about location on plate **/
 	CvPoint stageVelocity; //compensating velocity of stage.
 
@@ -185,12 +195,6 @@ typedef struct WormImageAnalysisStruct{
 
 
 
-typedef struct WormTimeEvolutionStruct{
-	/** Phase and Curvature Analysis **/
-	CvSeq* MeanHeadCurvatureBuffer;
-	double derivativeOfCurvature;
-	CvMemStorage* MemTimeEvolutionStorage;
-}WormTimeEvolution;
 
 
 
@@ -339,6 +343,28 @@ void DestroySegmentedWormStruct(SegmentedWorm* SegWorm);
  * Data object.
  */
 void ClearSegmentedInfo(SegmentedWorm* SegWorm);
+
+
+
+/************************************************************/
+/* Creating, Destroying and updating SegmentedWormStruct	*/
+/*  					 									*/
+/*															*/
+/************************************************************/
+
+/*
+ * Creates and allocates memory for a WormTimeEvolution Structure
+ * (which contains information about the worm that extends in time
+ * beyond just this frame, e.g. the mean haead curvature of the past
+ * few frames )
+ */
+WormTimeEvolution* CreateWormTimeEvolution();
+
+int DestroyWormTimeEvolution(WormTimeEvolution** TimeEvolution);
+
+int AddMeanHeadCurvature(WormTimeEvolution* TimeEvolution);
+
+
 
 
 

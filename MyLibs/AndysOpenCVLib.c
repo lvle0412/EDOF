@@ -993,7 +993,7 @@ int extractCurvatureOfSeq(const CvSeq* seq, double* curvature, double sigma,CvMe
 		 if (DEBUG_FLAG) printf("k[%d] = %f\n",i,k[i]);
 	 }
 
-	memcpy ((void*) curvature ,(void*) k, sizeof( (N-2)*sizeof(double) ));
+	memcpy((void*) curvature ,(const void*) k, (N-2)*sizeof(double) );
 
 	free(k);
 	free(x);

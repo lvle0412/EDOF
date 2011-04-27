@@ -468,7 +468,7 @@ int HandleCurvaturePhaseAnalysis(Experiment* exp){
 	/** Otherwise Let's Calculate the Mean Curvature of the Head**/
 
 	/** Smoothing parameter**/
-	double sigma=5;
+	double sigma=5; /** made bigger **/
 
 	/** Define the head in worm coordinates **/
 	int HEAD_BEGIN=10;

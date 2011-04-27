@@ -465,19 +465,31 @@ int HandleCurvaturePhaseAnalysis(Experiment* exp){
 		return EXP_SUCCESS;
 	}
 
+	/** Otherwise Let's Calculate the Mean Curvature of the Head**/
 
+	/** Smoothing parameter**/
 	double sigma=0.5;
 
-	/** Otherwise Let's Calculate the Mean Curvature of the Head**/
-	CvSeq* cent=exp->Worm->Segmented->Centerline; /** ANDY DO SPLICE TO HEAD HERE **/
-	int N=cent->total - 2;
+	/** Define the head in worm coordinates **/
+	int HEAD_BEGIN=10;
+	int HEAD_END=30;
+
+	/** Splice the head **/
+	CvSeq* headcent=cvSeqSlice(exp->Worm->Segmented->Centerline,cvSlice(HEAD_BEGIN,HEAD_END));
+	int N=headcent->total - 2;
+
+	/** Extract the curvature of the head **/
 	double* curvature= (double*) malloc(N* (sizeof(double)));
 	RefreshWormMemStorage(exp->Worm);
-	if (extractCurvatureOfSeq( cent,curvature,sigma,exp->Worm->MemScratchStorage)< 0) return EXP_ERROR;
+	if (extractCurvatureOfSeq( headcent,curvature,sigma,exp->Worm->MemScratchStorage)< 0) return EXP_ERROR;
 	RefreshWormMemStorage(exp->Worm);
-	double mean_curvature=SumDoubleArray(curvature, N);
+
+
+	double mean_curvature=SumDoubleArray(curvature, N) / ((double) N);
 
 	/** Store Mean head curvature in buffer that includes mean head curvatures from previous 20 frames**/
+
+
 
 	/** Calculate the derivative of the mean head curvature with respect to time **/
 

@@ -452,6 +452,11 @@ int PushToSeqBuffer(CvSeq* seq, void* element, int MaxBuffSize);
 
 void printSeq(CvSeq* Seq);
 
+/*
+ * Converts a CvSeq of doubles into an array.
+ * Allocates memory for the array.
+ */
+int SeqDoublesToArr(CvSeq* seq, double* arr);
 #endif /* ANDYSOPENCVLIB_H_ */
 
 

@@ -492,10 +492,10 @@ int HandleCurvaturePhaseAnalysis(Experiment* exp){
 	AddMeanHeadCurvature(exp->Worm->TimeEvolution,mean_curvature,exp->Params);
 
 	/** Calculate the derivative of the mean head curvature with respect to time **/
-
-	// ANDY!!!!!! REDO THIS by wrapping it in a function that converts the CvSeq MeanHeadCurvatureBuffer into
-	// an actual double array.
-	mean_derivative(exp->Worm->TimeEvolution->MeanHeadCurvatureBuffer,exp->Worm->TimeEvolution->derivativeOfHeadCurvature,exp->Params->CurvaturePhaseNumFrames);
+	double* headPhaseBuff=NULL;
+	SeqDoublesToArr(exp->Worm->TimeEvolution->MeanHeadCurvatureBuffer,headPhaseBuff);
+	double* k_dot=&(exp->Worm->TimeEvolution->derivativeOfHeadCurvature);
+	mean_derivative(headPhaseBuff,k_dot,exp->Params->CurvaturePhaseNumFrames);
 
 	printf("Derivative of Head Curvature: %f\n",exp->Worm->TimeEvolution->derivativeOfHeadCurvature);
 	/** If triggering based on phase is turned off, return **/

@@ -429,7 +429,7 @@ void ClearSegmentedInfo(SegmentedWorm* SegWorm){
 
 
 /************************************************************/
-/* Creating, Destroying and updating SegmentedWormStruct	*/
+/* Creating, Destroying and updating TimeEvolution Structure	*/
 /*  					 									*/
 /*															*/
 /************************************************************/
@@ -446,8 +446,9 @@ WormTimeEvolution* CreateWormTimeEvolution(){
 
 	/*** Setup Memory storage ***/
 	TimeEv->MemTimeEvolutionStorage=cvCreateMemStorage(0);
-
-	TimeEv->MeanHeadCurvatureBuffer=cvCreateSeq(CV_32FC1,sizeof(CvSeq),sizeof(double),TimeEv->MemTimeEvolutionStorage);
+	printf("ping!\n");
+	TimeEv->MeanHeadCurvatureBuffer=cvCreateSeq(0,sizeof(CvSeq),sizeof(double),TimeEv->MemTimeEvolutionStorage);
+	printf("pong!\n");
 	TimeEv->derivativeOfHeadCurvature=0;
 
 	return TimeEv;

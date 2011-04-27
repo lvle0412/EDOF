@@ -370,6 +370,20 @@ void printSeq(CvSeq* Seq){
 	}
 }
 
+/*
+ * Converts a CvSeq of doubles into an array.
+ * Allocates memory for the array.
+ */
+int SeqDoublesToArr(CvSeq* seq, double* arr){
+	if (seq->elem_size!=sizeof(double)) return A_ERROR;
+	arr= (double*) malloc(seq->total*sizeof(double));
+	int i;
+	for (i = 0; i < seq->total; i++) {
+			arr[i]= (double) *(cvGetSeqElem(seq, i));
+		}
+	return A_OK;
+}
+
 /* Function Draws a Sequence of CvPoint's with little circles.
  * This function uses only a sequence and an image.
 

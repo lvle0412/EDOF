@@ -483,7 +483,7 @@ void printSeqScalarDoubles(CvSeq* Seq);
  * Converts a CvSeq of doubles into an array.
  * Allocates memory for the array.
  */
-int SeqDoublesToArr(CvSeq* seq, double* arr);
+int SeqDoublesToArr(const CvSeq* seq, double** arr);
 #endif /* ANDYSOPENCVLIB_H_ */
 
 

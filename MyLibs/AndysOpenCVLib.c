@@ -309,9 +309,9 @@ int PushToSeqBuffer(CvSeq* seq, void* element, int MaxBuffSize){
 
 	/** if full, pop off the last value **/
 	void* popped_pt;
-	do {
+	while (seq->total > MaxBuffSize){
 		cvSeqPop(seq, popped_pt);
-	} while (seq->total > MaxBuffSize);
+	} ;
 
 	return A_OK;
 }
@@ -400,13 +400,34 @@ void printSeqScalarDoubles(CvSeq* Seq){
  * Converts a CvSeq of doubles into an array.
  * Allocates memory for the array.
  */
-int SeqDoublesToArr(CvSeq* seq, double* arr){
+int SeqDoublesToArr(const CvSeq* seq, double** arr){
 	if (seq->elem_size!=sizeof(double)) return A_ERROR;
-	arr= (double*) malloc(seq->total*sizeof(double));
+
+	/** If the sequence is empty return the null pointer **/
+	if (seq->total<1) {
+		*arr=NULL;
+		return A_OK;
+	}
+
+	*arr= (double*) malloc(seq->total*sizeof(double));
+
 	int i;
+	double* tempPt ;
 	for (i = 0; i < seq->total; i++) {
-			arr[i]= (double) *(cvGetSeqElem(seq, i));
-		}
+		tempPt = (double *) cvGetSeqElem(seq, i);
+		(*arr)[i]=*tempPt;
+		printf("%d: %f\n",i,*tempPt);
+	}
+
+
+//	*arr= (double*) malloc(seq->total*sizeof(double));
+//	int i;
+//	double* temp;
+//	for (i = 0; i < seq->total; i++) {
+//			temp= (double*) cvGetSeqElem(seq, i);
+//			(*arr)[i]=*temp;
+//			printf("In SeqDoublesToArr: *temp=%f\n",i,*temp);
+//		}
 	return A_OK;
 }
 

@@ -202,8 +202,21 @@ double SumDoubleArray(const double* arr,int N){
  * Returns the mean derivative of a series of n values in buffer x
  * Written by Quan Wen
  */
-void mean_derivative(double *x, double *x_dot, int n)
+int mean_derivative(double *x, double *x_dot, int n)
 {
+	/** If there are no elements in the buffer, then the derivative is zero **/
+	if (n<1){
+		printf("no elements in the buffer!\n");
+		*x_dot=0;
+		return A_OK;
+	}
+
+
+	if (x==NULL){
+		printf("Mean_derivative: Error!\n");
+		return A_ERROR;
+	}
+
     int i;
     double s_xx, s_xy, s_x, s_y, delta;
 
@@ -220,6 +233,7 @@ void mean_derivative(double *x, double *x_dot, int n)
 
     delta=n*s_xx-s_x*s_x;
     *x_dot=(n*s_xy-s_x*s_y)/delta;  /*using linear fit to find the slope x_dot */
+    printf("*x_dot=%f\n",*x_dot);
 
 }
 
@@ -252,6 +266,8 @@ double MedianOfDoubleArr(const double* arr, int N){
  * with N elements
  */
 void printDoubleArr(const double* arr, int N){
+	if (N<1) return;
+	if (arr==NULL) return;
 	int i;
 	for (i = 0; i < N; ++i) {
 		printf("%d: %f\n",i,arr[i]);

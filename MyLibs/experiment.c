@@ -503,18 +503,28 @@ int HandleCurvaturePhaseAnalysis(Experiment* exp){
 	/***************** IGNORED *********************/
 	printf("About to add the mean head curvature to the buffer.\n");
 	/** Store Mean head curvature in buffer that includes mean head curvatures from previous 20 frames**/
-	AddMeanHeadCurvature(exp->Worm->TimeEvolution,median_curvature,exp->Params);
+	if (AddMeanHeadCurvature(exp->Worm->TimeEvolution,median_curvature,exp->Params)!=A_OK) printf("Error adding mean curvature!!\n");
 	printf("exp->Worm->TimeEvolution->MeanHeadCurvatureBuffer->total=%d\n",exp->Worm->TimeEvolution->MeanHeadCurvatureBuffer->total);
 	printSeqScalarDoubles(exp->Worm->TimeEvolution->MeanHeadCurvatureBuffer);
 
 	printf("About to calculate the derivative of the mean head curvature.\n");
 	/** Calculate the derivative of the mean head curvature with respect to time **/
 	double* headPhaseBuff=NULL;
-	SeqDoublesToArr(exp->Worm->TimeEvolution->MeanHeadCurvatureBuffer,headPhaseBuff);
+	SeqDoublesToArr((const CvSeq*) exp->Worm->TimeEvolution->MeanHeadCurvatureBuffer,&headPhaseBuff);
+
+	printf("headPhaseBuff\n");
+	printDoubleArr(headPhaseBuff,exp->Worm->TimeEvolution->MeanHeadCurvatureBuffer->total);
+	printf("k_dot...");
 	double* k_dot=&(exp->Worm->TimeEvolution->derivativeOfHeadCurvature);
+
+	printf("About to take derivative\n");
 	mean_derivative(headPhaseBuff,k_dot,exp->Params->CurvaturePhaseNumFrames);
 
-	printf("Derivative of Head Curvature: %f\n",exp->Worm->TimeEvolution->derivativeOfHeadCurvature);
+	/** Deallocate memory for head phase buffer **/
+	free(headPhaseBuff);
+
+	printf("Derivative of Head Curvature* 100: %f\n",(double)100* (exp->Worm->TimeEvolution->derivativeOfHeadCurvature));
+	cvWaitKey(1000);
 	/** If triggering based on phase is turned off, return **/
 
 	/** Otherwise turn the DLP on if phase is within the region we are triggering over **/

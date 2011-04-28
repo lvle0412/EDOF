@@ -38,6 +38,9 @@
 #define ANDYSCOMPUTATIONS_H_
 
 
+#define A_OK 0
+#define A_ERROR -1
+
 #define _N_TIME_PTS 100
 
 typedef struct TimeProfileStruct{
@@ -143,7 +146,7 @@ double SumDoubleArray(const double* arr,int N);
  * Returns the mean derivative of a series of n values in buffer x
  * Written by Quan Wen
  */
-void mean_derivative(double *x, double *x_dot, int n);
+int mean_derivative(double *x, double *x_dot, int n);
 
 /*
  * Print out the values of a double array

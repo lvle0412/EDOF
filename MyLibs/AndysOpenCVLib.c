@@ -370,6 +370,7 @@ void printSeq(CvSeq* Seq){
 	}
 }
 
+
 /*
  * Print sequences of double points (CvPoint2D64f)
  */
@@ -378,6 +379,19 @@ void printSeqDouble(CvSeq* Seq){
 	for (i = 0; i < Seq->total; i++) {
 		CvPoint2D64f* tempPt = (CvPoint2D64f*) cvGetSeqElem(Seq, i);
 		printf("%d: ( %f, %f)\n",i,tempPt->x,tempPt->y);
+	}
+}
+
+/*
+ * Print out a sequence of Scalar Doubles to stdout
+ */
+
+void printSeqScalarDoubles(CvSeq* Seq){
+	int i;
+	double* tempPt ;
+	for (i = 0; i < Seq->total; i++) {
+		tempPt = (double *) cvGetSeqElem(Seq, i);
+		printf("%d: %f\n",i,*tempPt);
 	}
 }
 

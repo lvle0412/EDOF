@@ -299,10 +299,10 @@ WormAnalysisParam* CreateWormAnalysisParam(){
 	ParamPtr->CurvatureAnalyzeOn = 1;
 
 	/** Trigger Illumination Based on Phase of Curvature **/
-	int CurvaturePhaseTriggerOn = 0;
-	int CurvaturePhaseThresholdMax = 0;
-	int CurvaturePhaseThresholdMin = 0;
-	int CurvaturePhaseNumFrames = 20;
+	ParamPtr->CurvaturePhaseTriggerOn = 0;
+	ParamPtr->CurvaturePhaseThresholdMax = 0;
+	ParamPtr->CurvaturePhaseThresholdMin = 0;
+	ParamPtr->CurvaturePhaseNumFrames = 20;
 
 	/** Illum Head-Tail Sweep **/
 	ParamPtr->IllumSweepHT = 1;
@@ -460,15 +460,20 @@ int DestroyWormTimeEvolution(WormTimeEvolution** TimeEvolution){
 }
 
 int AddMeanHeadCurvature(WormTimeEvolution* TimeEvolution, double CurrHeadCurvature, WormAnalysisParam* AnalysisParam){
-	if (TimeEvolution==NULL || AnalysisParam==NULL) return A_ERROR;
+	if (TimeEvolution==NULL || AnalysisParam==NULL) {
+		printf("AddMeanHeadCurvature Error!");
+				return A_ERROR;
+	}
 
 	int MaxBuff;
+	printf("CurvaturePhaseNumFrames=%d\n",AnalysisParam->CurvaturePhaseNumFrames);
 	if (AnalysisParam->CurvaturePhaseNumFrames>0){
 		MaxBuff=AnalysisParam->CurvaturePhaseNumFrames;
 	}else{
 		MaxBuff=1;
 	}
 
+	printf("MaxBuff=%d\n",MaxBuff);
 	PushToSeqBuffer(TimeEvolution->MeanHeadCurvatureBuffer,(void*) &CurrHeadCurvature,MaxBuff);
 	return A_OK;
 }

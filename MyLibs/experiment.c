@@ -499,12 +499,13 @@ int HandleCurvaturePhaseAnalysis(Experiment* exp){
 	printf("median_curvature*100=%f\n",median_curvature* (double) 100);
 
 
-	return A_OK;
+
 	/***************** IGNORED *********************/
 	printf("About to add the mean head curvature to the buffer.\n");
 	/** Store Mean head curvature in buffer that includes mean head curvatures from previous 20 frames**/
 	AddMeanHeadCurvature(exp->Worm->TimeEvolution,median_curvature,exp->Params);
-
+	printf("exp->Worm->TimeEvolution->MeanHeadCurvatureBuffer->total=%d\n",exp->Worm->TimeEvolution->MeanHeadCurvatureBuffer->total);
+	printSeqScalarDoubles(exp->Worm->TimeEvolution->MeanHeadCurvatureBuffer);
 
 	printf("About to calculate the derivative of the mean head curvature.\n");
 	/** Calculate the derivative of the mean head curvature with respect to time **/
@@ -517,6 +518,7 @@ int HandleCurvaturePhaseAnalysis(Experiment* exp){
 	/** If triggering based on phase is turned off, return **/
 
 	/** Otherwise turn the DLP on if phase is within the region we are triggering over **/
+	return A_OK;
 
 
 }

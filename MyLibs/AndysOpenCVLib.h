@@ -474,6 +474,12 @@ void printSeq(CvSeq* Seq);
 void printSeqDouble(CvSeq* Seq);
 
 /*
+ * Print out a sequence of Scalar Doubles to stdout
+ */
+
+void printSeqScalarDoubles(CvSeq* Seq);
+
+/*
  * Converts a CvSeq of doubles into an array.
  * Allocates memory for the array.
  */

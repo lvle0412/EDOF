@@ -513,17 +513,21 @@ int HandleCurvaturePhaseAnalysis(Experiment* exp){
 	SeqDoublesToArr((const CvSeq*) exp->Worm->TimeEvolution->MeanHeadCurvatureBuffer,&headPhaseBuff);
 
 	printf("headPhaseBuff\n");
-	printDoubleArr(headPhaseBuff,exp->Worm->TimeEvolution->MeanHeadCurvatureBuffer->total);
+	int N_curr=exp->Worm->TimeEvolution->MeanHeadCurvatureBuffer->total;
+	printDoubleArr(headPhaseBuff,N_curr);
 	printf("k_dot...");
 	double* k_dot=&(exp->Worm->TimeEvolution->derivativeOfHeadCurvature);
 
 	printf("About to take derivative\n");
-	mean_derivative(headPhaseBuff,k_dot,exp->Params->CurvaturePhaseNumFrames);
+	mean_derivative(headPhaseBuff,k_dot,N_curr);
 
 	/** Deallocate memory for head phase buffer **/
 	free(headPhaseBuff);
 
 	printf("Derivative of Head Curvature* 100: %f\n",(double)100* (exp->Worm->TimeEvolution->derivativeOfHeadCurvature));
+
+	if (exp->Worm->TimeEvolution->derivativeOfHeadCurvature > (double) 100||exp->Worm->TimeEvolution->derivativeOfHeadCurvature< (double) -1000) cvWaitKey(2000);
+
 	cvWaitKey(1000);
 	/** If triggering based on phase is turned off, return **/
 

@@ -223,16 +223,20 @@ int mean_derivative(double *x, double *x_dot, int n)
     s_y=0;
     s_xy=0;
     s_xx=0;
-    s_x=n*(n-1)/2;
+    s_x=  ((double) (n*(n-1)) ) /(double)2;
 
     for (i=0;i<n;i++){
-        s_xx+=i*i;
-        s_y+=*(x+i);
-        s_xy+=(*(x+i))*i;
+        s_xx+=  (double) (i*i);
+        s_y+=*(x+ i);
+        s_xy+=(*(x+ i))* (double)i;
+        printf("i=%d, s_xy=%f, s_x=%f, ,s_xx=%f, s_y=%f \n",i,s_xy,s_x,s_xx,s_y);
+
     }
 
     delta=n*s_xx-s_x*s_x;
     *x_dot=(n*s_xy-s_x*s_y)/delta;  /*using linear fit to find the slope x_dot */
+    printf("numerator=%f\n\n",(n*s_xy-s_x*s_y));
+    printf("denom=%f\n",delta);
     printf("*x_dot=%f\n",*x_dot);
 
 }

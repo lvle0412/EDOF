@@ -35,8 +35,9 @@
  */
 
 #include "tictoc.h"
-#include <limits>
+#include "limits.h"
 #include <map>
+#include <cassert>
 #include <sstream>
 #include "Timer.h"
 

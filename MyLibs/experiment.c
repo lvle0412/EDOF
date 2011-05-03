@@ -460,6 +460,13 @@ int HandleIlluminationSweep(Experiment* exp){
  *
  */
 int HandleCurvaturePhaseAnalysis(Experiment* exp){
+	int DEBUG_FLAG=0; // print out ?
+
+
+
+	_TICTOC_TIC_FUNC
+	TICTOC::timer().tic("_CurvaturePhaseAnalysis",exp->e);
+
 	/** If Curvature Analysis is turned off, just return **/
 	if (exp->Params->CurvatureAnalyzeOn == 0){
 		return EXP_SUCCESS;
@@ -478,57 +485,60 @@ int HandleCurvaturePhaseAnalysis(Experiment* exp){
 	CvSeq* headcent=cvSeqSlice(exp->Worm->Segmented->Centerline,cvSlice(HEAD_BEGIN,HEAD_END));
 	int N=headcent->total - 2;
 
-	printf("Whole Centerline :\n");
-	printSeq(exp->Worm->Segmented->Centerline);
-	printf("Just the Head:\n");
-	printSeq(headcent);
+
+	if (DEBUG_FLAG!=0){
+		printf("Whole Centerline :\n");
+		printSeq(exp->Worm->Segmented->Centerline);
+		printf("Just the Head:\n");
+		printSeq(headcent);
+	}
+
 
 	/** Extract the curvature of the head **/
 	double* curvature= (double*) malloc(N* (sizeof(double)));
 	RefreshWormMemStorage(exp->Worm);
+
+	/** Smooth and Extract Curvature **/
 	if (extractCurvatureOfSeq( headcent,curvature,sigma,exp->Worm->MemScratchStorage)< 0) return EXP_ERROR;
 	RefreshWormMemStorage(exp->Worm);
 
-	printDoubleArr(curvature,N);
+	if (DEBUG_FLAG!=0) printDoubleArr(curvature,N);
 
 	/** Calculate Median Curvature **/
-
-
-
 	double median_curvature=MedianOfDoubleArr(curvature,N);
-	printf("median_curvature*100=%f\n",median_curvature* (double) 100);
+	if (DEBUG_FLAG!=0) {
+		printf("median_curvature*100=%f\n",median_curvature* (double) 100);
+		printf("About to add the mean head curvature to the buffer.\n");
+	}
 
-
-
-	/***************** IGNORED *********************/
-	printf("About to add the mean head curvature to the buffer.\n");
 	/** Store Mean head curvature in buffer that includes mean head curvatures from previous 20 frames**/
 	if (AddMeanHeadCurvature(exp->Worm->TimeEvolution,median_curvature,exp->Params)!=A_OK) printf("Error adding mean curvature!!\n");
-	printf("exp->Worm->TimeEvolution->MeanHeadCurvatureBuffer->total=%d\n",exp->Worm->TimeEvolution->MeanHeadCurvatureBuffer->total);
-	printSeqScalarDoubles(exp->Worm->TimeEvolution->MeanHeadCurvatureBuffer);
+	if (DEBUG_FLAG!=0) {
+		printf("exp->Worm->TimeEvolution->MeanHeadCurvatureBuffer->total=%d\n",exp->Worm->TimeEvolution->MeanHeadCurvatureBuffer->total);
+		printSeqScalarDoubles(exp->Worm->TimeEvolution->MeanHeadCurvatureBuffer);
+	}
 
-	printf("About to calculate the derivative of the mean head curvature.\n");
 	/** Calculate the derivative of the mean head curvature with respect to time **/
 	double* headPhaseBuff=NULL;
 	SeqDoublesToArr((const CvSeq*) exp->Worm->TimeEvolution->MeanHeadCurvatureBuffer,&headPhaseBuff);
 
-	printf("headPhaseBuff\n");
 	int N_curr=exp->Worm->TimeEvolution->MeanHeadCurvatureBuffer->total;
-	printDoubleArr(headPhaseBuff,N_curr);
-	printf("k_dot...");
+	if (DEBUG_FLAG!=0){
+		printf("headPhaseBuff\n");
+		printDoubleArr(headPhaseBuff,N_curr);
+	}
 	double* k_dot=&(exp->Worm->TimeEvolution->derivativeOfHeadCurvature);
 
-	printf("About to take derivative\n");
 	mean_derivative(headPhaseBuff,k_dot,N_curr);
 
 	/** Deallocate memory for head phase buffer **/
 	free(headPhaseBuff);
 
+
+	TICTOC::timer().toc("_CurvaturePhaseAnalysis",exp->e);
 	printf("Derivative of Head Curvature* 100: %f\n",(double)100* (exp->Worm->TimeEvolution->derivativeOfHeadCurvature));
 
-	if (exp->Worm->TimeEvolution->derivativeOfHeadCurvature > (double) 100||exp->Worm->TimeEvolution->derivativeOfHeadCurvature< (double) -1000) cvWaitKey(2000);
 
-	cvWaitKey(1000);
 	/** If triggering based on phase is turned off, return **/
 
 	/** Otherwise turn the DLP on if phase is within the region we are triggering over **/

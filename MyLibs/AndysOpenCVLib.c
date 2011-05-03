@@ -403,6 +403,8 @@ void printSeqScalarDoubles(CvSeq* Seq){
 int SeqDoublesToArr(const CvSeq* seq, double** arr){
 	if (seq->elem_size!=sizeof(double)) return A_ERROR;
 
+	int PO=0; //print out?
+
 	/** If the sequence is empty return the null pointer **/
 	if (seq->total<1) {
 		*arr=NULL;
@@ -416,7 +418,7 @@ int SeqDoublesToArr(const CvSeq* seq, double** arr){
 	for (i = 0; i < seq->total; i++) {
 		tempPt = (double *) cvGetSeqElem(seq, i);
 		(*arr)[i]=*tempPt;
-		printf("%d: %f\n",i,*tempPt);
+		if (PO!=0) printf("%d: %f\n",i,*tempPt);
 	}
 
 
@@ -1079,17 +1081,22 @@ int extractCurvatureOfSeqDouble(const CvSeq* seq, double* curvature, double sigm
  */
 int extractCurvatureOfSeq(const CvSeq* seq, double* curvature, double sigma,CvMemStorage* mem){
 
-	int DEBUG_FLAG=1;
+	int DEBUG_FLAG=0;
 
 	if (seq== NULL || curvature == NULL) return A_ERROR;
 	if (seq->elem_size!=sizeof(CvPoint)) return A_ERROR;
 
-	printf("Before smoothing:\n");
-	printSeq((CvSeq*)seq);
+	if (DEBUG_FLAG) {
+		printf("Before smoothing:\n");
+		printSeq((CvSeq*)seq);
+	}
+
 	/** Smooth the sequence **/
 	CvSeq* sseq=smoothPtSequenceIntToDouble(seq, sigma, mem);
-	printf("After smoothing:\n");
-	printSeqDouble(sseq);
+	if (DEBUG_FLAG) {
+		printf("After smoothing:\n");
+		printSeqDouble(sseq);
+	}
 	int N=sseq->total;
 
 	double *x = (double *) malloc (N * sizeof(double));

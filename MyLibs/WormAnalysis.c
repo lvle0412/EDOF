@@ -465,15 +465,17 @@ int AddMeanHeadCurvature(WormTimeEvolution* TimeEvolution, double CurrHeadCurvat
 				return A_ERROR;
 	}
 
+	int PO=0; // print out
+
 	int MaxBuff;
-	printf("CurvaturePhaseNumFrames=%d\n",AnalysisParam->CurvaturePhaseNumFrames);
+	if (PO!=0) printf("CurvaturePhaseNumFrames=%d\n",AnalysisParam->CurvaturePhaseNumFrames);
 	if (AnalysisParam->CurvaturePhaseNumFrames>0){
 		MaxBuff=AnalysisParam->CurvaturePhaseNumFrames;
 	}else{
 		MaxBuff=1;
 	}
 
-	printf("MaxBuff=%d\n",MaxBuff);
+	if (PO!=0) printf("MaxBuff=%d\n",MaxBuff);
 	PushToSeqBuffer(TimeEvolution->MeanHeadCurvatureBuffer,(void*) &CurrHeadCurvature,MaxBuff);
 	return A_OK;
 }

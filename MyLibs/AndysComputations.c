@@ -204,6 +204,8 @@ double SumDoubleArray(const double* arr,int N){
  */
 int mean_derivative(double *x, double *x_dot, int n)
 {
+	int PO=0; //print out?
+
 	/** If there are no elements in the buffer, then the derivative is zero **/
 	if (n<1){
 		printf("no elements in the buffer!\n");
@@ -229,15 +231,17 @@ int mean_derivative(double *x, double *x_dot, int n)
         s_xx+=  (double) (i*i);
         s_y+=*(x+ i);
         s_xy+=(*(x+ i))* (double)i;
-        printf("i=%d, s_xy=%f, s_x=%f, ,s_xx=%f, s_y=%f \n",i,s_xy,s_x,s_xx,s_y);
+        if (PO!=0)  printf("i=%d, s_xy=%f, s_x=%f, ,s_xx=%f, s_y=%f \n",i,s_xy,s_x,s_xx,s_y);
 
     }
 
     delta=n*s_xx-s_x*s_x;
     *x_dot=(n*s_xy-s_x*s_y)/delta;  /*using linear fit to find the slope x_dot */
-    printf("numerator=%f\n\n",(n*s_xy-s_x*s_y));
-    printf("denom=%f\n",delta);
-    printf("*x_dot=%f\n",*x_dot);
+    if (PO!=0) {
+    	printf("numerator=%f\n\n",(n*s_xy-s_x*s_y));
+    	printf("denom=%f\n",delta);
+    	printf("*x_dot=%f\n",*x_dot);
+    }
 
 }
 

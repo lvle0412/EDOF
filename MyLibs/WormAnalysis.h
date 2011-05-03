@@ -115,8 +115,8 @@ typedef struct WormAnalysisParamStruct{
 
 	/** Trigger Illumination Based on Phase of Curvature **/
 	int CurvaturePhaseTriggerOn;
-	int CurvaturePhaseThresholdMax;
-	int CurvaturePhaseThresholdMin;
+	int CurvaturePhaseThreshold;
+	int CurvaturePhaseDerivThresholdPositive;
 	int CurvaturePhaseNumFrames; // Number of frames back (in time) to store
 
 

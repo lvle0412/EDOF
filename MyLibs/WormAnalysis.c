@@ -296,12 +296,12 @@ WormAnalysisParam* CreateWormAnalysisParam(){
 	ParamPtr->BlueLaser=-1;
 
 	/** Real Time Curvature Analysis **/
-	ParamPtr->CurvatureAnalyzeOn = 1;
+	ParamPtr->CurvatureAnalyzeOn = 0;
 
 	/** Trigger Illumination Based on Phase of Curvature **/
 	ParamPtr->CurvaturePhaseTriggerOn = 0;
-	ParamPtr->CurvaturePhaseThresholdMax = 0;
-	ParamPtr->CurvaturePhaseThresholdMin = 0;
+	ParamPtr->CurvaturePhaseThreshold = 0;
+	ParamPtr->CurvaturePhaseDerivThresholdPositive = 1;
 	ParamPtr->CurvaturePhaseNumFrames = 20;
 
 	/** Illum Head-Tail Sweep **/

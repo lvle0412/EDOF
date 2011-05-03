@@ -535,13 +535,63 @@ int HandleCurvaturePhaseAnalysis(Experiment* exp){
 	free(headPhaseBuff);
 
 
+
+
+	if (DEBUG_FLAG!=0) {
+		printf("Derivative of Head Curvature* 100: %f\n",(double)100* (exp->Worm->TimeEvolution->derivativeOfHeadCurvature));
+		printf("NumFrames: %d, +/-: %d, Thresh: %d\n",exp->Params->CurvaturePhaseNumFrames,exp->Params->CurvaturePhaseDerivThresholdPositive,exp->Params->CurvaturePhaseThreshold);
+	}
+
+
+
+	/** If triggering based on phase, decide weather to turn the DLP on or off**/
+
+
+	double k, kdot, trig, desiredSign, signOfk, signOfkdot;
+	int factor=1000;
+	if (exp->Params->CurvaturePhaseTriggerOn != 0){
+
+		/*
+		 * This is subtle. There is k and kdot. k is the median curvature. kdot is the derivative of the median curvature.
+		 * We want to trigger based upon when |k| > trig and when sign(kdot) == desiredSign .
+		 */
+
+
+		kdot=exp->Worm->TimeEvolution->derivativeOfHeadCurvature;
+		k=median_curvature*factor;
+
+		/** find signOfkdot**/
+		signOfkdot=-1;
+		if (kdot>0) signOfkdot=1;
+
+		/** find sign(k) **/
+		signOfk=-1;
+		if (k>0) signOfk=1;
+
+		/** get desiredSign **/
+		desiredSign= 1;
+		if (exp->Params->CurvaturePhaseDerivThresholdPositive ==0) desiredSign=  -1;
+
+		trig= (double) exp->Params->CurvaturePhaseThreshold ;
+
+		/** trigger if the abs(k)>trig AND signOfk==desiredSign **/
+		if (  (signOfk * k) > trig   && (signOfkdot==desiredSign)   )  {
+
+			/** Turn on the DLP **/
+			exp->Params->DLPOn = 1;
+		} else {
+
+			/** Turn the DLP Off **/
+			exp->Params->DLPOn = 0;
+		}
+
+		printf("Derivative of Head Curvature* %d: %f\n", factor, (double) factor* (exp->Worm->TimeEvolution->derivativeOfHeadCurvature));
+		printf("median_curvature * %d: %f\n", factor, (double) factor*  median_curvature);
+
+	}
+
 	TICTOC::timer().toc("_CurvaturePhaseAnalysis",exp->e);
-	printf("Derivative of Head Curvature* 100: %f\n",(double)100* (exp->Worm->TimeEvolution->derivativeOfHeadCurvature));
 
-
-	/** If triggering based on phase is turned off, return **/
-
-	/** Otherwise turn the DLP on if phase is within the region we are triggering over **/
 	return A_OK;
 
 
@@ -716,9 +766,30 @@ void SetupGUI(Experiment* exp) {
 
 	/****** Setup Debug Control Panel ******/
 	cvNamedWindow(exp->WinCon2);
-	cvResizeWindow(exp->WinCon2, 450, 200);
+	//cvResizeWindow(exp->WinCon2, 200, 200);
 	cvCreateTrackbar("FloodLight", exp->WinCon2,
 			&(exp->Params->IllumFloodEverything), 1, (int) NULL);
+
+	/** Setup Information about Curvature Analysis on the extra control panel **/
+	//Curvature analysis? Yes / No
+	cvCreateTrackbar("KAnalyzeOn", exp->WinCon2,
+			&(exp->Params->CurvatureAnalyzeOn), 1, (int) NULL);
+
+	//Trigger based on the derivative of the mean curvature of the head? Yes/No
+	cvCreateTrackbar("KTriggerOn", exp->WinCon2,
+			&(exp->Params->CurvaturePhaseTriggerOn), 1, (int) NULL);
+
+	//How many number of frames do we go back in time to calculate the derivative?
+	cvCreateTrackbar("KNumFrames", exp->WinCon2,
+				&(exp->Params->CurvaturePhaseNumFrames), 50, (int) NULL);
+
+	//Abs value threshold for mean curvature, greater than which we illuminate
+	cvCreateTrackbar("KThresh", exp->WinCon2,
+				&(exp->Params->CurvaturePhaseThreshold), 100, (int) NULL);
+
+	//Illuminate for positive or negative derivative of curvature (kdot >? 0)?
+	cvCreateTrackbar("KThresh+/-", exp->WinCon2,
+					&(exp->Params->CurvaturePhaseDerivThresholdPositive), 1, (int) NULL);
 
 
 

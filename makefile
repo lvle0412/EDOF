@@ -311,12 +311,17 @@ $(API_DLL_dir)/mc_api.dll: API/bin/mc_api.dll
 API/bin/mc_api.dll: API/makefile
 	cd API && make clean && make all && cd ..
 
-.PHONY: clean	
+.PHONY: clean run
 clean:
 	rm -rfv *.o
 	rm -fv 	$(API_DLL_dir)/mc_api.dll
-	
-	
+
+run:
+	echo "Running bin/VirtualMC.exe -s -i bin/TestSwimLong.avi"
+	./bin/VirtualMC.exe -s -i bin/TestSwimLong.avi
+ 
+
+
 
 #OpenCV Libraries have to be available on the environment path.
 

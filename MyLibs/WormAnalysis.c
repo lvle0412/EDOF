@@ -303,6 +303,7 @@ WormAnalysisParam* CreateWormAnalysisParam(){
 	ParamPtr->CurvaturePhaseThreshold = 0;
 	ParamPtr->CurvaturePhaseDerivThresholdPositive = 1;
 	ParamPtr->CurvaturePhaseNumFrames = 20;
+	ParamPtr->CurvaturePhaseVisualaziationFactor=1000;  //this is just for printfs and for the GUI because the numbers are too hard to read by eye
 
 	/** Illum Head-Tail Sweep **/
 	ParamPtr->IllumSweepHT = 1;

@@ -463,19 +463,20 @@ int HandleCurvaturePhaseAnalysis(Experiment* exp){
 	int DEBUG_FLAG=0; // print out ?
 
 
-
 	_TICTOC_TIC_FUNC
 	TICTOC::timer().tic("_CurvaturePhaseAnalysis",exp->e);
 
 	/** If Curvature Analysis is turned off, just return **/
 	if (exp->Params->CurvatureAnalyzeOn == 0){
 		return EXP_SUCCESS;
-	}
+	}  /** Otherwise Let's Calculate the Mean Curvature of the Head**/
 
-	/** Otherwise Let's Calculate the Mean Curvature of the Head**/
+
+
 
 	/** Smoothing parameter**/
 	double sigma=5; /** made bigger **/
+	int factor=exp->Params->CurvaturePhaseVisualaziationFactor; //visualization parameter
 
 	/** Define the head in worm coordinates **/
 	int HEAD_BEGIN=10;
@@ -484,8 +485,6 @@ int HandleCurvaturePhaseAnalysis(Experiment* exp){
 	/** Splice the head **/
 	CvSeq* headcent=cvSeqSlice(exp->Worm->Segmented->Centerline,cvSlice(HEAD_BEGIN,HEAD_END));
 	int N=headcent->total - 2;
-
-
 	if (DEBUG_FLAG!=0){
 		printf("Whole Centerline :\n");
 		printSeq(exp->Worm->Segmented->Centerline);
@@ -501,7 +500,6 @@ int HandleCurvaturePhaseAnalysis(Experiment* exp){
 	/** Smooth and Extract Curvature **/
 	if (extractCurvatureOfSeq( headcent,curvature,sigma,exp->Worm->MemScratchStorage)< 0) return EXP_ERROR;
 	RefreshWormMemStorage(exp->Worm);
-
 	if (DEBUG_FLAG!=0) printDoubleArr(curvature,N);
 
 	/** Calculate Median Curvature **/
@@ -521,42 +519,32 @@ int HandleCurvaturePhaseAnalysis(Experiment* exp){
 	/** Calculate the derivative of the mean head curvature with respect to time **/
 	double* headPhaseBuff=NULL;
 	SeqDoublesToArr((const CvSeq*) exp->Worm->TimeEvolution->MeanHeadCurvatureBuffer,&headPhaseBuff);
-
 	int N_curr=exp->Worm->TimeEvolution->MeanHeadCurvatureBuffer->total;
+
 	if (DEBUG_FLAG!=0){
 		printf("headPhaseBuff\n");
 		printDoubleArr(headPhaseBuff,N_curr);
 	}
-	double* k_dot=&(exp->Worm->TimeEvolution->derivativeOfHeadCurvature);
 
+	double* k_dot=&(exp->Worm->TimeEvolution->derivativeOfHeadCurvature);
 	mean_derivative(headPhaseBuff,k_dot,N_curr);
 
 	/** Deallocate memory for head phase buffer **/
 	free(headPhaseBuff);
-
-
-
-
 	if (DEBUG_FLAG!=0) {
-		printf("Derivative of Head Curvature* 100: %f\n",(double)100* (exp->Worm->TimeEvolution->derivativeOfHeadCurvature));
+		printf("Derivative of Head Curvature* %d: %f\n",factor, (double)factor* (exp->Worm->TimeEvolution->derivativeOfHeadCurvature));
 		printf("NumFrames: %d, +/-: %d, Thresh: %d\n",exp->Params->CurvaturePhaseNumFrames,exp->Params->CurvaturePhaseDerivThresholdPositive,exp->Params->CurvaturePhaseThreshold);
 	}
 
 
-
 	/** If triggering based on phase, decide weather to turn the DLP on or off**/
-
-
 	double k, kdot, trig, desiredSign, signOfk, signOfkdot;
-	int factor=1000;
-	if (exp->Params->CurvaturePhaseTriggerOn != 0){
 
+	if (exp->Params->CurvaturePhaseTriggerOn != 0){
 		/*
 		 * This is subtle. There is k and kdot. k is the median curvature. kdot is the derivative of the median curvature.
 		 * We want to trigger based upon when |k| > trig and when sign(kdot) == desiredSign .
 		 */
-
-
 		kdot=exp->Worm->TimeEvolution->derivativeOfHeadCurvature;
 		k=median_curvature*factor;
 
@@ -585,16 +573,10 @@ int HandleCurvaturePhaseAnalysis(Experiment* exp){
 			exp->Params->DLPOn = 0;
 		}
 
-		printf("Derivative of Head Curvature* %d: %f\n", factor, (double) factor* (exp->Worm->TimeEvolution->derivativeOfHeadCurvature));
-		printf("median_curvature * %d: %f\n", factor, (double) factor*  median_curvature);
 
 	}
-
 	TICTOC::timer().toc("_CurvaturePhaseAnalysis",exp->e);
-
 	return A_OK;
-
-
 }
 
 
@@ -1262,10 +1244,25 @@ void StartFrameRateTimer(Experiment* exp) {
  * Calculate the frame rate and print i tout
  *
  */
-void CalculateAndPrintFrameRate(Experiment* exp) {
+void CalculateAndPrintFrameRateAndInfo(Experiment* exp) {
 	/*** Print out Frame Rate ***/
+	int fps,factor;
 	if ((exp->Worm->timestamp - exp->prevTime) > CLOCKS_PER_SEC) {
-		printf("%d fps\n", exp->Worm->frameNum - exp->prevFrames);
+
+		/** Simply count the frames given in the last second **/
+		fps=exp->Worm->frameNum - exp->prevFrames;
+
+		/** If we are doing real time analysis of head curvature **/
+		if (exp->Params->CurvatureAnalyzeOn) {
+			factor=exp->Params->CurvaturePhaseVisualaziationFactor;
+			/** display the head curvature and derivative along with the frame rate **/
+			printf("%d fps \tk*%d=%Lf \tkdot*%d=%Lf \n", fps, factor, (double)factor*exp->Worm->TimeEvolution->currMeanHeadCurvature,factor, (double)factor* exp->Worm->TimeEvolution->derivativeOfHeadCurvature);
+		}else{
+			/** Print only frames **/
+			printf("%d fps\n", fps);
+		}
+
+		/** In all cases, reset the timer **/
 		exp->prevFrames = exp->Worm->frameNum;
 		exp->prevTime = exp->Worm->timestamp;
 	}

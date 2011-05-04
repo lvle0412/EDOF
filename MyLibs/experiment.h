@@ -359,10 +359,10 @@ void StartFrameRateTimer(Experiment* exp);
 
 /*
  * If more than a second has elapsed
- * Calculate the frame rate and print i tout
- *
+ * Calculate the frame rate and print it out
+ * Also print out information about curvature, if thats relevant.
  */
-void CalculateAndPrintFrameRate(Experiment* exp);
+void CalculateAndPrintFrameRateAndInfo(Experiment* exp);
 
 
 

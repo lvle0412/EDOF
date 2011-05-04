@@ -206,7 +206,7 @@ int main (int argc, char** argv){
 
 
 			/** Calculate the frame rate and every second print the result **/
-			CalculateAndPrintFrameRate(exp);
+			CalculateAndPrintFrameRateAndInfo(exp);
 
 
 			/** Do we even bother doing analysis?**/

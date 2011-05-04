@@ -118,6 +118,7 @@ typedef struct WormAnalysisParamStruct{
 	int CurvaturePhaseThreshold;
 	int CurvaturePhaseDerivThresholdPositive;
 	int CurvaturePhaseNumFrames; // Number of frames back (in time) to store
+	int CurvaturePhaseVisualaziationFactor; //Factor by which we are multiplying for the GUI and for human readability.
 
 
 	/** Stage Control Parameters **/

@@ -147,6 +147,7 @@ typedef struct WormTimeEvolutionStruct{
 	/** Phase and Curvature Analysis **/
 	CvSeq* MeanHeadCurvatureBuffer;
 	double derivativeOfHeadCurvature;
+	double currMeanHeadCurvature;
 	CvMemStorage* MemTimeEvolutionStorage;
 }WormTimeEvolution;
 

@@ -280,6 +280,12 @@ int AppendWormFrameToDisk(WormAnalysisData* Worm, WormAnalysisParam* Params, Wri
 			cvWriteInt(fs,"Blue",Params->BlueLaser);
 		cvEndWriteStruct(fs);
 
+		/** Head Curvature Information **/
+		if (Params->CurvatureAnalyzeOn){
+			cvWriteReal(fs,"HeadCurv",(float) Worm->TimeEvolution->currMeanHeadCurvature);
+			cvWriteReal(fs,"HeadCurvDeriv",(float) Worm->TimeEvolution->derivativeOfHeadCurvature);
+		}
+
 		/** Protocol Information **/
 
 		cvWriteInt(fs,"ProtocolIsOn",Params->ProtocolUse);

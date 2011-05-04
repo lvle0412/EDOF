@@ -448,6 +448,7 @@ WormTimeEvolution* CreateWormTimeEvolution(){
 	TimeEv->MemTimeEvolutionStorage=cvCreateMemStorage(0);
 	TimeEv->MeanHeadCurvatureBuffer=cvCreateSeq(0,sizeof(CvSeq),sizeof(double),TimeEv->MemTimeEvolutionStorage);
 	TimeEv->derivativeOfHeadCurvature=0;
+	TimeEv->currMeanHeadCurvature=0;
 
 	return TimeEv;
 }
@@ -465,18 +466,24 @@ int AddMeanHeadCurvature(WormTimeEvolution* TimeEvolution, double CurrHeadCurvat
 				return A_ERROR;
 	}
 
-	int PO=0; // print out
+	int DEBUG_INFO=0; // print out
 
 	int MaxBuff;
-	if (PO!=0) printf("CurvaturePhaseNumFrames=%d\n",AnalysisParam->CurvaturePhaseNumFrames);
+	if (DEBUG_INFO!=0) printf("CurvaturePhaseNumFrames=%d\n",AnalysisParam->CurvaturePhaseNumFrames);
 	if (AnalysisParam->CurvaturePhaseNumFrames>0){
 		MaxBuff=AnalysisParam->CurvaturePhaseNumFrames;
 	}else{
 		MaxBuff=1;
 	}
 
-	if (PO!=0) printf("MaxBuff=%d\n",MaxBuff);
+	if (DEBUG_INFO!=0) printf("MaxBuff=%d\n",MaxBuff);
+
+	/** Push onto Bufeer **/
 	PushToSeqBuffer(TimeEvolution->MeanHeadCurvatureBuffer,(void*) &CurrHeadCurvature,MaxBuff);
+
+	/** Set Current Mean Head Curvature **/
+	TimeEvolution->currMeanHeadCurvature = CurrHeadCurvature;
+
 	return A_OK;
 }
 

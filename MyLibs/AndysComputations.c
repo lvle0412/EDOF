@@ -201,6 +201,7 @@ double SumDoubleArray(const double* arr,int N){
 /*
  * Returns the mean derivative of a series of n values in buffer x
  * Written by Quan Wen
+ * It assumes that the zeroth index is at t=0.
  */
 int mean_derivative(double *x, double *x_dot, int n)
 {

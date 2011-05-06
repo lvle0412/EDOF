@@ -526,19 +526,23 @@ int HandleCurvaturePhaseAnalysis(Experiment* exp){
 		printDoubleArr(headPhaseBuff,N_curr);
 	}
 
-	double* k_dot=&(exp->Worm->TimeEvolution->derivativeOfHeadCurvature);
-	mean_derivative(headPhaseBuff,k_dot,N_curr);
+	double negative_k_dot;//our buffer is backwards. 0th index is most recent.
+
+	mean_derivative(headPhaseBuff,&negative_k_dot,N_curr);
+	exp->Worm->TimeEvolution->derivativeOfHeadCurvature=-negative_k_dot;
+
 
 	/** Deallocate memory for head phase buffer **/
 	free(headPhaseBuff);
 	if (DEBUG_FLAG!=0) {
-		printf("Derivative of Head Curvature* %d: %f\n",factor, (double)factor* (exp->Worm->TimeEvolution->derivativeOfHeadCurvature));
-		printf("NumFrames: %d, +/-: %d, Thresh: %d\n",exp->Params->CurvaturePhaseNumFrames,exp->Params->CurvaturePhaseDerivThresholdPositive,exp->Params->CurvaturePhaseThreshold);
+		printf("k*%d=%f\t, kdot* %d: %f\n",factor, (double)factor *median_curvature, factor, (double)factor* (exp->Worm->TimeEvolution->derivativeOfHeadCurvature));
+		printf("NumFrames: %d, kdot+/-: %d, k+/-: %d, Thresh: %d\n",exp->Params->CurvaturePhaseNumFrames, exp->Params->CurvaturePhaseDerivThresholdPositive,exp->Params->CurvaturePhaseThresholdPositive,exp->Params->CurvaturePhaseThreshold);
+		cvWaitKey(1000);
 	}
 
 
 	/** If triggering based on phase, decide weather to turn the DLP on or off**/
-	double k, kdot, trig, desiredSign, signOfk, signOfkdot;
+	double k, kdot, trig, desiredSignk, desiredSignkdot, signOfk, signOfkdot;
 
 	if (exp->Params->CurvaturePhaseTriggerOn != 0){
 		/*
@@ -556,14 +560,17 @@ int HandleCurvaturePhaseAnalysis(Experiment* exp){
 		signOfk=-1;
 		if (k>0) signOfk=1;
 
-		/** get desiredSign **/
-		desiredSign= 1;
-		if (exp->Params->CurvaturePhaseDerivThresholdPositive ==0) desiredSign=  -1;
+		/** get desiredSign  for k and kdot**/
+		desiredSignkdot= 1;
+		desiredSignk =1;
+		if (exp->Params->CurvaturePhaseDerivThresholdPositive ==0) desiredSignkdot=  -1;
+		if (exp->Params->CurvaturePhaseThresholdPositive ==0) desiredSignk=  -1;
 
-		trig= (double) exp->Params->CurvaturePhaseThreshold ;
+
+		trig= (double) exp->Params->CurvaturePhaseThreshold  / 10; //Divide by 10 because the slider bar is multiplied by 10
 
 		/** trigger if the abs(k)>trig AND signOfk==desiredSign **/
-		if (  (signOfk * k) > trig   && (signOfkdot==desiredSign)   )  {
+		if (  (signOfk * k) > trig   && (signOfkdot==desiredSignkdot)   && (signOfk==desiredSignk))  {
 
 			/** Turn on the DLP **/
 			exp->Params->DLPOn = 1;
@@ -766,11 +773,16 @@ void SetupGUI(Experiment* exp) {
 				&(exp->Params->CurvaturePhaseNumFrames), 50, (int) NULL);
 
 	//Abs value threshold for mean curvature, greater than which we illuminate
-	cvCreateTrackbar("KThresh", exp->WinCon2,
+	cvCreateTrackbar("KThresh*10", exp->WinCon2,
 				&(exp->Params->CurvaturePhaseThreshold), 100, (int) NULL);
 
-	//Illuminate for positive or negative derivative of curvature (kdot >? 0)?
+	//Illuminate during sign of k positive or negative
 	cvCreateTrackbar("KThresh+/-", exp->WinCon2,
+				&(exp->Params->CurvaturePhaseThresholdPositive), 1, (int) NULL);
+
+
+	//Illuminate for positive or negative derivative of curvature (kdot >? 0)?
+	cvCreateTrackbar("KdotThresh+/-", exp->WinCon2,
 					&(exp->Params->CurvaturePhaseDerivThresholdPositive), 1, (int) NULL);
 
 

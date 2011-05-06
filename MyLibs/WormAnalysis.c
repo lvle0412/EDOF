@@ -301,9 +301,10 @@ WormAnalysisParam* CreateWormAnalysisParam(){
 	/** Trigger Illumination Based on Phase of Curvature **/
 	ParamPtr->CurvaturePhaseTriggerOn = 0;
 	ParamPtr->CurvaturePhaseThreshold = 0;
+	ParamPtr->CurvaturePhaseThresholdPositive = 1;
 	ParamPtr->CurvaturePhaseDerivThresholdPositive = 1;
-	ParamPtr->CurvaturePhaseNumFrames = 20;
-	ParamPtr->CurvaturePhaseVisualaziationFactor=1000;  //this is just for printfs and for the GUI because the numbers are too hard to read by eye
+	ParamPtr->CurvaturePhaseNumFrames = 10;
+	ParamPtr->CurvaturePhaseVisualaziationFactor=100;  //this is just for printfs and for the GUI because the numbers are too hard to read by eye
 
 	/** Illum Head-Tail Sweep **/
 	ParamPtr->IllumSweepHT = 1;

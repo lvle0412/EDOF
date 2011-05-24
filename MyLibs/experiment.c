@@ -600,6 +600,10 @@ int HandleCurvaturePhaseAnalysis(Experiment* exp){
 					/** Turn on the DLP for a preset amount of time **/
 					exp->Params->DLPOnFlash=1;
 
+					/** TRICKY!!  **/
+					exp->Params->DLPOn=1; // let's also turn the DLP on right now! this shoudln't mess with HAndle Illumination Timing
+
+
 				} else {
 					// Don't actually turn on the DLP, because the refractory period isn't met.
 				}

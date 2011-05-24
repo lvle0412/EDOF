@@ -222,11 +222,6 @@ int main (int argc, char** argv){
 			/** Handle head-tail illumination sweep **/
 			HandleIlluminationSweep(exp);
 
-			/** Real-Time Curvature Phase Analysis, and phase induced illumination **/
-			HandleCurvaturePhaseAnalysis(exp);
-
-			/** If the DLP is not displaying right now, than turn off the mirrors */
-			ClearDLPifNotDisplayingNow(exp);
 
 
 			/** Load Image into Our Worm Objects **/
@@ -239,12 +234,20 @@ int main (int argc, char** argv){
 			DoSegmentation(exp);
 			TICTOC::timer().toc("EntireSegmentation");
 
+
+			/** Real-Time Curvature Phase Analysis, and phase induced illumination **/
+		    HandleCurvaturePhaseAnalysis(exp);
+
+			/** If the DLP is not displaying right now, than turn off the mirrors */
+			ClearDLPifNotDisplayingNow(exp);
+
+
+
 			TICTOC::timer().tic("TransformSegWormCam2DLP");
 			if (exp->e == 0){
 				TransformSegWormCam2DLP(exp->Worm->Segmented, exp->segWormDLP,exp->Calib);
 			}
 			TICTOC::timer().toc("TransformSegWormCam2DLP");
-
 
 
 

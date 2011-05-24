@@ -580,13 +580,28 @@ int HandleCurvaturePhaseAnalysis(Experiment* exp){
 			 *
 			 */
 
-			// if DLP TIMING
-				//if refactory period is over..
-					// turn on DLPFlashOn
-			//else
+			/** If we are in Illumination-Stay-On-and-Refractory-Period-Mode **/
+			if (exp->Params->StayOnAndRefract){
+
+				/** Get timing info to Find out if Refractory Period is Over **/
+				gettimeofday(&curr_tv, NULL);
+				double diff = curr_tv.tv_sec + (curr_tv.tv_usec / 1000000.0) - exp->illumFinished;
+				tenthsOfSecondsElapsed = (int) (diff * 10.0);
+				if (tenthsOfSecondsElapsed > exp->Params->IllumRefractoryPeriod){
+
+					/** Turn on the DLP for a preset amount of time **/
+					exp->Params->DLPOnFlash=1;
+
+				} else {
+					// Don't actually turn on the DLP, because the refractory period isn't met.
+				}
+
+			}else{
 
 			/** Turn on the DLP **/
 			exp->Params->DLPOn = 1;
+
+			}
 
 		} else {
 
@@ -627,7 +642,13 @@ int HandleIlluminationTiming(Experiment* exp) {
 	if ((exp->Params->DLPOnFlash) && (exp->illumStart == 0)) {
 		/**Set the start time to now. **/
 		gettimeofday(&curr_tv, NULL);
+
+		/** Set illumStart Time **/
 		exp->illumStart = curr_tv.tv_sec + (curr_tv.tv_usec / 1000000.0);
+
+		/** Set illumFinished Time as now (even though we are not yet finished) **/
+		exp->illumStart = exp->illumFinished;
+
 
 		/** Turn the DLP On **/
 		exp->Params->DLPOn = 1;
@@ -640,6 +661,11 @@ int HandleIlluminationTiming(Experiment* exp) {
 		gettimeofday(&curr_tv, NULL);
 		diff = curr_tv.tv_sec + (curr_tv.tv_usec / 1000000.0) - exp->illumStart;
 
+		/** Set IllumFinished **/
+		exp->illumFinished = curr_tv.tv_sec + (curr_tv.tv_usec / 1000000.0);
+
+
+		/** Determine if we should continue illuminating or stop **/
 		tenthsOfSecondsElapsed = (int) (diff * 10.0);
 		if (tenthsOfSecondsElapsed > exp->Params->IllumDuration) {
 			/** The illumination is now finished **/
@@ -810,7 +836,8 @@ void SetupGUI(Experiment* exp) {
 	cvCreateTrackbar("StayOn&Refract", exp->WinCon2,
 					&(exp->Params->StayOnAndRefract), 1, (int) NULL);
 
-
+	cvCreateTrackbar("IllumRefractPeriod", exp->WinCon1,
+			&(exp->Params->IllumRefractoryPeriod), 70, (int) NULL);
 
 
 

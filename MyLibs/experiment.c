@@ -453,7 +453,7 @@ int HandleIlluminationSweep(Experiment* exp){
  * Calculate the Mean Curvature of the Head and Analyze the Phase of the
  * worm's sinusoidal body motions.
  *
- * Put this is in a buffer that includes prior curvatures over the last 20 frames or so.
+ * Put this  in a buffer that includes prior curvatures over the last 20 frames or so.
  *
  * If we are trigging based on the phase of the worm's motion, turn the DLP on if we are
  * in the triggering region.
@@ -572,10 +572,27 @@ int HandleCurvaturePhaseAnalysis(Experiment* exp){
 		/** trigger if the abs(k)>trig AND signOfk==desiredSign **/
 		if (  (signOfk * k) > trig   && (signOfkdot==desiredSignkdot)   && (signOfk==desiredSignk))  {
 
+
+			/*
+			 * We want to implement a minimum DLP on-time, and a refactory
+			 * period. E.g. once the DLP goes on it should stay on a minimimum of n seconds
+			 * and once it goes off it should stay off a minimum of m seconds.
+			 *
+			 */
+
+			// if DLP TIMING
+				//if refactory period is over..
+					// turn on DLPFlashOn
+			//else
+
 			/** Turn on the DLP **/
 			exp->Params->DLPOn = 1;
+
 		} else {
 
+			// if DLPTIMING
+				//don't do anything because the Handle IllumiantionTiming DLP function will take care of it
+			// else
 			/** Turn the DLP Off **/
 			exp->Params->DLPOn = 0;
 		}
@@ -788,6 +805,12 @@ void SetupGUI(Experiment* exp) {
 	//Illuminate for positive or negative derivative of curvature (kdot >? 0)?
 	cvCreateTrackbar("KdotThresh+/-", exp->WinCon2,
 					&(exp->Params->CurvaturePhaseDerivThresholdPositive), 1, (int) NULL);
+
+	//Use the minimum DLP On and Refractory Period?
+	cvCreateTrackbar("StayOn&Refract", exp->WinCon2,
+					&(exp->Params->StayOnAndRefract), 1, (int) NULL);
+
+
 
 
 

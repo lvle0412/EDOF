@@ -104,7 +104,7 @@ typedef struct WormAnalysisParamStruct{
 
 	/** Timed DLP On **/
 	int IllumDuration; // in tenthsOfSeconds
-	int DLPOnFlash;
+	int DLPOnFlash;  // (see also StimulusRefractoryPeriod and StayOnAndRefrat)
 
 	/** Use Protocols? **/
 	int ProtocolUse;
@@ -126,6 +126,9 @@ typedef struct WormAnalysisParamStruct{
 	int CurvaturePhaseNumFrames; // Number of frames back (in time) to store
 	int CurvaturePhaseVisualaziationFactor; //Factor by which we are multiplying for the GUI and for human readability.
 
+	/** Timing for Phase & Curvature Based Triggering **/
+	int StayOnAndRefract; //Stay On for the time IllumDuration and wait to turn on again a time specified below
+	int StimulusRefractoryPeriod; //Amount of time to wait to turn on again in tenths of Seconds
 
 	/** Stage Control Parameters **/
 	int stageTrackingOn;

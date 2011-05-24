@@ -306,6 +306,11 @@ WormAnalysisParam* CreateWormAnalysisParam(){
 	ParamPtr->CurvaturePhaseNumFrames = 10;
 	ParamPtr->CurvaturePhaseVisualaziationFactor=100;  //this is just for printfs and for the GUI because the numbers are too hard to read by eye
 
+	/** Timing for Phase & Curvature Based Triggering **/
+	ParamPtr->StayOnAndRefract=0; //Stay On for the time IllumDuration and wait to turn on again a time specified below
+	ParamPtr->StimulusRefractoryPeriod=0; //Amount of time to wait to turn on again in tenths of Seconds
+
+
 	/** Illum Head-Tail Sweep **/
 	ParamPtr->IllumSweepHT = 1;
 	ParamPtr->IllumSweepOn=0;

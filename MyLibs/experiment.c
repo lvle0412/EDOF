@@ -590,12 +590,7 @@ int HandleCurvaturePhaseAnalysis(Experiment* exp){
 				/** Get timing info to Find out if Refractory Period is Over **/
 				gettimeofday(&curr_tv, NULL);
 				double diff = curr_tv.tv_sec + (curr_tv.tv_usec / 1000000.0) - exp->illumFinished;
-				printf("diff=%f\n",diff);
-				int tenthsOfSecondsElapsed = (int) (diff * 10.0);
-				printf("exp->illumFinished=%f\n",exp->illumFinished);
-				printf("tenthsOfSecondsElapsed = %d, IllumRefractoryPeriod=%f\n",tenthsOfSecondsElapsed,exp->Params->IllumRefractoryPeriod);
-
-				if (diff  > (double) exp->Params->IllumRefractoryPeriod / 10.0){
+				if ( diff  >  (double) exp->Params->IllumRefractoryPeriod / 10.0){
 
 					/** Turn on the DLP for a preset amount of time **/
 					exp->Params->DLPOnFlash=1;

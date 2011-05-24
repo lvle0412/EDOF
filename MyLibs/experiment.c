@@ -587,7 +587,11 @@ int HandleCurvaturePhaseAnalysis(Experiment* exp){
 }
 
 
-/** Handle Transient Illumination Timing **/
+/*
+ * Feature to turn on DLP illumination for a specified period of time
+ * and then auto shut off.
+ *
+ */
 int HandleIlluminationTiming(Experiment* exp) {
 
 	struct timeval curr_tv;

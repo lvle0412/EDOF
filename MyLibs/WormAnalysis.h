@@ -49,6 +49,11 @@
 
 
 typedef struct WormAnalysisParamStruct{
+	/* WormAnalyisisParam is a structure containing inputs
+	 * to the analysis machinery. As a general principle it
+	 * should not contain outputs or computed values.
+	 */
+
 	/** Turn Analysis On Generally **/
 	int OnOff;
 
@@ -131,7 +136,7 @@ typedef struct WormAnalysisParamStruct{
 
 } WormAnalysisParam;
 
-/** These are computed and segmented information about the worm **/
+/** These are computed and segmented information about the worm at the current frame**/
 typedef struct SegmentedWormStruct{
 	CvSeq* Centerline;
 	CvSeq* LeftBound;
@@ -146,6 +151,12 @@ typedef struct SegmentedWormStruct{
 
 
 typedef struct WormTimeEvolutionStruct{
+	/*
+	 * This information about the worm
+	 * that is derived from observing the worm
+	 * over a period of time.
+	 */
+
 	/** Phase and Curvature Analysis **/
 	CvSeq* MeanHeadCurvatureBuffer;
 	double derivativeOfHeadCurvature;

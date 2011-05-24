@@ -658,7 +658,7 @@ int HandleIlluminationTiming(Experiment* exp) {
 		exp->illumStart = curr_tv.tv_sec + (curr_tv.tv_usec / 1000000.0);
 
 		/** Set illumFinished Time as now (even though we are not yet finished) **/
-		exp->illumStart = exp->illumFinished;
+		exp->illumFinished =exp->illumStart;
 
 
 		/** Turn the DLP On **/

@@ -308,7 +308,7 @@ WormAnalysisParam* CreateWormAnalysisParam(){
 
 	/** Timing for Phase & Curvature Based Triggering **/
 	ParamPtr->StayOnAndRefract=0; //Stay On for the time IllumDuration and wait to turn on again a time specified below
-	ParamPtr->IllumRefractoryPeriod=0; //Amount of time to wait to turn on again in tenths of Seconds
+	ParamPtr->IllumRefractoryPeriod= 0; //Amount of time to wait to turn on again in tenths of Seconds
 
 
 	/** Illum Head-Tail Sweep **/

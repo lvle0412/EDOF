@@ -164,6 +164,7 @@ Experiment* CreateExperimentStruct() {
 
 	/** Illumination Timing Info **/
 	exp->illumStart = 0;
+	exp->illumFinished = 0;
 
 	/** Illumination Head Tail Timing Info **/
 	exp->illumSweepHTtimer=0;
@@ -460,6 +461,7 @@ int HandleIlluminationSweep(Experiment* exp){
  *
  */
 int HandleCurvaturePhaseAnalysis(Experiment* exp){
+
 	int DEBUG_FLAG=0; // print out ?
 
 
@@ -583,13 +585,17 @@ int HandleCurvaturePhaseAnalysis(Experiment* exp){
 			 */
 
 			/** If we are in Illumination-Stay-On-and-Refractory-Period-Mode **/
-			if (exp->Params->StayOnAndRefract){
+			if (exp->Params->StayOnAndRefract==1){
 
 				/** Get timing info to Find out if Refractory Period is Over **/
 				gettimeofday(&curr_tv, NULL);
 				double diff = curr_tv.tv_sec + (curr_tv.tv_usec / 1000000.0) - exp->illumFinished;
+				printf("diff=%f\n",diff);
 				int tenthsOfSecondsElapsed = (int) (diff * 10.0);
-				if (tenthsOfSecondsElapsed > exp->Params->IllumRefractoryPeriod){
+				printf("exp->illumFinished=%f\n",exp->illumFinished);
+				printf("tenthsOfSecondsElapsed = %d, IllumRefractoryPeriod=%f\n",tenthsOfSecondsElapsed,exp->Params->IllumRefractoryPeriod);
+
+				if (diff  > (double) exp->Params->IllumRefractoryPeriod / 10.0){
 
 					/** Turn on the DLP for a preset amount of time **/
 					exp->Params->DLPOnFlash=1;
@@ -606,12 +612,14 @@ int HandleCurvaturePhaseAnalysis(Experiment* exp){
 			}
 
 		} else {
+			/** The curvature is such that we are no longer triggering **/
 
-			// if DLPTIMING
-				//don't do anything because the Handle IllumiantionTiming DLP function will take care of it
-			// else
-			/** Turn the DLP Off **/
-			exp->Params->DLPOn = 0;
+			 if (exp->Params->StayOnAndRefract==1){
+				//don't do anything because the Handle IllumiantionTiming DLP function will take care of turning things off
+			 } else {
+				/** Turn the DLP Off **/
+				exp->Params->DLPOn = 0;
+			 }
 		}
 
 
@@ -632,6 +640,7 @@ int HandleIlluminationTiming(Experiment* exp) {
 	double diff;
 
 	int tenthsOfSecondsElapsed;
+
 
 	/** Case 1: Nothing to do **/
 	if (!exp->Params->DLPOnFlash) {
@@ -834,12 +843,13 @@ void SetupGUI(Experiment* exp) {
 	cvCreateTrackbar("KdotThresh+/-", exp->WinCon2,
 					&(exp->Params->CurvaturePhaseDerivThresholdPositive), 1, (int) NULL);
 
+	cvCreateTrackbar("IllumRefractPeriod", exp->WinCon2,
+			&(exp->Params->IllumRefractoryPeriod), 70, (int) NULL);
+
 	//Use the minimum DLP On and Refractory Period?
 	cvCreateTrackbar("StayOn&Refract", exp->WinCon2,
 					&(exp->Params->StayOnAndRefract), 1, (int) NULL);
 
-	cvCreateTrackbar("IllumRefractPeriod", exp->WinCon1,
-			&(exp->Params->IllumRefractoryPeriod), 70, (int) NULL);
 
 
 

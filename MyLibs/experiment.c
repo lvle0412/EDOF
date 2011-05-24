@@ -545,6 +545,8 @@ int HandleCurvaturePhaseAnalysis(Experiment* exp){
 	double k, kdot, trig, desiredSignk, desiredSignkdot, signOfk, signOfkdot;
 
 	if (exp->Params->CurvaturePhaseTriggerOn != 0){
+		struct timeval curr_tv;
+
 		/*
 		 * This is subtle. There is k and kdot. k is the median curvature. kdot is the derivative of the median curvature.
 		 * We want to trigger based upon when |k| > trig and when sign(kdot) == desiredSign .
@@ -586,7 +588,7 @@ int HandleCurvaturePhaseAnalysis(Experiment* exp){
 				/** Get timing info to Find out if Refractory Period is Over **/
 				gettimeofday(&curr_tv, NULL);
 				double diff = curr_tv.tv_sec + (curr_tv.tv_usec / 1000000.0) - exp->illumFinished;
-				tenthsOfSecondsElapsed = (int) (diff * 10.0);
+				int tenthsOfSecondsElapsed = (int) (diff * 10.0);
 				if (tenthsOfSecondsElapsed > exp->Params->IllumRefractoryPeriod){
 
 					/** Turn on the DLP for a preset amount of time **/

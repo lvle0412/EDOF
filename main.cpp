@@ -230,6 +230,10 @@ int main (int argc, char** argv){
 			if (exp->e == 0) exp->e=RefreshWormMemStorage(exp->Worm);
 			if (exp->e == 0) exp->e=LoadWormImg(exp->Worm,exp->fromCCD->iplimg);
 
+			/** Apply Levels**/  //Note this is slightly redundant with LoadWormImg
+			if (exp->e == 0) exp->e=simpleAdjustLevels(exp->fromCCD->iplimg, exp->Worm->ImgOrig, exp->Params->LevelsMin, exp->Params->LevelsMax);
+
+
 			TICTOC::timer().tic("EntireSegmentation");
 			/** Do Segmentation **/
 			DoSegmentation(exp);

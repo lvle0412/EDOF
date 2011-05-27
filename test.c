@@ -163,6 +163,15 @@ int main(){
 
 	printf(copyString("Hello you World\n"));
 
+
+	printf("Running Simple Adjust Levels\n");
+
+	IplImage* src=NULL;
+	IplImage* dest=NULL;
+	simpleAdjustLevels( src, dest,5 , 50 );
+	return 0;
+
+
 	printf("Points between line test\n");
 	CvMemStorage* mem= cvCreateMemStorage();
 	CvSeq* test=cvCreateSeq(CV_SEQ_ELTYPE_POINT, sizeof(CvSeq), sizeof(CvPoint),mem);

@@ -256,6 +256,10 @@ WormAnalysisParam* CreateWormAnalysisParam(){
 	ParamPtr->BoundSmoothSize=0;
 	ParamPtr->DilateErode=0;
 
+	/** Levels Brightness **/
+	ParamPtr->LevelsMin=0;
+	ParamPtr->LevelsMax=255;
+
 	/** Default WormSpace GridSize **/
 	ParamPtr->DefaultGridSize=cvSize(20,ParamPtr->NumSegments);
 

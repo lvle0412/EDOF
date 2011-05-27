@@ -54,6 +54,10 @@ typedef struct WormAnalysisParamStruct{
 
 
 
+	/** Image Brightness Levels **/
+	int LevelsMin;
+	int LevelsMax;
+
 	/** Single Frame Analysis Parameters**/
 	int LengthScale;
 	int LengthOffset;

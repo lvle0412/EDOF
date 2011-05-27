@@ -1605,7 +1605,7 @@ int HandleStageTracker(Experiment* exp){
 			//printf("stageFeedbackTargetoffset=(%d, %d)\n",exp->stageFeedbackTargetOffset.x,exp->stageFeedbackTargetOffset.y);
 			CvPoint target=cvPoint(exp->stageCenter.x + exp->stageFeedbackTargetOffset.x,exp->stageCenter.y+exp->stageFeedbackTargetOffset.y);
 			//printf("target=(%d, %d)\n",target.x,target.y);
-			exp->Worm->stageVelocity=AdjustStageToKeepObjectAtTarget(exp->stage,exp->Worm->Segmented->centerOfWorm,target,exp->Params->stageSpeedFactor);
+			exp->Worm->stageVelocity=AdjustStageToKeepObjectAtTarget(exp->stage,exp->Worm->Segmented->Head,target,exp->Params->stageSpeedFactor);
 			}
 		}
 		if (exp->Params->stageTrackingOn==0){/** Tracking Should be off **/

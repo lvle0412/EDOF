@@ -1111,7 +1111,13 @@ void DoSegmentation(Experiment* exp) {
 	/*** <segmentworm> ***/
 
 	/*** Find Worm Boundary ***/
-
+	/*
+	 *  There is a lot in this one function, FindWormBoudnary(), including:
+	 *  Gaussian Blurring
+	 *  Thresholding
+	 *  Blob Detection
+	 *  etc
+	 */
 	TICTOC::timer().tic("_FindWormBoundary",exp->e);
 	if (!(exp->e))
 		FindWormBoundary(exp->Worm, exp->Params);

@@ -439,20 +439,28 @@ void FindWormBoundary(WormAnalysisData* Worm, WormAnalysisParam* Params){
 	 *  c) resize
 	 *  d) not using CV_GAUSSIAN for smoothing
 	 */
+
+	/** Smooth the Image **/
 	TICTOC::timer().tic("cvSmooth");
 	cvSmooth(Worm->ImgOrig,Worm->ImgSmooth,CV_GAUSSIAN,Params->GaussSize*2+1);
 	//cvSmooth(Worm->ImgOrig,Worm->ImgSmooth,CV_MEDIAN,Params->GaussSize*2+1);
 	//cvSmooth(Worm->ImgOrig,Worm->ImgSmooth,CV_BLUR,Params->GaussSize*2+1,Params->GaussSize*2+1);
 	TICTOC::timer().toc("cvSmooth");
+
+	/** Thershold the Image **/
 	TICTOC::timer().tic("cvThreshold");
 	cvThreshold(Worm->ImgSmooth,Worm->ImgThresh,Params->BinThresh,255,CV_THRESH_BINARY );
 	TICTOC::timer().toc("cvThreshold");
+
+	/** Find Contours **/
 	CvSeq* contours;
 	IplImage* TempImage=cvCreateImage(cvGetSize(Worm->ImgThresh),IPL_DEPTH_8U,1);
 	cvCopy(Worm->ImgThresh,TempImage);
 	TICTOC::timer().tic("cvFindContours");
 	cvFindContours(TempImage,Worm->MemStorage, &contours,sizeof(CvContour),CV_RETR_EXTERNAL,CV_CHAIN_APPROX_NONE,cvPoint(0,0));
 	TICTOC::timer().toc("cvFindContours");
+
+	/** Find Longest Contour **/
 	TICTOC::timer().tic("cvLongestContour");
 	if (contours) LongestContour(contours,&(Worm->Boundary));
 	TICTOC::timer().toc("cvLongestContour");

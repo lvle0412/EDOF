@@ -1233,16 +1233,15 @@ CvMat* CreateMinMaxLUT(int min, int max){
 		min=tmp;
 	}
 
-	LUT=cvCreateMat(255,1,CV_8UC1);
-	for (int k=0; k<255; k++){
-		unsigned int* ptr= (unsigned int*) (LUT->data.ptr+ k * LUT->step);
+	LUT=cvCreateMat(1,256,CV_8U);
+	for (int k=0; k<256; k++){
 
 		if (k<min) {
-			*ptr=0;
+			*(  (unsigned int *) CV_MAT_ELEM_PTR(*LUT,0,k)  ) =0;
 		} else if (k>max){
-			*ptr=255;
+			*(  (unsigned int *) CV_MAT_ELEM_PTR(*LUT,0,k)  )=255;
 		} else {
-			*ptr = (k-min) *   (unsigned int) (  (  255.0 ) / ( (float) max-  (float) min) );
+			*(  (unsigned int *) CV_MAT_ELEM_PTR(*LUT,0,k)  )= (k-min) *   (unsigned int) (  (  255.0 ) / ( (float) max-  (float) min) );
 		}
 
 	}
@@ -1258,6 +1257,8 @@ int simpleAdjustLevels(const IplImage* src, IplImage* dest, int min, int max){
 
 	CvMat* LUT= NULL;
 	LUT=CreateMinMaxLUT(min,max);
+
+	cvLUT( src, dest, (const CvArr*) LUT);
 
 	cvReleaseMat(&LUT);
 

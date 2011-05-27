@@ -103,8 +103,8 @@ MyLibs=MyLibs
 3rdPartyLibs=3rdPartyLibs
 bfIncDir=$(3rdPartyLibs)/BitFlowSDK
 targetDir=bin
-CVdir=C:/Progra~1/OpenCV
-GIT=C:/Program\ Files/Git/bin/git #version control system
+CVdir=C:/Progra~2/OpenCV
+GIT=C:/Progra~2/Git/bin/git #version control system
 
 #Matlab Include directory for header files
 MatlabIncDir= C:/Progra~1/MATLAB/R2009a/extern/include
@@ -176,11 +176,12 @@ $(targetDir)/CalibrateApparatus.exe : $(calib_objects) Talk2Stage.o
 calibrate.o : calibrate.c $(3rdPartyLibs)/tisgrabber.h $(3rdPartyLibs)/TISGrabberGlobalDefs.h $(MyLibs)/Talk2DLP.h $(MyLibs)/Talk2Camera.h $(MatlabIncDir)/engine.h
 	$(CXX) $(CXXFLAGS) calibrate.c -I"inc" -I$(MyLibs) $(openCVincludes) $(TailOpts) 
 
-$(targetDir)/ClosedLoop.exe : main.o $(objects) Talk2Stage.o
-	$(CXX) -o $(targetDir)/ClosedLoop.exe main.o $(objects) Talk2Stage.o $(LinkerWinAPILibObj) $(TailOpts)
+## CLosed Loop should be renamed ImagingSource + Stage but no DLP or FrameGrabber
+$(targetDir)/ClosedLoop.exe : main.o  $(hw_ind) Talk2Camera.o Talk2Stage.o DontTalk2FrameGrabber.o DontTalk2DLP.o $(3rdPartyLibs)/tisgrabber.lib
+	$(CXX) -o $(targetDir)/ClosedLoop.exe main.o $(hw_ind)  Talk2Camera.o $(3rdPartyLibs)/tisgrabber.lib  Talk2Stage.o DontTalk2FrameGrabber.o DontTalk2DLP.o  $(LinkerWinAPILibObj) $(TailOpts)
 	
 	
-main.o : main.cpp $(3rdPartyLibs)/tisgrabber.h $(3rdPartyLibs)/TISGrabberGlobalDefs.h $(MyLibs)/Talk2DLP.h $(MyLibs)/Talk2Camera.h  $(MyLibs)/TransformLib.h $(MatlabIncDir)/engine.h
+main.o : main.cpp $(3rdPartyLibs)/tisgrabber.h $(3rdPartyLibs)/TISGrabberGlobalDefs.h $(MyLibs)/Talk2DLP.h $(MyLibs)/Talk2Camera.h  $(MyLibs)/TransformLib.h  	
 	$(CXX) $(CXXFLAGS) main.cpp -I"inc" -I$(MyLibs) $(openCVincludes) -I$(bfIncDir) $(TailOpts) 
 	
 Talk2DLP.o : $(MyLibs)/Talk2DLP.h $(MyLibs)/Talk2DLP.cpp $(3rdPartyLibs)/alp4basic.lib

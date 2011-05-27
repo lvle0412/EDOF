@@ -574,6 +574,10 @@ void SetupGUI(Experiment* exp) {
 			(int) NULL);
 	cvCreateTrackbar("Gauss=x*2+1", exp->WinCon1, &(exp->Params->GaussSize),
 			15, (int) NULL);
+	cvCreateTrackbar("BoundSmooth", exp->WinCon1, &(exp->Params->BoundSmoothSize),
+				15, (int) NULL);
+	cvCreateTrackbar("DilateErode", exp->WinCon1, &(exp->Params->DilateErode),
+					1, (int) NULL);
 	cvCreateTrackbar("ScalePx", exp->WinCon1, &(exp->Params->LengthScale), 50,
 			(int) NULL);
 	cvCreateTrackbar("Proximity", exp->WinCon1,

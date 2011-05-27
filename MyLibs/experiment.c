@@ -616,6 +616,9 @@ void SetupGUI(Experiment* exp) {
 	cvCreateTrackbar("FloodLight", exp->WinCon2,
 			&(exp->Params->IllumFloodEverything), 1, (int) NULL);
 
+	/** Levels **/
+	cvCreateTrackbar("Min",exp->WinCon2,&(exp->Params->LevelsMin),255, (int) NULL );
+	cvCreateTrackbar("Max",exp->WinCon2,&(exp->Params->LevelsMax),255, (int) NULL );
 
 
 	/** If we have loaded a protocol, set up protocol specific sliders **/

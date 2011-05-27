@@ -254,6 +254,10 @@ WormAnalysisParam* CreateWormAnalysisParam(){
 	ParamPtr->LengthOffset=ParamPtr->LengthScale/2;
 	ParamPtr->NumSegments=100;
 
+	/** Levels Brightness **/
+	ParamPtr->LevelsMin=0;
+	ParamPtr->LevelsMax=255;
+
 	/** Default WormSpace GridSize **/
 	ParamPtr->DefaultGridSize=cvSize(20,ParamPtr->NumSegments);
 

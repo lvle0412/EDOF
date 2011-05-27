@@ -1210,3 +1210,59 @@ int CropNumber(int min, int max, int x){
 	return x;
 }
 
+
+
+/*
+ * Create a lookup table  such that:
+ * 1) all pixels less then min are zero
+ * 2) all pixels greater than max are 255
+ * 3) everything in between is linear.
+ */
+CvMat* CreateMinMaxLUT(int min, int max){
+
+	CvMat* LUT=NULL;
+	if (min <0 || max <0 ){
+		return LUT;
+	}
+
+	if (min>max){
+		/** If the user made min bigger than max, then invert the two **/
+		int tmp;
+		tmp=max;
+		max=min;
+		min=tmp;
+	}
+
+	LUT=cvCreateMat(255,1,CV_8UC1);
+	for (int k=0; k<255; k++){
+		unsigned int* ptr= (unsigned int*) (LUT->data.ptr+ k * LUT->step);
+
+		if (k<min) {
+			*ptr=0;
+		} else if (k>max){
+			*ptr=255;
+		} else {
+			*ptr = (k-min) *   (unsigned int) (  (  255.0 ) / ( (float) max-  (float) min) );
+		}
+
+	}
+
+	return LUT;
+}
+
+/*
+ *  Adjust the pixel levels of an image
+ *  Creates a lookup table and applies it
+ */
+int simpleAdjustLevels(const IplImage* src, IplImage* dest, int min, int max){
+
+	CvMat* LUT= NULL;
+	LUT=CreateMinMaxLUT(min,max);
+
+	cvReleaseMat(&LUT);
+
+	return 0;
+}
+
+
+

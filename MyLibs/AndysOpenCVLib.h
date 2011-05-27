@@ -413,6 +413,12 @@ bool IntExists(int MyInt);
 int CropNumber(int max, int min, int x);
 
 
+/*
+ *  Adjust the pixel levels of an image
+ *  Creates a lookup table and applies it
+ */
+int simpleAdjustLevels(const IplImage* src, IplImage* dest, int min, int max);
+
 
 #endif /* ANDYSOPENCVLIB_H_ */
 

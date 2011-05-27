@@ -253,6 +253,8 @@ WormAnalysisParam* CreateWormAnalysisParam(){
 	ParamPtr->LengthScale=9;
 	ParamPtr->LengthOffset=ParamPtr->LengthScale/2;
 	ParamPtr->NumSegments=100;
+	ParamPtr->BoundSmoothSize=0;
+	ParamPtr->DilateErode=0;
 
 	/** Default WormSpace GridSize **/
 	ParamPtr->DefaultGridSize=cvSize(20,ParamPtr->NumSegments);
@@ -439,24 +441,59 @@ void FindWormBoundary(WormAnalysisData* Worm, WormAnalysisParam* Params){
 	 *  c) resize
 	 *  d) not using CV_GAUSSIAN for smoothing
 	 */
+
+	/** Smooth the Image **/
 	TICTOC::timer().tic("cvSmooth");
 	cvSmooth(Worm->ImgOrig,Worm->ImgSmooth,CV_GAUSSIAN,Params->GaussSize*2+1);
-	//cvSmooth(Worm->ImgOrig,Worm->ImgSmooth,CV_MEDIAN,Params->GaussSize*2+1);
-	//cvSmooth(Worm->ImgOrig,Worm->ImgSmooth,CV_BLUR,Params->GaussSize*2+1,Params->GaussSize*2+1);
 	TICTOC::timer().toc("cvSmooth");
+
+	/** Dilate and Erode **/
+//	cvDilate(Worm->ImgSmooth, Worm->ImgSmooth,NULL,3);
+//	cvErode(Worm->ImgSmooth, Worm->ImgSmooth,NULL,2);
+
+
+	/** Threshold the Image **/
 	TICTOC::timer().tic("cvThreshold");
 	cvThreshold(Worm->ImgSmooth,Worm->ImgThresh,Params->BinThresh,255,CV_THRESH_BINARY );
 	TICTOC::timer().toc("cvThreshold");
+
+
+	/** Dilate and Erode **/
+	if (Params->DilateErode==1){
+		TICTOC::timer().tic("DilateAndErode");
+		cvDilate(Worm->ImgThresh, Worm->ImgThresh,NULL,3);
+		cvErode(Worm->ImgThresh, Worm->ImgThresh,NULL,2);
+		TICTOC::timer().toc("DilateAndErode");
+	}
+
+
+	/** Find Contours **/
 	CvSeq* contours;
 	IplImage* TempImage=cvCreateImage(cvGetSize(Worm->ImgThresh),IPL_DEPTH_8U,1);
 	cvCopy(Worm->ImgThresh,TempImage);
 	TICTOC::timer().tic("cvFindContours");
 	cvFindContours(TempImage,Worm->MemStorage, &contours,sizeof(CvContour),CV_RETR_EXTERNAL,CV_CHAIN_APPROX_NONE,cvPoint(0,0));
 	TICTOC::timer().toc("cvFindContours");
+
+	CvSeq* rough;
+	/** Find Longest Contour **/
 	TICTOC::timer().tic("cvLongestContour");
-	if (contours) LongestContour(contours,&(Worm->Boundary));
+	if (contours) LongestContour(contours,&rough);
 	TICTOC::timer().toc("cvLongestContour");
 	cvReleaseImage(&TempImage);
+
+	/** Smooth the Boundary **/
+	if (Params->BoundSmoothSize>0){
+		TICTOC::timer().tic("SmoothBoundary");
+		CvSeq* smooth=smoothPtSequence(rough,Params->BoundSmoothSize,Worm->MemStorage);
+		Worm->Boundary=cvCloneSeq(smooth);
+		TICTOC::timer().toc("SmoothBoundary");
+
+	} else {
+		Worm->Boundary=cvCloneSeq(rough);
+	}
+
+
 
 }
 
@@ -932,7 +969,9 @@ int CreateWormHUDS(IplImage* TempImage, WormAnalysisData* Worm, WormAnalysisPara
 	cvAddWeighted(Worm->ImgOrig,1,IlluminationFrame->iplimg,weighting,0,TempImage);
 
 	//Want to also display boundary!
-	cvDrawContours(TempImage, Worm->Boundary, cvScalar(255,0,0),cvScalar(0,255,0),100);
+	//cvDrawContours(TempImage, Worm->Boundary, cvScalar(255,0,0),cvScalar(0,255,0),100);
+
+	DrawSequence(&TempImage,Worm->Boundary);
 
 //	DrawSequence(&TempImage,Worm->Segmented->LeftBound);
 //	DrawSequence(&TempImage,Worm->Segmented->RightBound);

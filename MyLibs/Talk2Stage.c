@@ -88,6 +88,7 @@ HANDLE InitializeUsbStage(){
 
 
 	}else if  (mode==Serial){
+		printf("In Serial mode!\n");
 		/** If Serial **/
 
 		/** This code is adapted from
@@ -98,7 +99,7 @@ HANDLE InitializeUsbStage(){
 
 		/** Open the Serial Port **/
 		HANDLE hSerial;
-		hSerial = CreateFile("COM1", GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+		hSerial = CreateFile("COM1", GENERIC_READ | GENERIC_WRITE, FILE_SHARE_WRITE | FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
 		if(hSerial==INVALID_HANDLE_VALUE){
 			if(GetLastError()==ERROR_FILE_NOT_FOUND){
 				//serial port does not exist.
@@ -120,9 +121,9 @@ HANDLE InitializeUsbStage(){
 		}
 
 
-		dcbSerialParams.BaudRate=CBR_19200;
+		dcbSerialParams.BaudRate=CBR_9600;
 		dcbSerialParams.ByteSize=8;
-		dcbSerialParams.StopBits=ONESTOPBIT;
+		dcbSerialParams.StopBits=TWOSTOPBITS;
 		dcbSerialParams.Parity=NOPARITY;
 
 		if(!SetCommState(hSerial, &dcbSerialParams)){
@@ -133,8 +134,8 @@ HANDLE InitializeUsbStage(){
 
 		/** Set TimeOuts **/
 		COMMTIMEOUTS timeouts={0};
-		timeouts.ReadIntervalTimeout=30;
-		timeouts.ReadTotalTimeoutConstant=30;
+		timeouts.ReadIntervalTimeout=50;
+		timeouts.ReadTotalTimeoutConstant=50;
 		timeouts.ReadTotalTimeoutMultiplier=10;
 		timeouts.WriteTotalTimeoutConstant=50;
 		timeouts.WriteTotalTimeoutMultiplier=10;

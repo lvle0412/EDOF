@@ -55,24 +55,102 @@ void PrintVersion(HANDLE hUsb) {
  * Initializes the USB stage;
  */
 HANDLE InitializeUsbStage(){
-	char DeviceName[MAX_PATH];
 
-	// Scan for Usb Device
-	if (!UsbScan(DeviceName)) {
-		printf("No devices found!\n");
+	int USB=1;
+	int Serial=2;
+
+	/** Set mode to serial **/
+	/* To implement: the user should be able to pass a value to initialize either the USB or the Serial port **/
+	int mode=Serial;
+
+
+	/** If USB **/
+	if (mode==USB){
+		char DeviceName[MAX_PATH];
+
+		// Scan for Usb Device
+		if (!UsbScan(DeviceName)) {
+			printf("No devices found!\n");
+			return NULL;
+		}
+		printf("Device Found: %s\n", DeviceName);
+		HANDLE hUsb = CreateFile(DeviceName, GENERIC_READ | GENERIC_WRITE,
+				FILE_SHARE_WRITE | FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+		if (hUsb == INVALID_HANDLE_VALUE) {
+			printf("Error %d: Failed to open USB file handle.\n", GetLastError());
+			return NULL;
+		} else
+			printf("Device Opened: ");
+		// Print driver version
+		PrintVersion(hUsb);
+		return hUsb;
+
+
+
+	}else if  (mode==Serial){
+		/** If Serial **/
+
+		/** This code is adapted from
+		 *
+		 * http://www.robbayer.com/files/serial-win.pdf
+		 *
+		 * **/
+
+		/** Open the Serial Port **/
+		HANDLE hSerial;
+		hSerial = CreateFile("COM1", GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+		if(hSerial==INVALID_HANDLE_VALUE){
+			if(GetLastError()==ERROR_FILE_NOT_FOUND){
+				//serial port does not exist.
+				printf("ERROR: Serial port does not exist\n");
+				return NULL;
+			}
+			printf("ERROR: Some other error with the serial port happend\n");
+			//some other error occurred. Inform user.
+			return NULL;
+		}
+
+
+		/** Set Serial Port Parameters **/
+		DCB dcbSerialParams = {0};
+		dcbSerialParams.DCBlength=sizeof(dcbSerialParams);
+		if (!GetCommState(hSerial, &dcbSerialParams)) {
+			printf("Error getting serialport state\n");
+			//error getting state
+		}
+
+
+		dcbSerialParams.BaudRate=CBR_19200;
+		dcbSerialParams.ByteSize=8;
+		dcbSerialParams.StopBits=ONESTOPBIT;
+		dcbSerialParams.Parity=NOPARITY;
+
+		if(!SetCommState(hSerial, &dcbSerialParams)){
+			printf("Error setting serial port state\n");
+			//error setting serial port state
+		}
+
+
+		/** Set TimeOuts **/
+		COMMTIMEOUTS timeouts={0};
+		timeouts.ReadIntervalTimeout=30;
+		timeouts.ReadTotalTimeoutConstant=30;
+		timeouts.ReadTotalTimeoutMultiplier=10;
+		timeouts.WriteTotalTimeoutConstant=50;
+		timeouts.WriteTotalTimeoutMultiplier=10;
+		if(!SetCommTimeouts(hSerial, &timeouts)){
+			//error occureed.
+			printf("Error: unable to set serial port timeouts.\n");
+		}
+
+
+		return hSerial;
+
+	} else {
+		printf("Error, unrecognized mode of communicating with stage.\n");
 		return NULL;
 	}
-	printf("Device Found: %s\n", DeviceName);
-	HANDLE hUsb = CreateFile(DeviceName, GENERIC_READ | GENERIC_WRITE,
-			FILE_SHARE_WRITE | FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
-	if (hUsb == INVALID_HANDLE_VALUE) {
-		printf("Error %d: Failed to open USB file handle.\n", GetLastError());
-		return NULL;
-	} else
-		printf("Device Opened: ");
-	// Print driver version
-	PrintVersion(hUsb);
-	return hUsb;
+
 }
 
 /*
@@ -183,7 +261,7 @@ void steerStageFromNumberPad(HANDLE s, int speed, int input){
 // ------------------------------------------------------------------------ //
 // UsbScan() - Scan for first USB device with a GUID that matches the one
 // passed. Return 1 if device found, else 0.
-// This function only detech the first match of the device found.
+// This function only detects the first match of the device found.
 // If you have more than one controller attached you will have to
 // scan for the device more than once. See the MFC windows
 // example. You can also get the devicename from the registry.

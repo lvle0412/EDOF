@@ -59,6 +59,7 @@ using namespace std;
 #include "MyLibs/WormAnalysis.h"
 #include "MyLibs/IllumWormProtocol.h"
 #include "MyLibs/version.h"
+#include "MyLibs/Talk2Stage.h" 	
 
 //3rd Party Libraries
 #include "3rdPartyLibs/tictoc.h"
@@ -163,7 +164,26 @@ int main(){
 
 	printf(copyString("Hello you World\n"));
 
+	HANDLE stage= InitializeUsbStage(); 
+	if (stage==NULL) printf("Stage is NULL!\n");
+	int c;
 
+	Sleep(1000);
+	printf("Spin Stage...");
+	spinStage(stage, 1000,1000);
+		Sleep(1000);
+		
+
+	printf("Stop..");
+		 haltStage(stage);
+
+
+	
+	printf("Goodbye");
+	return 0;
+
+	
+	
 	printf("Running Simple Adjust Levels\n");
 
 	IplImage* src=NULL;

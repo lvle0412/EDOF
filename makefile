@@ -238,9 +238,9 @@ FORCE:
 
 
 ###### Test.exe
-$(targetDir)/Test.exe : test.o $(CVlibs) IllumWormProtocol.o AndysOpenCvLib.o version.o $(TimerLibrary)
+$(targetDir)/Test.exe : test.o $(CVlibs) IllumWormProtocol.o AndysOpenCVLib.o Talk2Stage.o version.o $(TimerLibrary)
 	echo "attempting to make executable."
-	$(CXX) -o $(targetDir)/Test.exe test.o IllumWormProtocol.o AndysOpenCvLib.o version.o $(TimerLibrary) $(CVlibs) $(TailOpts)
+	$(CXX) -o $(targetDir)/Test.exe test.o IllumWormProtocol.o AndysOpenCVLib.o  Talk2Stage.o version.o $(TimerLibrary) $(CVlibs) $(LinkerWinAPILibObj) $(TailOpts)
 
 test.o : test.c
 	$(CXX) $(CXXFLAGS) test.c -I$(MyLibs) $(openCVincludes) $(TailOpts) 

@@ -56,39 +56,41 @@ void PrintVersion(HANDLE hUsb) {
  */
 HANDLE InitializeUsbStage(){
 
-	int USB=1;
-	int Serial=2;
 
-	/** Set mode to serial **/
-	/* To implement: the user should be able to pass a value to initialize either the USB or the Serial port **/
-	int mode=Serial;
 
 
 	/** If USB **/
-	if (mode==USB){
+
 		char DeviceName[MAX_PATH];
 
 		// Scan for Usb Device
 		if (!UsbScan(DeviceName)) {
 			printf("No devices found!\n");
-			return NULL;
+			printf("Moving on to try serial device!\n");
+		} else {
+			/** Device was found **/
+			printf("Device Found: %s\n", DeviceName);
+			HANDLE hUsb = CreateFile(DeviceName, GENERIC_READ | GENERIC_WRITE,
+					FILE_SHARE_WRITE | FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+			if (hUsb == INVALID_HANDLE_VALUE) {
+				printf("Error %d: Failed to open USB file handle.\n", GetLastError());
+				return NULL;
+			} else
+				printf("Device Opened: ");
+			// Print driver version
+			PrintVersion(hUsb);
+
+			/** We were succesful so now we are done **/
+			return hUsb;
+
 		}
-		printf("Device Found: %s\n", DeviceName);
-		HANDLE hUsb = CreateFile(DeviceName, GENERIC_READ | GENERIC_WRITE,
-				FILE_SHARE_WRITE | FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
-		if (hUsb == INVALID_HANDLE_VALUE) {
-			printf("Error %d: Failed to open USB file handle.\n", GetLastError());
-			return NULL;
-		} else
-			printf("Device Opened: ");
-		// Print driver version
-		PrintVersion(hUsb);
-		return hUsb;
 
 
 
-	}else if  (mode==Serial){
-		printf("In Serial mode!\n");
+
+
+		printf("Checking for serial port!\n");
+
 		/** If Serial **/
 
 		/** This code is adapted from
@@ -143,14 +145,9 @@ HANDLE InitializeUsbStage(){
 			//error occureed.
 			printf("Error: unable to set serial port timeouts.\n");
 		}
-
-
+		printf("Successfully configured serial port\n");
 		return hSerial;
 
-	} else {
-		printf("Error, unrecognized mode of communicating with stage.\n");
-		return NULL;
-	}
 
 }
 

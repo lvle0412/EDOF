@@ -1605,6 +1605,13 @@ int HandleStageTracker(Experiment* exp){
 			//printf("stageFeedbackTargetoffset=(%d, %d)\n",exp->stageFeedbackTargetOffset.x,exp->stageFeedbackTargetOffset.y);
 			CvPoint target=cvPoint(exp->stageCenter.x + exp->stageFeedbackTargetOffset.x,exp->stageCenter.y+exp->stageFeedbackTargetOffset.y);
 			//printf("target=(%d, %d)\n",target.x,target.y);
+			
+			/** Get the Point on the worm some distance along the centerline **/
+			/* Later I will want to make this a user setable parameter
+			/*
+			/* */
+			
+			CvPoint* PtOnWorm= (CvPoint*) cvGetSeqElem(exp->Worm->Segmented->Centerline, 5);
 			exp->Worm->stageVelocity=AdjustStageToKeepObjectAtTarget(exp->stage,exp->Worm->Segmented->Head,target,exp->Params->stageSpeedFactor);
 			}
 		}

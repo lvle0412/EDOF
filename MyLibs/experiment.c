@@ -1009,7 +1009,8 @@ int SetupRecording(Experiment* exp) {
 		BeginToWriteOutFrames(exp->DataWriter);
 
 		printf("Initialized data recording\n");
-		DestroyFilename(&DataFileName);
+		//DestroyFilename(&DataFileName); //Somehow this seems to be throwing a bug.
+		printf("Destroyed filename\n");
 	}
 
 	/** Set Up Video Recording **/
@@ -1549,7 +1550,7 @@ CvPoint AdjustStageToKeepObjectAtTarget(HANDLE stage, CvPoint* obj,CvPoint targe
 	diff.x=target.y-obj->y;
 
 	//printf("About to Multiply!\n");
-	vel.x=diff.x*speed;
+	vel.x=diff.x*speed*1.5; //ANDY: why is this 1 and the other is 1.5
 	vel.y=diff.y*(speed+ speed/2);
 
 	//printf("SpinStage: vel.x=%d, vel.y=%d\n",vel.x,vel.y);
@@ -1611,8 +1612,8 @@ int HandleStageTracker(Experiment* exp){
 			/*
 			/* */
 			
-			CvPoint* PtOnWorm= (CvPoint*) cvGetSeqElem(exp->Worm->Segmented->Centerline, 5);
-			exp->Worm->stageVelocity=AdjustStageToKeepObjectAtTarget(exp->stage,exp->Worm->Segmented->Head,target,exp->Params->stageSpeedFactor);
+			CvPoint* PtOnWorm= (CvPoint*) cvGetSeqElem(exp->Worm->Segmented->Centerline, 15);
+			exp->Worm->stageVelocity=AdjustStageToKeepObjectAtTarget(exp->stage,PtOnWorm,target,exp->Params->stageSpeedFactor);
 			}
 		}
 		if (exp->Params->stageTrackingOn==0){/** Tracking Should be off **/

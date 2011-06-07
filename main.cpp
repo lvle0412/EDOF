@@ -454,7 +454,7 @@ UINT Thread(LPVOID lpdwParam) {
 			TICTOC::timer().toc("DisplayThreadGuts");
 			UpdateGUI(exp);
 
-			key=cvWaitKey(100);
+			key=cvWaitKey(65); //This controls how often the stage and GUI get updated
 
 
 			if (MainThreadHasStopped==1) continue;

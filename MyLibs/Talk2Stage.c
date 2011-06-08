@@ -122,7 +122,7 @@ HANDLE InitializeUsbStage(){
 			//error getting state
 		}
 
-
+		//CBR_9600 works
 		dcbSerialParams.BaudRate=CBR_9600;
 		dcbSerialParams.ByteSize=8;
 		dcbSerialParams.StopBits=TWOSTOPBITS;

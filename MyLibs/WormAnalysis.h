@@ -64,6 +64,8 @@ typedef struct WormAnalysisParamStruct{
 	int LengthOffset;
 	int BinThresh;
 	int GaussSize;
+	int BoundSmoothSize;
+	int DilateErode;
 	int NumSegments;
 
 	/** Frame to Frame Temporal Analysis**/

@@ -430,6 +430,9 @@ UINT Thread(LPVOID lpdwParam) {
 
 	printf("DispThread: Starting loop\n");
 
+	printf("Waiting a few ms to start the loop.");
+	cvWaitKey(50);
+
 	int key;
 	int k=0;
 	while (!MainThreadHasStopped) {

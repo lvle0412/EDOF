@@ -76,6 +76,11 @@ To compile an executable that uses a camera and DLP requires
 
 See the `makefile` for more details about the different compile targets. 
 
+
+Development Environment
+=======================
+On Windows, see this gist: https://gist.github.com/1107504
+
 Contact
 =======
 Please contact Andrew Leifer, leifer (at) fas (dot) harvard.edu with questions or feedback.

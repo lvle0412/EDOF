@@ -103,8 +103,8 @@ MyLibs=MyLibs
 3rdPartyLibs=3rdPartyLibs
 bfIncDir=$(3rdPartyLibs)/BitFlowSDK
 targetDir=bin
-CVdir=C:/Progra~2/OpenCV
-GIT=C:/Progra~2/Git/bin/git #version control system
+CVdir=C:/Progra~1/OpenCV
+GIT=C:/Progra~1/Git/bin/git #version control system
 
 #Matlab Include directory for header files
 MatlabIncDir= C:/Progra~1/MATLAB/R2009a/extern/include

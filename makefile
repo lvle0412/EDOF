@@ -159,6 +159,7 @@ virtual_hardware =DontTalk2DLP.o DontTalk2Camera.o DontTalk2FrameGrabber.o Talk2
 ##
 ## If you only: MATLAB, OpenCV, the DLP and FrameGrabber use "make FGandDLP"
 
+## Or if you only have the imaging Source camera (USB cam) use USBCam
 
 all : $(targetDir)/ClosedLoop.exe $(targetDir)/CalibrateApparatus.exe FGandDLP  virtual
 
@@ -168,7 +169,7 @@ framegrabberonly :  $(targetDir)/FGMindControl.exe version.o $(targetDir)/Test.e
 
 virtual: $(targetDir)/VirtualMC.exe version.o $(targetDir)/Test.exe
 
-
+USBCam : $(targetDir)/ClosedLoop.exe virtual  
 
 $(targetDir)/CalibrateApparatus.exe : $(calib_objects) Talk2Stage.o
 	$(CXX) -o $(targetDir)/CalibrateApparatus.exe $(calib_objects) Talk2Stage.o $(LinkerWinAPILibObj) $(TailOpts)

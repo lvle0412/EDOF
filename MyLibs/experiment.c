@@ -1551,7 +1551,7 @@ CvPoint AdjustStageToKeepObjectAtTarget(HANDLE stage, CvPoint* obj,CvPoint targe
 
 	//printf("About to Multiply!\n");
 	vel.x=diff.x*speed*1.5; //ANDY: why is this 1 and the other is 1.5
-	vel.y=diff.y*(speed+ speed/2);
+	vel.y=diff.y*speed*1.5;
 
 	//printf("SpinStage: vel.x=%d, vel.y=%d\n",vel.x,vel.y);
 	spinStage(stage,vel.x,vel.y);
@@ -1612,7 +1612,7 @@ int HandleStageTracker(Experiment* exp){
 			/*
 			/* */
 			
-			CvPoint* PtOnWorm= (CvPoint*) cvGetSeqElem(exp->Worm->Segmented->Centerline, 15);
+			CvPoint* PtOnWorm= (CvPoint*) cvGetSeqElem(exp->Worm->Segmented->Centerline, 10);
 			exp->Worm->stageVelocity=AdjustStageToKeepObjectAtTarget(exp->stage,PtOnWorm,target,exp->Params->stageSpeedFactor);
 			}
 		}

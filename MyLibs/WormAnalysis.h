@@ -114,9 +114,11 @@ typedef struct WormAnalysisParamStruct{
 	/** Stage Control Parameters **/
 	int stageTrackingOn;
 	int stageSpeedFactor;
+	int stageROIRadius;
 
 	/** Record Data Parameters **/
 	int Record;
+
 
 } WormAnalysisParam;
 

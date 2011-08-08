@@ -635,7 +635,11 @@ void SetupGUI(Experiment* exp) {
 	}
 
 	if (exp->stageIsPresent){
-		cvCreateTrackbar("StageSpeed",exp->WinCon1,&(exp->Params->stageSpeedFactor),100, (int) NULL);
+		/* Slider to set Gain Factor akak StageSpeed */
+		cvCreateTrackbar("StageSpeed",exp->WinCon1,&(exp->Params->stageSpeedFactor),300, (int) NULL);
+		/* Within the Activezone, the gain on the feedback is linear with distance, outside it is  flat */
+		cvCreateTrackbar("ActiveZone",exp->WinCon1,&(exp->Params->stageROIRadius),300, (int) NULL);
+
 	}
 
 	printf("Created trackbars and windows\n");
@@ -1525,11 +1529,23 @@ int WriteRecentFrameNumberToFile(Experiment* exp){
  * It doesn't really belong in experiment.c either because it is not a method of experiment.c
  * But for now that is where it will sit.
  *
+ * Update for DualMag:
+ *  The dual magnification microscope presents a unique case. There I am trying to keep a spot on the
+ *  worm centered in a very small box (the field of view of the high magnification objective, which is just
+ *  a subset of the field of view of the low magnification objective). I want to work very hard to keep the object
+ *  at the target location, so I want to have very high gain (speed). This gain varies linearly with the distance
+ *  that the object is away from the target. But at some point, if the object is way off target, I don't actually want
+ *  to go so fast. At that point I just give up and go at some set max speed.
+ *
+ *  In other words, the velocity of the stage is linear with the objects distance from the target up until a point.
+ *  When the object is out side the activeZoneRadius, then the velocity is flat.
+ *
+ *  The user can set both the active zone radius and the gain (speed).
  */
 
 
 
-CvPoint AdjustStageToKeepObjectAtTarget(HANDLE stage, CvPoint* obj,CvPoint target, int speed){
+CvPoint AdjustStageToKeepObjectAtTarget(HANDLE stage, CvPoint* obj,CvPoint target, int speed,int activeZoneRadius){
 	if (obj==NULL){
 		printf("Error! obj is NULL in AdjustStageToKeepObjectAtTarget()\n");
 		return cvPoint(0,0);
@@ -1550,8 +1566,8 @@ CvPoint AdjustStageToKeepObjectAtTarget(HANDLE stage, CvPoint* obj,CvPoint targe
 	diff.x=target.y-obj->y;
 
 	//printf("About to Multiply!\n");
-	vel.x=diff.x*speed*1.5; //ANDY: why is this 1 and the other is 1.5
-	vel.y=diff.y*speed*1.5;
+	vel.x= CropNumber(0,activeZoneRadius, diff.x)*speed;
+	vel.y= CropNumber(0,activeZoneRadius, diff.y)*speed;
 
 	//printf("SpinStage: vel.x=%d, vel.y=%d\n",vel.x,vel.y);
 	spinStage(stage,vel.x,vel.y);
@@ -1613,7 +1629,7 @@ int HandleStageTracker(Experiment* exp){
 			/* */
 			
 			CvPoint* PtOnWorm= (CvPoint*) cvGetSeqElem(exp->Worm->Segmented->Centerline, 10);
-			exp->Worm->stageVelocity=AdjustStageToKeepObjectAtTarget(exp->stage,PtOnWorm,target,exp->Params->stageSpeedFactor);
+			exp->Worm->stageVelocity=AdjustStageToKeepObjectAtTarget(exp->stage,PtOnWorm,target,exp->Params->stageSpeedFactor, exp->Params->stageROIRadius);
 			}
 		}
 		if (exp->Params->stageTrackingOn==0){/** Tracking Should be off **/

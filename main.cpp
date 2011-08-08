@@ -159,10 +159,6 @@ int main (int argc, char** argv){
 	while (!DispThreadHasStarted)
 		Sleep(10);
 
-
-
-
-
 	/** SetUp Data Recording **/
 	exp->e = SetupRecording(exp);
 

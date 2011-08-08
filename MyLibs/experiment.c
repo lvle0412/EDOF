@@ -554,8 +554,10 @@ void SetupGUI(Experiment* exp) {
 	//	cvNamedWindow(exp->WinDisp); // <-- This goes into the thread.
 	cvNamedWindow("Display");
 	cvNamedWindow(exp->WinCon1);
+	cvResizeWindow(exp->WinCon1, 500, 1000);
+
 	cvNamedWindow("ProtoIllum");
-	cvResizeWindow(exp->WinCon1, 500, 900);
+
 
 	/** SelectDisplay **/
 	cvCreateTrackbar("SelDisplay", "Controls", &(exp->Params->Display), 7,
@@ -641,6 +643,7 @@ void SetupGUI(Experiment* exp) {
 		cvCreateTrackbar("ActiveZone",exp->WinCon1,&(exp->Params->stageROIRadius),300, (int) NULL);
 		cvCreateTrackbar("TargetSeg",exp->WinCon1,&(exp->Params->stageTargetSegment),99, (int) NULL);
 	}
+
 
 	printf("Created trackbars and windows\n");
 	return;

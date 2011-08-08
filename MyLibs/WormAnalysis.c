@@ -305,6 +305,7 @@ WormAnalysisParam* CreateWormAnalysisParam(){
 	ParamPtr->stageTrackingOn=0;
 	ParamPtr->stageSpeedFactor=25;
 	ParamPtr->stageROIRadius=250;
+	ParamPtr->stageTargetSegment=10;
 
 	/**Record Parameters **/
 	ParamPtr->Record=0;

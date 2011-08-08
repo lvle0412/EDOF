@@ -639,7 +639,7 @@ void SetupGUI(Experiment* exp) {
 		cvCreateTrackbar("StageSpeed",exp->WinCon1,&(exp->Params->stageSpeedFactor),300, (int) NULL);
 		/* Within the Activezone, the gain on the feedback is linear with distance, outside it is  flat */
 		cvCreateTrackbar("ActiveZone",exp->WinCon1,&(exp->Params->stageROIRadius),300, (int) NULL);
-
+		cvCreateTrackbar("TargetSeg",exp->WinCon1,&(exp->Params->stageTargetSegment),99, (int) NULL);
 	}
 
 	printf("Created trackbars and windows\n");
@@ -1624,11 +1624,9 @@ int HandleStageTracker(Experiment* exp){
 			//printf("target=(%d, %d)\n",target.x,target.y);
 			
 			/** Get the Point on the worm some distance along the centerline **/
-			/* Later I will want to make this a user setable parameter
-			/*
-			/* */
+			CvPoint* PtOnWorm= (CvPoint*) cvGetSeqElem(exp->Worm->Segmented->Centerline, exp->Params->stageTargetSegment);
 			
-			CvPoint* PtOnWorm= (CvPoint*) cvGetSeqElem(exp->Worm->Segmented->Centerline, 10);
+			/** Adjust the stage velocity to keep that point centered in the field of view **/
 			exp->Worm->stageVelocity=AdjustStageToKeepObjectAtTarget(exp->stage,PtOnWorm,target,exp->Params->stageSpeedFactor, exp->Params->stageROIRadius);
 			}
 		}

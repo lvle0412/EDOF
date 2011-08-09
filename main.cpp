@@ -291,6 +291,7 @@ int main (int argc, char** argv){
 
 			/*** DIsplay Some Monitoring Output ***/
 			if (exp->e == 0) CreateWormHUDS(exp->HUDS,exp->Worm,exp->Params,exp->IlluminationFrame);
+			if (exp->e==0 && exp->stageIsPresent==1) MarkRecenteringTarget(exp);
 
 			if (exp->e == 0 &&  EverySoOften(exp->Worm->frameNum,exp->Params->DispRate) ){
 				TICTOC::timer().tic("DisplayOnScreen");
@@ -366,13 +367,13 @@ int main (int argc, char** argv){
 
 
 
-	if (exp->stageIsPresent) ShutOffStage(exp);
+	if (exp->stageIsPresent) {
+		ShutOffStage(exp);
+		printf("Last used stage centering coordinates x=%d, y=%d\n",exp->stageFeedbackTarget.x,exp->stageFeedbackTarget.y);
+	}
 	VerifyProtocol(exp->p);
 	ReleaseExperiment(exp);
 	DestroyExperiment(&exp);
-
-
-
 
 	printf("\nMain Thread: Good bye.\n");
 	return 0;

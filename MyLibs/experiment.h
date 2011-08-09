@@ -367,6 +367,11 @@ void DoSegmentation(Experiment* exp);
 
 
 /*
+ * Add a rectangle to the image to denote the target for stage recentering.
+ */
+void MarkRecenteringTarget(Experiment* exp);
+
+/*
  * Preparesthe Selected Display
  *
  */

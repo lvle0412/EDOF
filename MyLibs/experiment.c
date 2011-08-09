@@ -1203,6 +1203,19 @@ void DoSegmentation(Experiment* exp) {
 _TICTOC_TOC_FUNC
 }
 
+
+/*
+ * Add a rectangle to the image to denote the target for stage recentering.
+ */
+void MarkRecenteringTarget(Experiment* exp){
+
+	CvPoint a=cvPoint( exp->stageFeedbackTarget.x +2, exp->stageFeedbackTarget.y +2);
+	CvPoint b=cvPoint(exp->stageFeedbackTarget.x -2, exp->stageFeedbackTarget.y -2);
+	cvRectangle(exp->HUDS,a,b, cvScalar(255,255,255),1);
+
+}
+
+
 /*
  * Prepare the Selected Display
  *

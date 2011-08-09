@@ -964,7 +964,7 @@ int SegmentWorm(WormAnalysisData* Worm, WormAnalysisParam* Params){
  *
  *
  */
-int CreateWormHUDS(IplImage* TempImage, WormAnalysisData* Worm, WormAnalysisParam* Params, Frame* IlluminationFrame){
+int CreateWormHUDS(IplImage* HUDSimg, WormAnalysisData* Worm, WormAnalysisParam* Params, Frame* IlluminationFrame){
 
 	int CircleDiameterSize=10;
 
@@ -972,18 +972,18 @@ int CreateWormHUDS(IplImage* TempImage, WormAnalysisData* Worm, WormAnalysisPara
 
 	double weighting=0.20; //Alpha blend weighting
 	if (Params->DLPOn) weighting=0.45; // if DLP is on make the illumination pattern more opaque
-	cvAddWeighted(Worm->ImgOrig,1,IlluminationFrame->iplimg,weighting,0,TempImage);
+	cvAddWeighted(Worm->ImgOrig,1,IlluminationFrame->iplimg,weighting,0,HUDSimg);
 
 	//Want to also display boundary!
-	//cvDrawContours(TempImage, Worm->Boundary, cvScalar(255,0,0),cvScalar(0,255,0),100);
+	//cvDrawContours(HUDSimg, Worm->Boundary, cvScalar(255,0,0),cvScalar(0,255,0),100);
 
-	DrawSequence(&TempImage,Worm->Boundary);
+	DrawSequence(&HUDSimg,Worm->Boundary);
 
-//	DrawSequence(&TempImage,Worm->Segmented->LeftBound);
-//	DrawSequence(&TempImage,Worm->Segmented->RightBound);
+//	DrawSequence(&HUDSimg,Worm->Segmented->LeftBound);
+//	DrawSequence(&HUDSimg,Worm->Segmented->RightBound);
 
-	cvCircle(TempImage,*(Worm->Tail),CircleDiameterSize,cvScalar(255,255,255),1,CV_AA,0);
-	cvCircle(TempImage,*(Worm->Head),CircleDiameterSize/2,cvScalar(255,255,255),1,CV_AA,0);
+	cvCircle(HUDSimg,*(Worm->Tail),CircleDiameterSize,cvScalar(255,255,255),1,CV_AA,0);
+	cvCircle(HUDSimg,*(Worm->Head),CircleDiameterSize/2,cvScalar(255,255,255),1,CV_AA,0);
 
 	/** Prepare Text **/
 	CvFont font;
@@ -991,27 +991,27 @@ int CreateWormHUDS(IplImage* TempImage, WormAnalysisData* Worm, WormAnalysisPara
 
 	/** Display DLP On Off **/
 	if (Params->DLPOn) {
-		cvPutText(TempImage,"DLP ON",cvPoint(20,70),&font,cvScalar(255,255,255));
+		cvPutText(HUDSimg,"DLP ON",cvPoint(20,70),&font,cvScalar(255,255,255));
 	}
 	/** Display Recording if we are recording **/
 	if (Params->Record){
-		cvPutText(TempImage,"Recording",cvPoint(20,100),&font,cvScalar(255,255,255));
+		cvPutText(HUDSimg,"Recording",cvPoint(20,100),&font,cvScalar(255,255,255));
 
 	} else {
-		if (Params->DLPOn) cvPutText(TempImage,"Did you forget to record?",cvPoint(20,100),&font,cvScalar(255,255,255));
+		if (Params->DLPOn) cvPutText(HUDSimg,"Did you forget to record?",cvPoint(20,100),&font,cvScalar(255,255,255));
 	}
 
 
 	/*** Let the user know if the illumination flood light is on ***/
 	if (Params->IllumFloodEverything){
-		cvPutText(TempImage,"Floodlight",cvPoint(20,130),&font,cvScalar(255,255,255));
+		cvPutText(HUDSimg,"Floodlight",cvPoint(20,130),&font,cvScalar(255,255,255));
 	}
 
 	char protoNum[20];
 	/** If we are using protocols, display the protocol number **/
 	if (Params->ProtocolUse){
 		sprintf(protoNum,"Step %d",Params->ProtocolStep);
-		cvPutText(TempImage,protoNum,cvPoint(20,160),&font,cvScalar(255,255,255));
+		cvPutText(HUDSimg,protoNum,cvPoint(20,160),&font,cvScalar(255,255,255));
 
 	}
 	free(protoNum);
@@ -1019,7 +1019,7 @@ int CreateWormHUDS(IplImage* TempImage, WormAnalysisData* Worm, WormAnalysisPara
 
 	char frame[30];
 	sprintf(frame,"%d",Worm->frameNum);
-	cvPutText(TempImage,frame,cvPoint(Worm->SizeOfImage.width- 200,Worm->SizeOfImage.height - 10),&font,cvScalar(255,255,255) );
+	cvPutText(HUDSimg,frame,cvPoint(Worm->SizeOfImage.width- 200,Worm->SizeOfImage.height - 10),&font,cvScalar(255,255,255) );
 	free( frame);
 	return 0;
 }

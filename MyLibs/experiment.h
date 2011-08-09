@@ -168,7 +168,7 @@ typedef struct ExperimentStruct{
 	HANDLE stage; // Handle to USB stage object
 	CvPoint stageVel; //Current velocity of stage
 	CvPoint stageCenter; // Point indicating center of stage.
-	CvPoint stageFeedbackTargetOffset; //Target of the stage feedback loop as a delta distance in pixels from the center of the image
+	CvPoint stageFeedbackTarget; //Target of the stage feedback loop as a point in the image
 	int stageIsTurningOff; //1 indicates stage is turning off. 0 indicates stage is on or off.
 
 	/** Error Handling **/

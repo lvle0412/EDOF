@@ -52,8 +52,6 @@ typedef struct WormAnalysisParamStruct{
 	/** Turn Analysis On Generally **/
 	int OnOff;
 
-
-
 	/** Image Brightness Levels **/
 	int LevelsMin;
 	int LevelsMax;
@@ -70,7 +68,6 @@ typedef struct WormAnalysisParamStruct{
 	/** Frame to Frame Temporal Analysis**/
 	int TemporalOn;
 	int InduceHeadTailFlip;
-
 	int MaxLocationChange;
 	int MaxPerimChange;
 
@@ -81,14 +78,12 @@ typedef struct WormAnalysisParamStruct{
 	/** Defaul Wormspace GridSize for illumination **/
 	CvSize DefaultGridSize;
 
-
 	/** Illumination Parameters **/
 	int IllumSegCenter; // Deprecated
 	int IllumSegRadius; // Deprecated
 	int IllumLRC; // Deprecated
 	int SegStart; // Deprecated
 	int SegStop; // Deprecated
-
 
 
 

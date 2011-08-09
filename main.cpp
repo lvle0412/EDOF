@@ -369,7 +369,7 @@ int main (int argc, char** argv){
 
 	if (exp->stageIsPresent) {
 		ShutOffStage(exp);
-		printf("Last used stage centering coordinates x=%d, y=%d\n",exp->stageFeedbackTarget.x,exp->stageFeedbackTarget.y);
+		printf("\nLast used stage centering coordinates x=%d, y=%d\n",exp->stageFeedbackTarget.x,exp->stageFeedbackTarget.y);
 	}
 	VerifyProtocol(exp->p);
 	ReleaseExperiment(exp);

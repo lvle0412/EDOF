@@ -178,7 +178,7 @@ Experiment* CreateExperimentStruct() {
 	exp->stage=NULL;
 	exp->stageVel=cvPoint(0,0);
 	exp->stageCenter=cvPoint(0,0);
-	exp->stageFeedbackTargetOffset=cvPoint(0,0);
+	exp->stageFeedbackTarget=cvPoint(512,384);
 	exp->stageIsTurningOff=0;
 
 	/** Macros **/
@@ -218,8 +218,8 @@ void displayHelp() {
 			"\t-s\n\t\tSimulate the existence of DLP. (No physical DLP required.)\n\n");
 	printf("\t-g\n\t\tUse camera attached to FrameGrabber.\n\n");
 	printf("\t-t\n\t\tUse USB stage tracker.\n\n");
-	printf("\t-x\n\tx 100\tSpecifies the x offset from center for the worm's location in the stage feedback trap. +x is to the right of screen.\n\n");
-	printf("\t-y\n\ty -100\tSpecifies the y offset from center for the worm's location in the stage feedback trap. +y is towards bottom of screen.\n\n");
+	printf("\t-x\n\tx 512\t Target x position  of worm for stage feedback loop. 0 is left.\n\n");
+	printf("\t-y\n\ty 384\t Target y position of worm for stage feedback loop. 0 is top.\n\n");
 	printf(
 			"\t-p  protocol.yml\n\t\tIlluminate according to a YAML protocol file.\n\n");
 	printf("\t-?\n\t\tDisplay this help.\n\n");
@@ -298,15 +298,15 @@ int HandleCommandLineArguments(Experiment* exp) {
 			break;
 		case 'x': /** adjust the target for stage feedback loop by these certain number of pixels **/
 				if (optarg != NULL) {
-					exp->stageFeedbackTargetOffset.x = atoi(optarg);
+					exp->stageFeedbackTarget.x = atoi(optarg);
 				}
-				printf("Adjusting target for stage feedback loop by x= %d pixels.\n",exp->stageFeedbackTargetOffset.x );
+				printf("Stage feedback target x= %d pixels.\n",exp->stageFeedbackTarget.x );
 		break;
 		case 'y': /** adjust the target for stage feedback loop by these certain number of pixels **/
 				if (optarg != NULL) {
-					exp->stageFeedbackTargetOffset.y = atoi(optarg);
+					exp->stageFeedbackTarget.y = atoi(optarg);
 				}
-				printf("Adjusting target for stage feedback loop by y= %d pixels.\n",exp->stageFeedbackTargetOffset.y );
+				printf("Stage feedback target y= %d pixels.\n",exp->stageFeedbackTarget.y );
 		break;
 
 
@@ -543,6 +543,28 @@ void ReleaseWindowNames(Experiment* exp) {
 	exp->WinCon3 = NULL;
 }
 
+
+/*
+ * Specifiy the stage recentering location when the user double clicks
+ * a location on the image
+ */
+void on_mouse( int event, int x, int y, int flags, void* param){
+
+	Experiment* exp =  (Experiment*) param;
+
+	switch (event){
+		case CV_EVENT_RBUTTONUP:{
+			exp->stageFeedbackTarget.x=x;
+			exp->stageFeedbackTarget.y=y;
+			printf("Centering target set to: x=%d, y=%d\n",exp->stageFeedbackTarget.x,exp->stageFeedbackTarget.y);
+		}
+
+	}
+
+}
+
+
+
 /*
  * SetupGui
  *
@@ -553,6 +575,8 @@ void SetupGUI(Experiment* exp) {
 
 	//	cvNamedWindow(exp->WinDisp); // <-- This goes into the thread.
 	cvNamedWindow("Display");
+
+
 	cvNamedWindow(exp->WinCon1);
 	cvResizeWindow(exp->WinCon1, 500, 1000);
 
@@ -636,12 +660,18 @@ void SetupGUI(Experiment* exp) {
 				(int) NULL);
 	}
 
+	/** Stage Related GUI elements **/
 	if (exp->stageIsPresent){
 		/* Slider to set Gain Factor akak StageSpeed */
 		cvCreateTrackbar("StageSpeed",exp->WinCon1,&(exp->Params->stageSpeedFactor),300, (int) NULL);
 		/* Within the Activezone, the gain on the feedback is linear with distance, outside it is  flat */
 		cvCreateTrackbar("ActiveZone",exp->WinCon1,&(exp->Params->stageROIRadius),300, (int) NULL);
 		cvCreateTrackbar("TargetSeg",exp->WinCon1,&(exp->Params->stageTargetSegment),99, (int) NULL);
+
+
+		 /** Specifiy the target for trackign by double clicking on the image **/
+		 cvSetMouseCallback( "Display", on_mouse, (void*) exp);
+		 printf("Right click on the image at any time to specify recentering target.\n");
 	}
 
 
@@ -649,6 +679,8 @@ void SetupGUI(Experiment* exp) {
 	return;
 
 }
+
+
 
 /*
  * Update's trackbar positions for variables that can be changed by the software
@@ -1171,6 +1203,19 @@ void DoSegmentation(Experiment* exp) {
 _TICTOC_TOC_FUNC
 }
 
+
+/*
+ * Add a rectangle to the image to denote the target for stage recentering.
+ */
+void MarkRecenteringTarget(Experiment* exp){
+
+	CvPoint a=cvPoint( exp->stageFeedbackTarget.x +2, exp->stageFeedbackTarget.y +2);
+	CvPoint b=cvPoint(exp->stageFeedbackTarget.x -2, exp->stageFeedbackTarget.y -2);
+	cvRectangle(exp->HUDS,a,b, cvScalar(255,255,255),1);
+
+}
+
+
 /*
  * Prepare the Selected Display
  *
@@ -1622,15 +1667,12 @@ int HandleStageTracker(Experiment* exp){
 			} else {
 			/** Move the stage to keep the worm centered in the field of view **/
 			printf(".");
-			//printf("stageFeedbackTargetoffset=(%d, %d)\n",exp->stageFeedbackTargetOffset.x,exp->stageFeedbackTargetOffset.y);
-			CvPoint target=cvPoint(exp->stageCenter.x + exp->stageFeedbackTargetOffset.x,exp->stageCenter.y+exp->stageFeedbackTargetOffset.y);
-			//printf("target=(%d, %d)\n",target.x,target.y);
-			
+
 			/** Get the Point on the worm some distance along the centerline **/
 			CvPoint* PtOnWorm= (CvPoint*) cvGetSeqElem(exp->Worm->Segmented->Centerline, exp->Params->stageTargetSegment);
 			
 			/** Adjust the stage velocity to keep that point centered in the field of view **/
-			exp->Worm->stageVelocity=AdjustStageToKeepObjectAtTarget(exp->stage,PtOnWorm,target,exp->Params->stageSpeedFactor, exp->Params->stageROIRadius);
+			exp->Worm->stageVelocity=AdjustStageToKeepObjectAtTarget(exp->stage,PtOnWorm,exp->stageFeedbackTarget,exp->Params->stageSpeedFactor, exp->Params->stageROIRadius);
 			}
 		}
 		if (exp->Params->stageTrackingOn==0){/** Tracking Should be off **/

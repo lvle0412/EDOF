@@ -1,3 +1,6 @@
+For a description of different branches see:
+https://gist.github.com/aleifer/c060861504d462031600
+
 Welcome to MindControl
 ======================
 

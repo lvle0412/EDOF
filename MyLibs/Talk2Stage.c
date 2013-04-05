@@ -101,7 +101,7 @@ HANDLE InitializeUsbStage(){
 
 		/** Open the Serial Port **/
 		HANDLE hSerial;
-		hSerial = CreateFile("COM1", GENERIC_READ | GENERIC_WRITE, FILE_SHARE_WRITE | FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+		hSerial = CreateFile("COM3", GENERIC_READ | GENERIC_WRITE, FILE_SHARE_WRITE | FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
 		if(hSerial==INVALID_HANDLE_VALUE){
 			if(GetLastError()==ERROR_FILE_NOT_FOUND){
 				//serial port does not exist.
@@ -123,7 +123,9 @@ HANDLE InitializeUsbStage(){
 		}
 
 		//CBR_9600 works
-		dcbSerialParams.BaudRate=CBR_9600;
+		//dcbSerialParams.BaudRate=CBR_9600;
+		//CBR_115200 also works.
+		dcbSerialParams.BaudRate=CBR_256000;
 		dcbSerialParams.ByteSize=8;
 		dcbSerialParams.StopBits=TWOSTOPBITS;
 		dcbSerialParams.Parity=NOPARITY;

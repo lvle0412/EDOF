@@ -85,7 +85,7 @@
 #	make virtual		  - This is the make target to use if you have no special hardware. It requires only 
 #							openCV, git and awk. 
 #
-#
+#   make USBCam			- This the make target to use if you have the ImagingSource camera, MATLAB and the stage.
 #
 #
 
@@ -103,14 +103,14 @@ MyLibs=MyLibs
 3rdPartyLibs=3rdPartyLibs
 bfIncDir=$(3rdPartyLibs)/BitFlowSDK
 targetDir=bin
-CVdir=C:/Progra~1/OpenCV
-GIT=C:/Progra~1/Git/bin/git #version control system
+CVdir=C:/Progra~2/OpenCV
+GIT=C:/Progra~2/Git/bin/git #version control system
 
 #Matlab Include directory for header files
-MatlabIncDir= C:/Progra~1/MATLAB/R2009a/extern/include
+MatlabIncDir= C:/Progra~1/MATLAB/R2012a/extern/include
 
 #Matlab Compiled Libraries Directgory
-MatlabLibsDir= C:/Progra~1/MATLAB/R2009a/extern/lib/win32/microsoft/
+MatlabLibsDir= C:/Progra~1/MATLAB/R2012a/extern/lib/win64/microsoft/
 
 #OpenCV Include directories (for header files)
 openCVincludes = -I$(CVdir)/cxcore/include -I$(CVdir)/otherlibs/highgui -I$(CVdir)/cv/include
@@ -131,7 +131,7 @@ HardwareLibrary=$(3rdPartyLibs)/alp4basic.lib $(3rdPartyLibs)/tisgrabber.lib
 3rdpartyobjects= $(TimerLibrary) $(HardwareLibrary)
 
 ##BitFlow SDK
-BFLibDir = C:/BitFlow\ SDK\ 5.20/Lib
+BFLibDir = C:/BitFlow\ SDK\ 5.60/Lib
 BFObj = $(BFLibDir)/BFD.lib   $(BFLibDir)/BFDiskIO.lib $(BFLibDir)/BFDrv.lib $(BFLibDir)/BFEr.lib $(BFLibDir)/BFOS.lib $(BFLibDir)/BFS.lib $(BFLibDir)/Bid.lib $(BFLibDir)/BufferInterface.lib $(BFLibDir)/Cid.lib  $(BFLibDir)/R2Cam.lib $(BFLibDir)/R2D.lib $(BFLibDir)/R64D.lib $(BFLibDir)/RvD.lib $(BFLibDir)/clallserial.lib $(BFLibDir)/clserbit.lib $(BFLibDir)/DispSurf.lib
 
 

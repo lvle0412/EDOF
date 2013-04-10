@@ -27,12 +27,8 @@
  */
 
 /*
- * This is a test program that includes the underlying
- * AndysOpenCVLib.h and AndysComputation.h libraries
- * amongst others.
- *
- * This is a great place to test out and debug underlying functions.
- *
+ * This is a test program that performs some basic tests of the mindcontrol software.
+ * It is mostly useful for debugging.
  */
 
 //Standard C headers
@@ -46,10 +42,10 @@
 
 
 //C++ header
-#include <iostream>
-#include <limits>
+//#include <iostream>
+//#include <limits>
 
-using namespace std;
+//using namespace std;
 
 //OpenCV Headers
 #include <highgui.h>
@@ -60,188 +56,157 @@ using namespace std;
 
 //Andy's Headers
 #include "MyLibs/AndysOpenCvLib.h"
-#include "MyLibs/AndysComputations.h"
 #include "MyLibs/WormAnalysis.h"
 #include "MyLibs/IllumWormProtocol.h"
 #include "MyLibs/version.h"
+//#include "MyLibs/Talk2Stage.h" 	
 
 //3rd Party Libraries
 #include "3rdPartyLibs/tictoc.h"
 
-Protocol* CreateTestProtocol(char* name){
+// Protocol* CreateTestProtocol(char* name){
 
-	Protocol* myP=CreateProtocolObject();
-	myP->Description="A test protocol.";
-	myP->Filename=name;
+	// Protocol* myP=CreateProtocolObject();
+	// myP->Description="A test protocol.";
+	// myP->Filename=name;
 
-	myP->GridSize=cvSize(21,99);
-	/** Create the Steps Object and Load it into the Protocol **/
-	myP->Steps=CreateStepsObject(myP->memory);
-
-
-	/** Create Some Polygons **/
-	WormPolygon* Head = CreateWormPolygon(myP->memory,myP->GridSize);
-	WormPolygon* Left = CreateWormPolygon(myP->memory,myP->GridSize);
-	WormPolygon* Right = CreateWormPolygon(myP->memory,myP->GridSize);
-	WormPolygon* Tail = CreateWormPolygon(myP->memory,myP->GridSize);
-	WormPolygon* Everything = CreateWormPolygon(myP->memory,myP->GridSize);
-
-	//(length along centerline,radius from centerline)
-	cvSeqPush(Head->Points,&cvPoint(-10,0));
-	cvSeqPush(Head->Points,&cvPoint(10,0));
-	cvSeqPush(Head->Points,&cvPoint(10,20));
-	cvSeqPush(Head->Points,&cvPoint(-10,20));
-
-	cvSeqPush(Left->Points,&cvPoint(0,30));
-	cvSeqPush(Left->Points,&cvPoint(-10,30));
-	cvSeqPush(Left->Points,&cvPoint(-10,70));
-	cvSeqPush(Left->Points,&cvPoint(0,70));
-
-	cvSeqPush(Right->Points,&cvPoint(0,30));
-	cvSeqPush(Right->Points,&cvPoint(10,30));
-	cvSeqPush(Right->Points,&cvPoint(10,70));
-	cvSeqPush(Right->Points,&cvPoint(0,70));
-
-	cvSeqPush(Tail->Points,&cvPoint(-10,80));
-	cvSeqPush(Tail->Points,&cvPoint(0,80));
-	cvSeqPush(Tail->Points,&cvPoint(0,99));
-	cvSeqPush(Tail->Points,&cvPoint(-10,99));
-
-	cvSeqPush(Everything->Points,&cvPoint(-10,0));
-	cvSeqPush(Everything->Points,&cvPoint(10,0));
-	cvSeqPush(Everything->Points,&cvPoint(10,99));
-	cvSeqPush(Everything->Points,&cvPoint(-10,99));
-
-	/** Create an Illumination Montage**/
-	CvSeq* FirstIllum=CreateIlluminationMontage(myP->memory);
-	CvSeq* SecondIllum=CreateIlluminationMontage(myP->memory);
-	CvSeq* ThirdIllum=CreateIlluminationMontage(myP->memory);
-	CvSeq* FourthIllum=CreateIlluminationMontage(myP->memory);
+	// myP->GridSize=cvSize(21,99);
+	// /** Create the Steps Object and Load it into the Protocol **/
+	// myP->Steps=CreateStepsObject(myP->memory);
 
 
-	/** Let's load up the illumination montages with polygons**/
-	cvSeqPush(FirstIllum,&Head);
-	cvSeqPush(FirstIllum,&Tail);
-	cvSeqPush(FirstIllum,&Left);
-	cvSeqPush(FirstIllum,&Right);
+	// /** Create Some Polygons **/
+	// WormPolygon* Head = CreateWormPolygon(myP->memory,myP->GridSize);
+	// WormPolygon* Left = CreateWormPolygon(myP->memory,myP->GridSize);
+	// WormPolygon* Right = CreateWormPolygon(myP->memory,myP->GridSize);
+	// WormPolygon* Tail = CreateWormPolygon(myP->memory,myP->GridSize);
+	// WormPolygon* Everything = CreateWormPolygon(myP->memory,myP->GridSize);
 
-	printf("FirstIllum->total=%d\n",FirstIllum->total);
+// //	(length along centerline,radius from centerline)
+	// cvSeqPush(Head->Points,&cvPoint(-10,0));
+	// cvSeqPush(Head->Points,&cvPoint(10,0));
+	// cvSeqPush(Head->Points,&cvPoint(10,20));
+	// cvSeqPush(Head->Points,&cvPoint(-10,20));
 
-	cvSeqPush(SecondIllum,&Head);
-	cvSeqPush(SecondIllum,&Right);
+	// cvSeqPush(Left->Points,&cvPoint(0,30));
+	// cvSeqPush(Left->Points,&cvPoint(-10,30));
+	// cvSeqPush(Left->Points,&cvPoint(-10,70));
+	// cvSeqPush(Left->Points,&cvPoint(0,70));
+
+	// cvSeqPush(Right->Points,&cvPoint(0,30));
+	// cvSeqPush(Right->Points,&cvPoint(10,30));
+	// cvSeqPush(Right->Points,&cvPoint(10,70));
+	// cvSeqPush(Right->Points,&cvPoint(0,70));
+
+	// cvSeqPush(Tail->Points,&cvPoint(-10,80));
+	// cvSeqPush(Tail->Points,&cvPoint(0,80));
+	// cvSeqPush(Tail->Points,&cvPoint(0,99));
+	// cvSeqPush(Tail->Points,&cvPoint(-10,99));
+
+	// cvSeqPush(Everything->Points,&cvPoint(-10,0));
+	// cvSeqPush(Everything->Points,&cvPoint(10,0));
+	// cvSeqPush(Everything->Points,&cvPoint(10,99));
+	// cvSeqPush(Everything->Points,&cvPoint(-10,99));
+
+	// /** Create an Illumination Montage**/
+	// CvSeq* FirstIllum=CreateIlluminationMontage(myP->memory);
+	// CvSeq* SecondIllum=CreateIlluminationMontage(myP->memory);
+	// CvSeq* ThirdIllum=CreateIlluminationMontage(myP->memory);
+	// CvSeq* FourthIllum=CreateIlluminationMontage(myP->memory);
 
 
-	cvSeqPush(ThirdIllum,&Tail);
-	cvSeqPush(ThirdIllum,&Left);
+	// /** Let's load up the illumination montages with polygons**/
+	// cvSeqPush(FirstIllum,&Head);
+	// cvSeqPush(FirstIllum,&Tail);
+	// cvSeqPush(FirstIllum,&Left);
+	// cvSeqPush(FirstIllum,&Right);
 
-    cvSeqPush(FourthIllum,&Everything);
+	// printf("FirstIllum->total=%d\n",FirstIllum->total);
 
-
-
-	/** Let's Load the montages into a series of steps **/
-	cvSeqPush(myP->Steps,&FirstIllum);
-	cvSeqPush(myP->Steps,&SecondIllum);
-	cvSeqPush(myP->Steps,&ThirdIllum);
-	cvSeqPush(myP->Steps,&FourthIllum);
+	// cvSeqPush(SecondIllum,&Head);
+	// cvSeqPush(SecondIllum,&Right);
 
 
-	printf("Writing test protocol in file: %s\n",myP->Filename);
-	WriteProtocolToYAML(myP);
+	// cvSeqPush(ThirdIllum,&Tail);
+	// cvSeqPush(ThirdIllum,&Left);
 
-	printf("Head->points->total=%d\n",Head->Points->total);
-	DestroyWormPolygon(&Head);
-	DestroyWormPolygon(&Tail);
-	DestroyWormPolygon(&Left);
-	DestroyWormPolygon(&Right);
-	return myP;
-
-}
+    // cvSeqPush(FourthIllum,&Everything);
 
 
 
-CvPoint2D64f cvPointDouble(double x, double y){
-	CvPoint2D64f p;
-	p.x=x;
-	p.y=y;
-	return p;
+	// /** Let's Load the montages into a series of steps **/
+	// cvSeqPush(myP->Steps,&FirstIllum);
+	// cvSeqPush(myP->Steps,&SecondIllum);
+	// cvSeqPush(myP->Steps,&ThirdIllum);
+	// cvSeqPush(myP->Steps,&FourthIllum);
 
-}
+
+	// printf("Writing test protocol in file: %s\n",myP->Filename);
+	// WriteProtocolToYAML(myP);
+
+	// printf("Head->points->total=%d\n",Head->Points->total);
+	// DestroyWormPolygon(&Head);
+	// DestroyWormPolygon(&Tail);
+	// DestroyWormPolygon(&Left);
+	// DestroyWormPolygon(&Right);
+	// return myP;
+
+// }
+
+
 
 
 int main(){
+	
+	/* Check for Intel Integrated Performance Primitives */
+	printf("Checking intel integrated perforumance  primitives...\n");
+	int NumUploadedFunction = 0;
+	NumUploadedFunction = cvUseOptimized(1);
+	printf("\t NumUploadedFunction = %d \n\n", NumUploadedFunction);
 
+	const char* opencv_lib = 0;
+	const char* add_modules = 0;
+	cvGetModuleInfo(0, &opencv_lib,&add_modules);
+	printf("\t opencv_lib = %s,\n\t add_modules = %s\n\n", opencv_lib,add_modules);
+	
+	
 	//char* name = (char*) malloc(sizeof(char)*50);
 
-	printf("test our median function\n");
-
-	double arr[]={5, 5, 5, 10, 4, 6, 34, 3, 2, 5};
-
-	double med=MedianOfDoubleArr(arr,10);
-	printf("med=%f\n",med);
-
-	printf("Let's test curvature extraction.");
-	CvMemStorage* mem= cvCreateMemStorage();
 
 
-	CvSeq* test=cvCreateSeq(0, sizeof(CvSeq), sizeof(CvPoint2D64f),mem);
+//	printf(copyString("Hello you World\n"));
+/*
+	HANDLE stage= InitializeUsbStage(); 
+	if (stage==NULL) printf("Stage is NULL!\n");
 
-	printf("Let's populate our test vector. \n");
+	Sleep(1000);
+	printf("Spin Stage...");
+	spinStage(stage, 1000,1000);
+		Sleep(1000);
+		
 
-	cvSeqPush(test,(void*) &cvPointDouble((double)446.222200,(double) 443.888900));
-	cvSeqPush(test,(void*) &cvPointDouble(449.333300,444.333300));
-	cvSeqPush(test,(void*) &cvPointDouble(452.444400,444.555600));
-	cvSeqPush(test,(void*) &cvPointDouble(455.555600,444.888900));
-	cvSeqPush(test,(void*) &cvPointDouble(458.666700,445.111100));
-	cvSeqPush(test,(void*) &cvPointDouble(461.777800,445.222200));
-	cvSeqPush(test,(void*) &cvPointDouble(464.888900,445.333300));
-	cvSeqPush(test,(void*) &cvPointDouble(468.000000,445.222200));
-	cvSeqPush(test,(void*) &cvPointDouble(471.000000,445.000000));
-	cvSeqPush(test,(void*) &cvPointDouble(474.000000,444.555600));
-	cvSeqPush(test,(void*) &cvPointDouble(477.000000,444.000000));
-	cvSeqPush(test,(void*) &cvPointDouble(480.000000,443.444400));
-	cvSeqPush(test,(void*) &cvPointDouble(482.888900,442.555600));
-	cvSeqPush(test,(void*) &cvPointDouble(485.777800,441.555600));
-	cvSeqPush(test,(void*) &cvPointDouble(488.555600,440.333300));
-	cvSeqPush(test,(void*) &cvPointDouble(491.333300,438.777800));
-	cvSeqPush(test,(void*) &cvPointDouble(494.000000,437.111100));
-	cvSeqPush(test,(void*) &cvPointDouble(496.555600,435.333300));
-	cvSeqPush(test,(void*) &cvPointDouble(499.000000,433.444400));
-	cvSeqPush(test,(void*) &cvPointDouble(501.333300,431.333300));
-	cvSeqPush(test,(void*) &cvPointDouble(503.555600,429.111100));
+	printf("Stop..");
+		 haltStage(stage);
 
-	printSeqDouble(test);
+*/
+	
+	printf("Goodbye");
+	return 0;
 
-	printf("test->total=%d\n",test->total);
-	int N=test->total-2;
-	double* curvature= (double*) malloc(N* (sizeof(double)));
-	double sigma=0.5;
-	printf("Extracting Curvature\n");
-	extractCurvatureOfSeqDouble(test,curvature,sigma,mem);
+	
+/*	
+	printf("Running Simple Adjust Levels\n");
 
-	printf("Curvature array:\n");
-	printDoubleArr(curvature,N);
-
-	double mean_curvature= SumDoubleArray((const double*) curvature, N) / ((double) N);
-	printf("Mean Curvature=%f",mean_curvature);
-
-	int k=0;
-
-	for (k=0; k< test->total - 2; k++){
-		printf("curvature[%d] = %f\n",k,curvature[k]);
-	}
-
-	printf("yo");
-
-
+	IplImage* src=NULL;
+	IplImage* dest=NULL;
+	simpleAdjustLevels( src, dest,5 , 50 );
 	return 0;
 
 
-
-
 	printf("Points between line test\n");
-//	CvMemStorage* mem= cvCreateMemStorage();
-//	CvSeq* test=cvCreateSeq(CV_SEQ_ELTYPE_POINT, sizeof(CvSeq), sizeof(CvPoint),mem);
-//	GetLineFromEndPts(cvPoint(0,0),cvPoint(10,15),test);
+	CvMemStorage* mem= cvCreateMemStorage();
+	CvSeq* test=cvCreateSeq(CV_SEQ_ELTYPE_POINT, sizeof(CvSeq), sizeof(CvPoint),mem);
+	GetLineFromEndPts(cvPoint(0,0),cvPoint(10,15),test);
 	return 0;
 
 	CvMemStorage* MyMem= cvCreateMemStorage();
@@ -284,7 +249,7 @@ int main(){
 	printf("ShowImage\n");
 	cvNamedWindow("RectWorm");
 	cvShowImage("RectWorm",rectWorm);
-//	int k;
+	int k;
 	for (k = 0; k < protocol2->Steps->total; ++k) {
 		printf("====Step Number %d====\n",k);
 		cvZero(rectWorm);
@@ -298,6 +263,7 @@ int main(){
 
 	printf("%s",TICTOC::timer().generateReportCstr());
 	return 0;
+	*/
 }
 
 

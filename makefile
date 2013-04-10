@@ -96,14 +96,14 @@ MyLibs=MyLibs
 3rdPartyLibs=3rdPartyLibs
 bfIncDir=$(3rdPartyLibs)/BitFlowSDK
 targetDir=bin
-CVdir=C:/Progra~1/OpenCV
-GIT=C:/Program\ Files/Git/bin/git #version control system
+CVdir=C:/Progra~2/OpenCV
+GIT=C:/Progra~2/Git/bin/git #version control system
 
 #Matlab Include directory for header files
-MatlabIncDir= C:/Progra~1/MATLAB/R2009a/extern/include
+MatlabIncDir= C:/Progra~1/MATLAB/R2012a/extern/include
 
 #Matlab Compiled Libraries Directgory
-MatlabLibsDir= C:/Progra~1/MATLAB/R2009a/extern/lib/win32/microsoft/
+MatlabLibsDir= C:/Progra~1/MATLAB/R2012a/extern/lib/win64/microsoft/
 
 #OpenCV Include directories (for header files)
 openCVincludes = -I$(CVdir)/cxcore/include -I$(CVdir)/otherlibs/highgui -I$(CVdir)/cv/include
@@ -274,7 +274,7 @@ calibrateFG_DLP.o : calibrateFG.cpp
 
 ## framegrabberonly FGMindControl.exe
 $(targetDir)/FGMindControl.exe : FGMindControl.o DontTalk2DLP.o DontTalk2Camera.o Talk2FrameGrabber.o Talk2Stage.o $(API_DLL_dir)/mc_api.dll $(hw_ind) 
-	$(CXX) -o $(targetDir)/FGMindControl.exe FGMindControl.o Talk2FrameGrabber.o $(BFObj)    DontTalk2DLP.o DontTalk2Camera.o Talk2Stage.o $(hw_ind) $(LinkerWinAPILibObj) $(API_Linker_Command) $(TailOpts) 
+	$(CXX) -o $(targetDir)/FGMindControl.exe FGMindControl.o Talk2FrameGrabber.o $(BFObj)  Talk2FrameGrabber.o  DontTalk2DLP.o DontTalk2Camera.o Talk2Stage.o  $(hw_ind) $(LinkerWinAPILibObj) $(API_Linker_Command) $(TailOpts) 
 
 FGMindControl.o : main.cpp $(myOpenCVlibraries) $(WormSpecificLibs) 
 	$(CXX) $(CXXFLAGS) main.cpp -oFGMindControl.o -I$(MyLibs) -I$(bfIncDir) $(openCVincludes) $(TailOpts)

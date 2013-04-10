@@ -131,7 +131,7 @@ HardwareLibrary=$(3rdPartyLibs)/alp4basic.lib $(3rdPartyLibs)/tisgrabber.lib
 3rdpartyobjects= $(TimerLibrary) $(HardwareLibrary)
 
 ##BitFlow SDK
-BFLibDir = C:/BitFlow\ SDK\ 5.60/Lib
+BFLibDir = C:/BitFlow\ SDK\ 5.20/Lib
 BFObj = $(BFLibDir)/BFD.lib   $(BFLibDir)/BFDiskIO.lib $(BFLibDir)/BFDrv.lib $(BFLibDir)/BFEr.lib $(BFLibDir)/BFOS.lib $(BFLibDir)/BFS.lib $(BFLibDir)/Bid.lib $(BFLibDir)/BufferInterface.lib $(BFLibDir)/Cid.lib  $(BFLibDir)/R2Cam.lib $(BFLibDir)/R2D.lib $(BFLibDir)/R64D.lib $(BFLibDir)/RvD.lib $(BFLibDir)/clallserial.lib $(BFLibDir)/clserbit.lib $(BFLibDir)/DispSurf.lib
 
 
@@ -270,7 +270,7 @@ FG_DLP.o : main.cpp
 	$(CXX) $(CXXFLAGS) main.cpp -oFG_DLP.o -I$(MyLibs) -I$(bfIncDir) $(openCVincludes) $(TailOpts)
 
 #Calibrate FG and DLP
-$(targetDir)/calibrateFG_DLP.exe : calibrateFG_DLP.o Talk2FrameGrabber.o $(BFObj)  Talk2DLP.o Talk2Stage.o  DontTalk2Camera.o $(3rdPartyLibs)/alp4basic.lib  Talk2Matlab.o $(MatlabLibs) $(hw_ind)
+$(targetDir)/calibrateFG_DLP.exe : calibrateFG_DLP.o  Talk2FrameGrabber.o $(BFObj)  Talk2DLP.o Talk2Stage.o  DontTalk2Camera.o $(3rdPartyLibs)/alp4basic.lib  Talk2Matlab.o $(MatlabLibs) $(hw_ind)
 	$(CXX) -o $(targetDir)/calibrateFG_DLP.exe  calibrateFG_DLP.o Talk2FrameGrabber.o $(BFObj)  Talk2DLP.o Talk2Stage.o DontTalk2Camera.o $(3rdPartyLibs)/alp4basic.lib  Talk2Matlab.o  $(MatlabLibs) $(hw_ind) $(LinkerWinAPILibObj) $(TailOpts)
 
 calibrateFG_DLP.o : calibrateFG.cpp 

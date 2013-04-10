@@ -157,7 +157,19 @@
 
 
 int main(){
+	
+	/* Check for Intel Integrated Performance Primitives */
+	printf("Checking intel integrated perforumance  primitives...\n");
+	int NumUploadedFunction = 0;
+	NumUploadedFunction = cvUseOptimized(1);
+	printf("\t NumUploadedFunction = %d \n\n", NumUploadedFunction);
 
+	const char* opencv_lib = 0;
+	const char* add_modules = 0;
+	cvGetModuleInfo(0, &opencv_lib,&add_modules);
+	printf("\t opencv_lib = %s,\n\t add_modules = %s\n\n", opencv_lib,add_modules);
+	
+	
 	//char* name = (char*) malloc(sizeof(char)*50);
 
 

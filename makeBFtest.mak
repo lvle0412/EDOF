@@ -39,12 +39,12 @@ mylibraries=  Talk2FrameGrabber.o
 BFLibDir = C:/BitFlow\ SDK\ 5.20/Lib
 BFObj = $(BFLibDir)/BFD.lib   $(BFLibDir)/BFDiskIO.lib $(BFLibDir)/BFDrv.lib $(BFLibDir)/BFEr.lib $(BFLibDir)/BFOS.lib $(BFLibDir)/BFS.lib $(BFLibDir)/Bid.lib $(BFLibDir)/BufferInterface.lib $(BFLibDir)/Cid.lib  $(BFLibDir)/R2Cam.lib $(BFLibDir)/R2D.lib $(BFLibDir)/R64D.lib $(BFLibDir)/RvD.lib $(BFLibDir)/clallserial.lib $(BFLibDir)/clserbit.lib $(BFLibDir)/DispSurf.lib
 
-
 testFG :  $(targetDir)/FGtest.exe 
 
 # Linker
 $(targetDir)/FGtest.exe : FGtest.o Talk2FrameGrabber.o $(BFobj) 
-	$(CXX) -o $(targetDir)/FGtest.exe FGtest.o Talk2FrameGrabber.o $(BFObj) $(LinkerWinAPILibObj) $(TailOpts) 
+	$(CXX) -o $(targetDir)/FGtest.exe FGtest.o  Talk2FrameGrabber.o  $(BFObj)
+#	$(CXX) -o $(targetDir)/FGtest.exe FGtest.o Talk2FrameGrabber.o $(BFObj) $(LinkerWinAPILibObj) $(TailOpts) 
 
 	
 # Compiler

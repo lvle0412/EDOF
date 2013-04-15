@@ -11,7 +11,7 @@ CXXFLAGS=  -W -Wall -O2 -DNDEBUG
 
 TailOpts= #No tail opts for now
 
-LinkerWinAPILibObj= -lcomctl32 -lgdi32 -lole32 -lavifil32 -lavicap32 -lwinmm -lmsvfw32 -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
+LinkerWinAPILibObj= -lcomctl32 -lgdi32 -lole32 -lavifil32 -lavicap32 -lwinmm -lmsvfw32 -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32 -lsetupapi -lmingw32
 #-lsetupapi
 
 #Location of directories
@@ -44,7 +44,7 @@ openCVinc=$(andysOpenCVIncFileHack) -IC:/OpenCV2x/build -IC:/OpenCV2x/source/ope
 #3rd party statically linked objects
 
 ##BitFlow SDK
-BFLibDir = C:/BitFlow/ SDK/ 5.20/Lib
+BFLibDir = C:/BitFlow\ SDK\ 5.20/Lib
 BFObj = $(BFLibDir)/BFD.lib   $(BFLibDir)/BFDiskIO.lib $(BFLibDir)/BFDrv.lib $(BFLibDir)/BFEr.lib $(BFLibDir)/BFOS.lib $(BFLibDir)/BFS.lib $(BFLibDir)/Bid.lib $(BFLibDir)/BufferInterface.lib $(BFLibDir)/Cid.lib  $(BFLibDir)/R2Cam.lib $(BFLibDir)/R2D.lib $(BFLibDir)/R64D.lib $(BFLibDir)/RvD.lib $(BFLibDir)/clallserial.lib $(BFLibDir)/clserbit.lib $(BFLibDir)/DispSurf.lib
 
 testCV: $(targetDir)/test.exe
@@ -53,7 +53,7 @@ testFG :  $(targetDir)/FGtest.exe
 
 # Linker
 $(targetDir)/FGtest.exe : FGtest.o Talk2FrameGrabber.o $(BFobj) 
-	$(CXX) $(CXXFLAGS) FGtest.o -o $(targetDir)/FGtest.exe   Talk2FrameGrabber.o  $(BFObj)
+	$(CXX) -o $(targetDir)/FGtest.exe FGtest.o  Talk2FrameGrabber.o  $(BFObj)
 #	$(CXX) -o $(targetDir)/FGtest.exe FGtest.o Talk2FrameGrabber.o $(BFObj) $(LinkerWinAPILibObj) $(TailOpts) 
 
 $(targetDir)/test.exe : test.o 
@@ -69,7 +69,7 @@ FGtest.o : $(MyLibs)/Talk2FrameGrabber.h FGtest.cpp
 	$(CCC) $(CCCFLAGS) FGtest.cpp -I$(MyLibs) -I$(bfIncDir)
 
 Talk2FrameGrabber.o: $(MyLibs)/Talk2FrameGrabber.cpp $(MyLibs)/Talk2FrameGrabber.h
-	$(CXX) $(CXXFLAGS) $(MyLibs)/Talk2FrameGrabber.cpp -I$(bfIncDir)
+	$(CCC) $(CCCFLAGS) $(MyLibs)/Talk2FrameGrabber.cpp -I$(bfIncDir)
 	
 
 .PHONY: clean run

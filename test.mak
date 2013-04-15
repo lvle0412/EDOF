@@ -4,14 +4,14 @@
 
 #Note it seems to work well to use gcc for compiling the c code but g++ for linking
 CCC=x86_64-w64-mingw32-gcc.exe
-CCCFLAGS= -Wall -O2 -c
+CCCFLAGS= -v -Wall -O2 -c
 
 CXX = x86_64-w64-mingw32-g++.exe
-CXXFLAGS=  -W -Wall -O2 -DNDEBUG 
+CXXFLAGS=  -v -W -Wall -O2 -DNDEBUG 
 
 TailOpts= #No tail opts for now
 
-LinkerWinAPILibObj= -lcomctl32 -lgdi32 -lole32 -lavifil32 -lavicap32 -lwinmm -lmsvfw32 -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32 -lsetupapi -lmingw32
+LinkerWinAPILibObj= -lcomctl32 -lgdi32 -lole32 -lavifil32 -lavicap32 -lwinmm -lmsvfw32 -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32 -lsetupapi -lmingw32 -lGdi32
 #-lsetupapi
 
 #Location of directories
@@ -53,7 +53,7 @@ testFG :  $(targetDir)/FGtest.exe
 
 # Linker
 $(targetDir)/FGtest.exe : FGtest.o Talk2FrameGrabber.o $(BFobj) 
-	$(CXX) -o $(targetDir)/FGtest.exe FGtest.o  Talk2FrameGrabber.o  $(BFObj)
+	$(CXX) -o $(targetDir)/FGtest.exe FGtest.o  Talk2FrameGrabber.o  $(BFObj)  $(openCVlibs) $(LinkerWinAPILibObj) $(TailOpts)
 #	$(CXX) -o $(targetDir)/FGtest.exe FGtest.o Talk2FrameGrabber.o $(BFObj) $(LinkerWinAPILibObj) $(TailOpts) 
 
 $(targetDir)/test.exe : test.o 
@@ -66,7 +66,7 @@ test.o : test.c
 
 
 FGtest.o : $(MyLibs)/Talk2FrameGrabber.h FGtest.cpp
-	$(CCC) $(CCCFLAGS) FGtest.cpp -I$(MyLibs) -I$(bfIncDir)
+	$(CCC) $(CCCFLAGS) FGtest.cpp -I$(MyLibs) -I$(bfIncDir) -I$(openCVinc)
 
 Talk2FrameGrabber.o: $(MyLibs)/Talk2FrameGrabber.cpp $(MyLibs)/Talk2FrameGrabber.h
 	$(CCC) $(CCCFLAGS) $(MyLibs)/Talk2FrameGrabber.cpp -I$(bfIncDir)

@@ -49,9 +49,9 @@
 
 #include "AndysOpenCVLib.h"
 
-#include <highgui.h>
-#include <cv.h>
-#include <cxcore.h>
+#include "opencv2/highgui/highgui_c.h"
+//#include <cv.h>
+//#include <cxcore.h>
 
 
 

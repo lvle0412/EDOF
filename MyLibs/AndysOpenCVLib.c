@@ -37,13 +37,15 @@
 
 #include <math.h>
 
-#include <highgui.h>
-#include <cxcore.h>
+#include "opencv2/highgui/highgui_c.h"
+//#include <cxcore.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 #include "AndysOpenCVLib.h"
 #include <limits.h>
+
 
 #define PRINTOUT 0
 

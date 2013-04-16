@@ -48,9 +48,9 @@
 #include <sys/time.h>
 
 //OpenCV Headers
-#include <highgui.h>
-#include <cv.h>
-#include <cxcore.h>
+#include "opencv2/highgui/highgui_c.h"
+#include "opencv/cv.h"
+#include "opencv/cxcore.h"
 
 //Timer Libray
 #include "../3rdPartyLibs/tictoc.h"

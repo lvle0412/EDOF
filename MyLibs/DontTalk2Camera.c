@@ -36,6 +36,8 @@
 #include <assert.h>
 #include <Talk2Camera.h>
 
+#define UNUSED(x) (void)(x)
+
 /**
  *
  * This library is a bit of a hack.
@@ -86,9 +88,11 @@ void T2Cam_CloseLib(){
  * CamData data type.
  *
  */
-void _cdecl callback(HGRABBER hGrabber, unsigned char* pData,
-		unsigned long frameNumber, void*){
+void _cdecl callback(HGRABBER hGrabber, unsigned char* pData, unsigned long frameNumber, void* blah){
 	T2Cam_errormsg();
+	UNUSED(hGrabber);
+	UNUSED(pData);
+	UNUSED(frameNumber);
 	assert(0);
 }
 

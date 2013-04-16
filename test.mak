@@ -70,12 +70,12 @@ targetDir=bin
 #=========================
 
 #Note it seems to work well to use gcc for compiling the c code but g++ for linking
-CCC=x86_64-w64-mingw32-gcc.exe
-CCCFLAGS= -v -Wall -O2 -c
+CCC=x86_64-w64-mingw32-g++.exe
+COMPFLAGS= -v  -O2 -c
 #-c option means link only
 
 CXX = x86_64-w64-mingw32-g++.exe
-CXXFLAGS=  -v -W -Wall -O2 -DNDEBUG 
+LINKFLAGS=  -v -W  -O2 -DNDEBUG 
 
 
 #======================
@@ -229,14 +229,14 @@ myOpenCVlibraries=AndysComputations.o AndysOpenCVLib.o WormAnalysis.o
 TimerLibrary=tictoc.o timer.o
 
 #Hardware Independent linkable objects
-hw_ind= version.o AndysComputations.o AndysOpenCVLib.o TransformLib.o IllumWormProtocol.o  $(WormSpecificLibs) $(TimerLibrary) $(openCVlibs)
+hw_ind= version.o AndysComputations.o AndysOpenCVLib.o TransformLib.o IllumWormProtocol.o  $(WormSpecificLibs) $(TimerLibrary) $(openCVobjs)
 
 #=========================
 # Top-level Make Targets
 #=========================
 
 #CoLBeRT is the whole megillah: BitFlow FrameGrabber, DLP, OpenCV, Stage Control
-colbert: $(targetDir)/colbert.exe
+makecolbert: $(targetDir)/colbert.exe
 
 
 all_tests: test_DLP test_CV test_FG
@@ -256,15 +256,17 @@ test_FG :  $(targetDir)/testFG.exe
 # Top-level Linker Targets
 #=========================
 
+
 $(targetDir)/colbert.exe : colbert.o \
 		Talk2FrameGrabber.o \
 		$(BFobj) \
 		Talk2DLP.o \
+		Talk2Stage.o \
 		$(ALP_OBJS) \
 		DontTalk2Camera.o \
 		$(openCVobjs) \
 		$(hw_ind)	
-	$(CXX) -o $(targetDir)/colbert.exe  Talk2FrameGrabber.o $(BFObj) Talk2DLP.o   $(ALP_STATIC) $(openCVlibs) $(LinkerWinAPILibObj) 
+	$(CXX) -o $(targetDir)/colbert.exe  colbert.o $(API_DLL_dir)/mc_api.dll Talk2FrameGrabber.o Talk2Stage.o DontTalk2Camera.o $(BFObj) Talk2DLP.o   $(ALP_STATIC) $(hw_ind) $(LinkerWinAPILibObj) 
 
 
 
@@ -276,21 +278,30 @@ $(targetDir)/testFG.exe : testFG.o Talk2FrameGrabber.o Talk2DLP.o $(BFobj)  $(AL
 
 
 $(targetDir)/testCV.exe : testCV.o  $(openCVobjs)
-	$(CXX) $(CXXFLAGS) testCV.o -o $(targetDir)/testCV.exe $(openCVlibs) $(LinkerWinAPILibObj) 
+	$(CXX) $(LINKFLAGS) testCV.o -o $(targetDir)/testCV.exe $(openCVlibs) $(LinkerWinAPILibObj) 
 	
 
 #=========================
 # Top-level Compile Source
 #=========================
 
+colbert.o : main.cpp  $(MyLibs)/Talk2DLP.h $(MyLibs)/Talk2Camera.h \
+$(MyLibs)/TransformLib.h $(MyLibs)/Talk2Camera.h $(MyLibs)/AndysOpenCVLib.h $(MyLibs)/Talk2FrameGrabber.h \
+$(MyLibs)/Talk2Matlab.h $(MyLibs)/AndysComputations.h $(MyLibs)/WormAnalysis.h \
+$(MyLibs)/WriteOutWorm.h $(MyLibs)/IllumWormProtocol.h $(MyLibs)/TransformLib.h \
+$(MyLibs)/experiment.h
+	$(CCC) $(COMPFLAGS) -o colbert.o main.cpp -I$(MyLibs) $(openCVinc) -I$(bfIncDir) 
+	
+
+
 testFG.o : $(MyLibs)/Talk2FrameGrabber.h testFG.cpp
-	$(CCC) $(CCCFLAGS) testFG.cpp -I$(MyLibs) -I$(bfIncDir) $(openCVinc)
+	$(CCC) $(COMPFLAGS) testFG.cpp -I$(MyLibs) -I$(bfIncDir) $(openCVinc)
 
 testDLP.o : testDLP.cpp $(MyLibs)/Talk2DLP.h 	
-	$(CCC) $(CCCFLAGS) testDLP.cpp -I$(MyLibs) -I$(ALP_INC_DIR)
+	$(CCC) $(COMPFLAGS) testDLP.cpp -I$(MyLibs) -I$(ALP_INC_DIR)
 		
 testCV.o : testCV.c
-	$(CCC) $(CCCFLAGS) testCV.c $(openCVinc)
+	$(CCC) $(COMPFLAGS) testCV.c $(openCVinc)
 	
 	
 	
@@ -298,13 +309,74 @@ testCV.o : testCV.c
 #=============================
 # Library-level Compile Source
 #=============================
+
+experiment.o: $(MyLibs)/experiment.c $(MyLibs)/experiment.h 
+	$(CCC) $(COMPFLAGS) $(MyLibs)/experiment.c $ -I$(MyLibs) $(openCVinc) -I$(bfIncDir)
+
+#Note I am using the C++ compiler here
+AndysOpenCVLib.o : $(MyLibs)/AndysOpenCVLib.c $(MyLibs)/AndysOpenCVLib.h 
+	$(CXX) $(COMPFLAGS) $(MyLibs)/AndysOpenCVLib.c $(openCVinc) 
+#
+# Worm Related Libraries
+#
+	
+TransformLib.o: $(MyLibs)/TransformLib.c
+	$(CCC) $(COMPFLAGS) $(MyLibs)/TransformLib.c $(openCVinc) 
+
+IllumWormProtocol.o : $(MyLibs)/IllumWormProtocol.h $(MyLibs)/IllumWormProtocol.c
+	$(CXX) $(COMPFLAGS) $(MyLibs)/IllumWormProtocol.c -I$(MyLibs) $(openCVinc)	
+	
+WormAnalysis.o : $(MyLibs)/WormAnalysis.c $(MyLibs)/WormAnalysis.h $(myOpenCVlibraries)  
+	$(CCC) $(COMPFLAGS) $(MyLibs)/WormAnalysis.c -I$(MyLibs) $(openCVinc)
+
+WriteOutWorm.o : $(MyLibs)/WormAnalysis.c $(MyLibs)/WormAnalysis.h $(MyLibs)/WriteOutWorm.c $(MyLibs)/WriteOutWorm.h $(myOpenCVlibraries) 
+	$(CCC) $(COMPFLAGS) $(MyLibs)/WriteOutWorm.c -I$(MyLibs) $(openCVinc)
+
+$(MyLibs)/WriteOutWorm.c :  $(MyLibs)/version.h 
+	
+
+#
+# Talk2 Libraries
+#
+# if talk to stage causes trouble try compiling without -mwindows flag.
+Talk2Stage.o: $(MyLibs)/Talk2Stage.c $(MyLibs)/Talk2Stage.h
+	$(CCC) $(COMPFLAGS) $(MyLibs)/Talk2Stage.c -I$(MyLibs)
+
 	
 Talk2FrameGrabber.o: $(MyLibs)/Talk2FrameGrabber.cpp $(MyLibs)/Talk2FrameGrabber.h
-	$(CCC) $(CCCFLAGS) $(MyLibs)/Talk2FrameGrabber.cpp -I$(bfIncDir)
+	$(CCC) $(COMPFLAGS) $(MyLibs)/Talk2FrameGrabber.cpp -I$(bfIncDir)
 
 Talk2DLP.o: $(MyLibs)/Talk2DLP.cpp $(MyLibs)/Talk2DLP.h
-	$(CCC) $(CCCFLAGS) $(MyLibs)/Talk2DLP.cpp -I$(MyLibs) -I$(ALP_INC_DIR)
+	$(CCC) $(COMPFLAGS) $(MyLibs)/Talk2DLP.cpp -I$(MyLibs) -I$(ALP_INC_DIR)
 
+Talk2Matlab.o : $(MyLibs)/Talk2Matlab.c $(MyLibs)/Talk2Matlab.h 
+	$(CCC) $(COMPFLAGS) $(MyLibs)/Talk2Matlab.c $(openCVinc) -I$(MatlabIncDir) $(TailOpts)
+
+	
+	
+#
+# Totally Seperate Libraries
+#	
+	
+AndysComputations.o : $(MyLibs)/AndysComputations.c $(MyLibs)/AndysComputations.h
+	$(CCC) $(COMPFLAGS) $(MyLibs)/AndysComputations.c 
+
+	
+tictoc.o: $(3rdPartyLibs)/tictoc.cpp $(3rdPartyLibs)/tictoc.h 
+	$(CXX) $(COMPFLAGS) $(3rdPartyLibs)/tictoc.cpp $ -I$(3rdPartyLibs) 
+	
+timer.o: $(3rdPartyLibs)/Timer.cpp $(3rdPartyLibs)/Timer.h 
+	$(CXX) $(COMPFLAGS) $(3rdPartyLibs)/Timer.cpp $ -I$(3rdPartyLibs) 
+	
+
+#
+# Hardware independent hack
+#
+
+DontTalk2Camera.o : $(MyLibs)/DontTalk2Camera.c $(MyLibs)/Talk2Camera.h
+	$(CCC) $(COMPFLAGS) $(MyLibs)/DontTalk2Camera.c -I$(MyLibs)  $(TailOpts)
+	
+	
 	
 #=============================
 # Dependency Applications
@@ -319,13 +391,13 @@ API/bin/mc_api.dll: API/makefile
 
 	
 
-#=============================
+#==================
 # Versioning System
-#=============================	
+#==================
 	
 # note that version.c is generated at the very top. under "timestamp"
 version.o : $(MyLibs)/version.c $(MyLibs)/version.h 
-	$(CCC) $(CCCFLAGS) $(MyLibs)/version.c  -I$(MyLibs)  
+	$(CCC) $(COMPFLAGS) $(MyLibs)/version.c  -I$(MyLibs)  
 
 #Trick so that git generates a version.c file
 $(MyLibs)/version.c: FORCE 
@@ -335,9 +407,9 @@ $(MyLibs)/version.c: FORCE
 FORCE:
 	
 	
-#=============================
+#==============
 # Dummy targets
-#=============================	
+#==============
 
 .PHONY: clean run
 clean:

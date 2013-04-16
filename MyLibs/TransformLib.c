@@ -28,11 +28,12 @@
 
 
 //OpenCV Headers
-#include <cxcore.h>
-#include <highgui.h>
-#include <cv.h>
+//#include <cxcore.h>
+#include "opencv2/highgui/highgui_c.h"
+//#include <cv.h>
 
 #include <stdio.h>
+#include <stdbool.h>
 
 #include "AndysOpenCVLib.h"
 #include "WormAnalysis.h"

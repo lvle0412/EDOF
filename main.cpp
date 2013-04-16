@@ -68,9 +68,7 @@ using namespace std;
 
 
 //OpenCV Headers
-#include <highgui.h>
-#include <cv.h>
-#include <cxcore.h>
+#include "opencv2/highgui/highgui_c.h"
 
 //Andy's Personal Headers
 #include "MyLibs/AndysOpenCVLib.h"

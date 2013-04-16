@@ -228,6 +228,9 @@ myOpenCVlibraries=AndysComputations.o AndysOpenCVLib.o WormAnalysis.o
 
 TimerLibrary=tictoc.o timer.o
 
+#Hardware Independent linkable objects
+hw_ind= version.o AndysComputations.o AndysOpenCVLib.o TransformLib.o IllumWormProtocol.o  $(WormSpecificLibs) $(TimerLibrary) $(openCVlibs)
+
 #=========================
 # Top-level Make Targets
 #=========================
@@ -252,12 +255,25 @@ test_FG :  $(targetDir)/testFG.exe
 #=========================
 # Top-level Linker Targets
 #=========================
+
+$(targetDir)/colbert.exe : colbert.o \
+		Talk2FrameGrabber.o \
+		$(BFobj) \
+		Talk2DLP.o \
+		$(ALP_OBJS) \
+		DontTalk2Camera.o \
+		$(openCVobjs) \
+		$(hw_ind)	
+	$(CXX) -o $(targetDir)/colbert.exe  Talk2FrameGrabber.o $(BFObj) Talk2DLP.o   $(ALP_STATIC) $(openCVlibs) $(LinkerWinAPILibObj) 
+
+
+
 $(targetDir)/testDLP.exe : testDLP.o Talk2DLP.o 
 		$(CXX) -o $(targetDir)/testDLP.exe testDLP.o  Talk2DLP.o  $(ALP_STATIC) $(LinkerWinAPILibObj) 
 
 $(targetDir)/testFG.exe : testFG.o Talk2FrameGrabber.o Talk2DLP.o $(BFobj)  $(ALP_OBJS) $(openCVobjs)
 	$(CXX) -o $(targetDir)/testFG.exe testFG.o   Talk2FrameGrabber.o $(BFObj) Talk2DLP.o   $(ALP_STATIC) $(openCVlibs) $(LinkerWinAPILibObj) 
-#	$(CXX) -o $(targetDir)/testFG.exe testFG.o Talk2FrameGrabber.o $(BFObj) $(LinkerWinAPILibObj) $(TailOpts) 
+
 
 $(targetDir)/testCV.exe : testCV.o  $(openCVobjs)
 	$(CXX) $(CXXFLAGS) testCV.o -o $(targetDir)/testCV.exe $(openCVlibs) $(LinkerWinAPILibObj) 
@@ -301,6 +317,24 @@ $(API_DLL_dir)/mc_api.dll: API/bin/mc_api.dll
 API/bin/mc_api.dll: API/makefile
 	cd API && make clean && make all && cd ..
 
+	
+
+#=============================
+# Versioning System
+#=============================	
+	
+# note that version.c is generated at the very top. under "timestamp"
+version.o : $(MyLibs)/version.c $(MyLibs)/version.h 
+	$(CCC) $(CCCFLAGS) $(MyLibs)/version.c  -I$(MyLibs)  
+
+#Trick so that git generates a version.c file
+$(MyLibs)/version.c: FORCE 
+	$(GIT) rev-parse HEAD | awk ' BEGIN {print "#include \"version.h\""} {print "extern const char * build_git_sha = \"" $$0"\";"} END {}' > $(MyLibs)/version.c
+	date | awk 'BEGIN {} {print "extern const char * build_git_time = \""$$0"\";"} END {} ' >> $(MyLibs)/version.c	
+		
+FORCE:
+	
+	
 #=============================
 # Dummy targets
 #=============================	

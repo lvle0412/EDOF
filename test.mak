@@ -290,7 +290,11 @@ $(MyLibs)/TransformLib.h $(MyLibs)/Talk2Camera.h $(MyLibs)/AndysOpenCVLib.h $(My
 $(MyLibs)/Talk2Matlab.h $(MyLibs)/AndysComputations.h $(MyLibs)/WormAnalysis.h \
 $(MyLibs)/WriteOutWorm.h $(MyLibs)/IllumWormProtocol.h $(MyLibs)/TransformLib.h \
 $(MyLibs)/experiment.h
+<<<<<<< HEAD
 	$(CCC) $(COMPFLAGS) -o colbert.o main.cpp -I$(MyLibs) $(openCVinc) -I$(bfIncDir) 
+=======
+	$(CCC) $(COMPFLAGS) main.cpp -I$(MyLibs) $(openCVinc) -I$(bfIncDir) 
+>>>>>>> 92ef97fc408184b72ac5f7e8bfe52032f3600383
 	
 
 

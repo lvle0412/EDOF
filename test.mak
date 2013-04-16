@@ -17,6 +17,21 @@
 #
 # also ensure to invoke this makefile in the msys bash shell
 
+# You say you want to compile from source?
+# Before attempting to compile you need to be 
+# proficient with the following core technologies and concepts
+#
+# - make and makefiles
+# - The GNU compiler, gcc and how to compile and link libraries
+# - the difference betwen statically linked and dynamically linked libraries
+# - using git and git submodules
+# - how to use the GNU toolchain on windows
+# - specifically how to use msys and mingw
+# - a thorough understanding of how to work with 32 bit and 64 bit binaries and libraries and when and how the can play together
+# - a thorough understanding of the differences between C and C++ and when and how they can be mixed and matched
+# - a working knolwedge of stnadard windows libraries
+
+
 
 #=================================
 # Location of external directories
@@ -32,14 +47,11 @@ OPENCV2_SOURCE_DIR=C:/OpenCV2x/source
 #BitFlow (frame grabber SDK)
 BitFlow_DIR = C:/BitFlow\ SDK\ 5.20/
 
+#Git Version control
+GIT=C:/Progra~2/Git/bin/git
 
-#=================================
-# List of Libraries (this doesn't belong here)
-#=================================
-
-#Librariers (.lib or .a)
-mylibraries=  Talk2FrameGrabber.o 
-
+#Matlab Include directory for header files
+MATLAB_DIR=C:/Progra~1/MATLAB/R2012a/extern
 
 
 #=========================
@@ -182,6 +194,29 @@ ALP_OBJS=$(ALP_STATIC) $(ALP_DLL)
 
 #Include directory (.h files)
 #$(ALP_INC_DIR)
+
+
+#=======
+# MATLAB 
+#=======
+#Matlab Compiled Libraries Directgory
+MatlabLibsDir=$(MATLAB_DIR)/lib/win64/microsoft/
+
+#Matlab Library Objects
+MatlabLibs=$(MatlabLibsDir)/libeng.lib $(MatlabLibsDir)/libmx.lib
+
+#MATLAB header files (.h)
+MatlabIncDir=$(MATLAB_DIR)/include
+
+
+#=================================
+# List of Libraries 
+#=================================
+
+#Librariers (.lib or .a)
+mylibraries=  Talk2FrameGrabber.o 
+
+
 
 
 #=========================

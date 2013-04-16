@@ -1,0 +1,13 @@
+This file mostly contains the header files from the BitFlow SDK which is normally located at C:/BitFlow SDK 5.20/Include
+
+It also has the crtdbg.h which is a santdard microsoft header file.
+
+The header files here are all holdovers from the code as it was in Aravi's lab. 
+
+That should have been BitFlow SDK5.2
+
+The funny thing is that if I switch my include directory from here to C:/BitFlow SDK 5.20/Include things fail to compile.
+
+I'm not going to deal with it now, but it is weird.
+
+

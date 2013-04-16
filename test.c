@@ -1,7 +1,5 @@
 #include <stdio.h>
-#include "highgui.h"
-#include "cxcore.h"
-#include "cv.h"
+#include "opencv2/highgui/highgui_c.h"
 
 int main(){
 printf("Hello World.\nWait\n");

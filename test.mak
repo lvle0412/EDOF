@@ -1,4 +1,9 @@
-# This is the new ultimate makefile for mindcontrol. software
+# This is the new ultimate makefile for mindcontrol software
+# Its all jazzed up for 64 bit windows 7
+# and it works witn MSYS 1.0
+# mingw-w64
+# opencv  2x
+
 
 ##
 ## Human instructions
@@ -18,7 +23,7 @@
 #=================================
 
 #DLP (ALP)
-ALP_API_DIR="C:/Program Files/ALP-4.1/ALP-4.1 basic API"
+ALP_INC_DIR=3rdPartyLibs/ALPx64
 
 # OpenCV
 OPENCV2_BUILD_DIR=C:/OpenCV2x/build_mingw64
@@ -55,7 +60,6 @@ LinkerWinAPILibObj= -lcomctl32 -lgdi32 -lole32 -lavifil32 -lavicap32 -lwinmm -lm
 #Location of directories
 MyLibs=MyLibs
 3rdPartyLibs=3rdPartyLibs
-bfIncDir=$(3rdPartyLibs)/BitFlowSDK
 targetDir=bin
 
 
@@ -75,8 +79,8 @@ opencvlib_dir=$(OPENCV2_BUILD_DIR)/lib/ -L$(OPENCV2_BUILD_DIR)/3rdparty/lib/
 # OpenCV
 #========
 
-openCVlibs= -Wl,--major-image-version,0,--minor-image-version,0  -lstdc++ \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_core243.a \
+#OpenCV objects
+openCVobjs=$(OPENCV2_BUILD_DIR)/lib/libopencv_core243.a \
 	$(OPENCV2_BUILD_DIR)/lib/libopencv_flann243.a \
 	$(OPENCV2_BUILD_DIR)/lib/libopencv_imgproc243.a \
 	$(OPENCV2_BUILD_DIR)/lib/libopencv_highgui243.a \
@@ -98,18 +102,21 @@ openCVlibs= -Wl,--major-image-version,0,--minor-image-version,0  -lstdc++ \
 	$(OPENCV2_BUILD_DIR)/lib/libopencv_highgui243.a \
 	$(OPENCV2_BUILD_DIR)/lib/libopencv_imgproc243.a \
 	$(OPENCV2_BUILD_DIR)/lib/libopencv_core243.a \
-	-lstdc++ \
 	$(OPENCV2_BUILD_DIR)/3rdparty/lib/liblibjpeg.a \
 	$(OPENCV2_BUILD_DIR)/3rdparty/lib/liblibpng.a \
 	$(OPENCV2_BUILD_DIR)/3rdparty/lib/liblibtiff.a \
 	$(OPENCV2_BUILD_DIR)/3rdparty/lib/liblibjasper.a \
 	$(OPENCV2_BUILD_DIR)/3rdparty/lib/libIlmImf.a \
 	$(OPENCV2_BUILD_DIR)/3rdparty/lib/libzlib.a
+
+#OpenCV library commands
+openCVlibs= -Wl,--major-image-version,0,--minor-image-version,0  -lstdc++ $(openCVobjs)
+	
+	
 #Intell IPP libs
 #-lzlib -lippvm_l -lippcc_l -lippcv_l -lippi_l -lipps_l -lippcore_l -ltbb
 
-#Include files (.h)
-
+#OpenCV include files (.h)
 openCVinc=-I$(OPENCV2_BUILD_DIR) \
 	-I$(OPENCV2_SOURCE_DIR)/opencv/include \
 	-I$(OPENCV2_SOURCE_DIR)/opencv/modules/core/include \
@@ -133,6 +140,7 @@ openCVinc=-I$(OPENCV2_BUILD_DIR) \
 #=========================
 # BitFlow Frame Graber SDK
 #=========================
+#BFobjects
 BFObj = $(BitFlow_DIR)/Lib/BFD.lib \
 	$(BitFlow_DIR)/Lib/BFDiskIO.lib \
 	$(BitFlow_DIR)/Lib/BFDrv.lib \
@@ -150,35 +158,67 @@ BFObj = $(BitFlow_DIR)/Lib/BFD.lib \
 	$(BitFlow_DIR)/Lib/clserbit.lib \
 	$(BitFlow_DIR)/Lib/DispSurf.lib
 
+#BF include directory (.h files)
+bfIncDir=$(3rdPartyLibs)/BitFlowSDK
 	
+
+#=========================
+# ALP DLP (DMD) SDK
+#=========================
+#Note we are using 4.1 x64 binaries
+#static libraries
+ALP_STATIC=$(ALP_INC_DIR)/alp41basic.lib 
+#dynamically linked runtime libraries
+ALP_DLL=$(targetDir)/alp41basic.dll $(targetDir)/fmteos.dll
+
+#all linker objects
+ALP_OBJS=$(ALP_STATIC) $(ALP_DLL)
+
+#Include directory (.h files)
+#$(ALP_INC_DIR)
+
+
+
+
+testDLP: $(targetDir)/testDLP.exe  
 	
-	
-	
-	
-testCV: $(targetDir)/test.exe
+testCV: $(targetDir)/test.exe 
  
-# This tests the frame grabber and openCV
-testFG :  $(targetDir)/FGtest.exe 
+ 
+# This tests the frame grabber, openCV and DLP
+testFG :  $(targetDir)/FGtest.exe  
 
 # Linker
-$(targetDir)/FGtest.exe : FGtest.o Talk2FrameGrabber.o $(BFobj) 
-	$(CXX) -o $(targetDir)/FGtest.exe FGtest.o  Talk2FrameGrabber.o  $(BFObj)  $(openCVlibs) $(LinkerWinAPILibObj) 
+$(targetDir)/testDLP.exe : testDLP.o Talk2DLP.o 
+		$(CXX) -o $(targetDir)/testDLP.exe testDLP.o  Talk2DLP.o  $(ALP_STATIC) $(LinkerWinAPILibObj) 
+
+$(targetDir)/FGtest.exe : FGtest.o Talk2FrameGrabber.o Talk2DLP.o $(BFobj)  $(ALP_OBJS) $(openCVobjs)
+	$(CXX) -o $(targetDir)/FGtest.exe FGtest.o  Talk2FrameGrabber.o  $(BFObj)  $(openCVlibs) Talk2DLP.o $(ALP_OBJS) $(LinkerWinAPILibObj) 
 #	$(CXX) -o $(targetDir)/FGtest.exe FGtest.o Talk2FrameGrabber.o $(BFObj) $(LinkerWinAPILibObj) $(TailOpts) 
 
-$(targetDir)/test.exe : test.o 
+$(targetDir)/test.exe : test.o  $(openCVobjs)
 	$(CXX) $(CXXFLAGS) test.o -o $(targetDir)/test.exe $(openCVlibs) $(LinkerWinAPILibObj) 
 	
 
 # Compiler
-test.o : test.c
-	$(CCC) $(CCCFLAGS) test.c $(openCVinc)
 
 
 FGtest.o : $(MyLibs)/Talk2FrameGrabber.h FGtest.cpp
 	$(CCC) $(CCCFLAGS) FGtest.cpp -I$(MyLibs) -I$(bfIncDir) $(openCVinc)
 
+testDLP.o : testDLP.cpp $(MyLibs)/Talk2DLP.h 	
+	$(CCC) $(CCCFLAGS) testDLP.cpp -I$(MyLibs) -I$(ALP_INC_DIR)
+		
+test.o : test.c
+	$(CCC) $(CCCFLAGS) test.c $(openCVinc)
+	
+	
 Talk2FrameGrabber.o: $(MyLibs)/Talk2FrameGrabber.cpp $(MyLibs)/Talk2FrameGrabber.h
 	$(CCC) $(CCCFLAGS) $(MyLibs)/Talk2FrameGrabber.cpp -I$(bfIncDir)
+
+Talk2DLP.o: $(MyLibs)/Talk2DLP.cpp $(MyLibs)/Talk2DLP.h
+	$(CCC) $(CCCFLAGS) $(MyLibs)/Talk2DLP.cpp -I$(MyLibs) -I$(ALP_INC_DIR)
+
 	
 
 .PHONY: clean run

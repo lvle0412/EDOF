@@ -210,14 +210,23 @@ MatlabIncDir=$(MATLAB_DIR)/include
 
 
 #=================================
+# MindContorl API
+#================================
+API_DLL_dir=bin
+API_Linker_Command= -Lbin -lmc_api
+
+#=================================
 # List of Libraries 
 #=================================
 
 #Librariers (.lib or .a)
-mylibraries=  Talk2FrameGrabber.o 
+mylibraries=  version.o AndysComputations.o $(API_DLL_dir)/mc_api.dll Talk2DLP.o Talk2Camera.o Talk2FrameGrabber.o AndysOpenCVLib.o Talk2Matlab.o TransformLib.o IllumWormProtocol.o
 
+WormSpecificLibs= WormAnalysis.o WriteOutWorm.o experiment.o 
 
+myOpenCVlibraries=AndysComputations.o AndysOpenCVLib.o WormAnalysis.o
 
+TimerLibrary=tictoc.o timer.o
 
 #=========================
 # Top-level Make Targets
@@ -281,9 +290,24 @@ Talk2DLP.o: $(MyLibs)/Talk2DLP.cpp $(MyLibs)/Talk2DLP.h
 	$(CCC) $(CCCFLAGS) $(MyLibs)/Talk2DLP.cpp -I$(MyLibs) -I$(ALP_INC_DIR)
 
 	
+#=============================
+# Dependency Applications
+#=============================
+	
+## Mind Control API
+$(API_DLL_dir)/mc_api.dll: API/bin/mc_api.dll
+	cp API/bin/mc_api.dll $(API_DLL_dir)/mc_api.dll
+
+API/bin/mc_api.dll: API/makefile
+	cd API && make clean && make all && cd ..
+
+#=============================
+# Dummy targets
+#=============================	
 
 .PHONY: clean run
 clean:
 	rm -rfv *.o
+	rm -fv 	$(API_DLL_dir)/mc_api.dll
 
 

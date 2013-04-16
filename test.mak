@@ -33,6 +33,25 @@ OPENCV2_SOURCE_DIR=C:/OpenCV2x/source
 BitFlow_DIR = C:/BitFlow\ SDK\ 5.20/
 
 
+#=================================
+# List of Libraries (this doesn't belong here)
+#=================================
+
+#Librariers (.lib or .a)
+mylibraries=  Talk2FrameGrabber.o 
+
+
+
+#=========================
+# Source Directory Layout
+#=========================
+
+#Location of directories
+MyLibs=MyLibs
+3rdPartyLibs=3rdPartyLibs
+targetDir=bin
+
+
 
 #=========================
 # Compiler & Linker Flags
@@ -53,27 +72,6 @@ CXXFLAGS=  -v -W -Wall -O2 -DNDEBUG
 #This WIN API linker objects must go at the END of the linker command
 LinkerWinAPILibObj= -lcomctl32 -lgdi32 -lole32 -lavifil32 -lavicap32 -lwinmm -lmsvfw32 -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32 -lsetupapi -lmingw32 -lsetupapi
 
-
-
-
-
-#Location of directories
-MyLibs=MyLibs
-3rdPartyLibs=3rdPartyLibs
-targetDir=bin
-
-
-
-# objects that I have written, in order of dependency. 
-# e.g. Objects that depend on nothing go left.
-	#Objects that depend on other objects go right.
-
-#Librariers (.lib or .a)
-mylibraries=  Talk2FrameGrabber.o 
-opencvlib_dir=$(OPENCV2_BUILD_DIR)/lib/ -L$(OPENCV2_BUILD_DIR)/3rdparty/lib/ 
-
-#Intel IPP
-#-L"C:/Program Files (x86)/Intel/Composer XE 2013/ipp/lib/intel64"
 
 #========
 # OpenCV
@@ -113,8 +111,6 @@ openCVobjs=$(OPENCV2_BUILD_DIR)/lib/libopencv_core243.a \
 openCVlibs= -Wl,--major-image-version,0,--minor-image-version,0  -lstdc++ $(openCVobjs)
 	
 	
-#Intell IPP libs
-#-lzlib -lippvm_l -lippcc_l -lippcv_l -lippi_l -lipps_l -lippcore_l -ltbb
 
 #OpenCV include files (.h)
 openCVinc=-I$(OPENCV2_BUILD_DIR) \
@@ -137,6 +133,16 @@ openCVinc=-I$(OPENCV2_BUILD_DIR) \
 	-I$(OPENCV2_SOURCE_DIR)/opencv/modules/ts/include \
 	-I$(OPENCV2_SOURCE_DIR)/opencv/modules/videostab/include
 
+#==============================================
+# Intel Integrated Performance Primitives (IPP)
+#==============================================
+	#Intel IPP
+#-L"C:/Program Files (x86)/Intel/Composer XE 2013/ipp/lib/intel64"	
+	
+#Intell IPP libs
+#-lzlib -lippvm_l -lippcc_l -lippcv_l -lippi_l -lipps_l -lippcore_l -ltbb
+
+	
 #=========================
 # BitFlow Frame Graber SDK
 #=========================
@@ -182,6 +188,12 @@ ALP_OBJS=$(ALP_STATIC) $(ALP_DLL)
 # Top-level Make Targets
 #=========================
 
+#CoLBeRT is the whole megillah: BitFlow FrameGrabber, DLP, OpenCV, Stage Control
+colbert: $(targetDir)/colbert.exe
+
+
+all_tests: test_DLP test_CV test_FG
+
 # Executables for testing different dependencies
 test_DLP: $(targetDir)/testDLP.exe  
 	
@@ -223,7 +235,7 @@ testCV.o : testCV.c
 	
 	
 	
-#============================
+#=============================
 # Library-level Compile Source
 #=============================
 	

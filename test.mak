@@ -178,40 +178,54 @@ ALP_OBJS=$(ALP_STATIC) $(ALP_DLL)
 #$(ALP_INC_DIR)
 
 
+#=========================
+# Top-level Make Targets
+#=========================
 
-
-testDLP: $(targetDir)/testDLP.exe  
+# Executables for testing different dependencies
+test_DLP: $(targetDir)/testDLP.exe  
 	
-testCV: $(targetDir)/test.exe 
- 
+test_CV: $(targetDir)/testCV.exe 
  
 # This tests the frame grabber, openCV and DLP
-testFG :  $(targetDir)/FGtest.exe  
+test_FG :  $(targetDir)/testFG.exe  
 
-# Linker
+
+
+
+#=========================
+# Top-level Linker Targets
+#=========================
 $(targetDir)/testDLP.exe : testDLP.o Talk2DLP.o 
 		$(CXX) -o $(targetDir)/testDLP.exe testDLP.o  Talk2DLP.o  $(ALP_STATIC) $(LinkerWinAPILibObj) 
 
-$(targetDir)/FGtest.exe : FGtest.o Talk2FrameGrabber.o Talk2DLP.o $(BFobj)  $(ALP_OBJS) $(openCVobjs)
-	$(CXX) -o $(targetDir)/FGtest.exe FGtest.o   Talk2FrameGrabber.o $(BFObj) Talk2DLP.o   $(ALP_STATIC) $(openCVlibs) $(LinkerWinAPILibObj) 
-#	$(CXX) -o $(targetDir)/FGtest.exe FGtest.o Talk2FrameGrabber.o $(BFObj) $(LinkerWinAPILibObj) $(TailOpts) 
+$(targetDir)/testFG.exe : testFG.o Talk2FrameGrabber.o Talk2DLP.o $(BFobj)  $(ALP_OBJS) $(openCVobjs)
+	$(CXX) -o $(targetDir)/testFG.exe testFG.o   Talk2FrameGrabber.o $(BFObj) Talk2DLP.o   $(ALP_STATIC) $(openCVlibs) $(LinkerWinAPILibObj) 
+#	$(CXX) -o $(targetDir)/testFG.exe testFG.o Talk2FrameGrabber.o $(BFObj) $(LinkerWinAPILibObj) $(TailOpts) 
 
-$(targetDir)/test.exe : test.o  $(openCVobjs)
-	$(CXX) $(CXXFLAGS) test.o -o $(targetDir)/test.exe $(openCVlibs) $(LinkerWinAPILibObj) 
+$(targetDir)/testCV.exe : testCV.o  $(openCVobjs)
+	$(CXX) $(CXXFLAGS) testCV.o -o $(targetDir)/testCV.exe $(openCVlibs) $(LinkerWinAPILibObj) 
 	
 
-# Compiler
+#=========================
+# Top-level Compile Source
+#=========================
 
-
-FGtest.o : $(MyLibs)/Talk2FrameGrabber.h FGtest.cpp
-	$(CCC) $(CCCFLAGS) FGtest.cpp -I$(MyLibs) -I$(bfIncDir) $(openCVinc)
+testFG.o : $(MyLibs)/Talk2FrameGrabber.h testFG.cpp
+	$(CCC) $(CCCFLAGS) testFG.cpp -I$(MyLibs) -I$(bfIncDir) $(openCVinc)
 
 testDLP.o : testDLP.cpp $(MyLibs)/Talk2DLP.h 	
 	$(CCC) $(CCCFLAGS) testDLP.cpp -I$(MyLibs) -I$(ALP_INC_DIR)
 		
-test.o : test.c
-	$(CCC) $(CCCFLAGS) test.c $(openCVinc)
+testCV.o : testCV.c
+	$(CCC) $(CCCFLAGS) testCV.c $(openCVinc)
 	
+	
+	
+	
+#============================
+# Library-level Compile Source
+#=============================
 	
 Talk2FrameGrabber.o: $(MyLibs)/Talk2FrameGrabber.cpp $(MyLibs)/Talk2FrameGrabber.h
 	$(CCC) $(CCCFLAGS) $(MyLibs)/Talk2FrameGrabber.cpp -I$(bfIncDir)

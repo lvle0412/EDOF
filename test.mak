@@ -193,7 +193,7 @@ $(targetDir)/testDLP.exe : testDLP.o Talk2DLP.o
 		$(CXX) -o $(targetDir)/testDLP.exe testDLP.o  Talk2DLP.o  $(ALP_STATIC) $(LinkerWinAPILibObj) 
 
 $(targetDir)/FGtest.exe : FGtest.o Talk2FrameGrabber.o Talk2DLP.o $(BFobj)  $(ALP_OBJS) $(openCVobjs)
-	$(CXX) -o $(targetDir)/FGtest.exe FGtest.o  Talk2FrameGrabber.o  $(BFObj)  $(openCVlibs) Talk2DLP.o $(ALP_OBJS) $(LinkerWinAPILibObj) 
+	$(CXX) -o $(targetDir)/FGtest.exe FGtest.o   Talk2FrameGrabber.o $(BFObj) Talk2DLP.o   $(ALP_STATIC) $(openCVlibs) $(LinkerWinAPILibObj) 
 #	$(CXX) -o $(targetDir)/FGtest.exe FGtest.o Talk2FrameGrabber.o $(BFObj) $(LinkerWinAPILibObj) $(TailOpts) 
 
 $(targetDir)/test.exe : test.o  $(openCVobjs)

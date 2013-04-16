@@ -21,6 +21,7 @@ int main(){
 	fg=CreateFrameGrabberObject();
 	printf("Calling an opencv function\n");
 	cvNamedWindow("RectWorm",CV_WINDOW_AUTOSIZE);
+	cvWaitKey(0);
 
 	
 	return 0;

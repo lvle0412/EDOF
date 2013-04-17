@@ -91,7 +91,6 @@ char* CreateFileName(const char* dir, const char* core, const char* suffix){
 	strcat(filename,suffix);
 	printf("Preparing filename: %s\n",filename);
 
-	free(&timestamp);
 	return filename;
 }
 

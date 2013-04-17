@@ -1277,8 +1277,8 @@ int SetupRecording(Experiment* exp) {
 		exp->VidHUDS = cvCreateVideoWriter(HUDSFileName,
 				CV_FOURCC('M','J','P','G'), 30, cvSize(NSIZEX / 2, NSIZEY / 2),
 				0);
-		if (exp->Vid ==NULL ) printf("\tERROR in SetupRecording! exp->Vid is NULL\n");
-		if (exp->VidHUDS ==NULL ) printf("\tERROR in SetupRecording! exp->VidHUDS is NULL\n");
+		if (exp->Vid ==NULL ) printf("\tERROR in SetupRecording! exp->Vid is NULL\nYou probably are missing the default codec.\n");
+		if (exp->VidHUDS ==NULL ) printf("\tERROR in SetupRecording! exp->VidHUDS is NULL\n You probably are missing the default codec.\n");
 		DestroyFilename(&MovieFileName);
 		DestroyFilename(&HUDSFileName);
 		printf("Initialized video recording\n");

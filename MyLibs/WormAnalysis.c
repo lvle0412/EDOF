@@ -1094,13 +1094,11 @@ int CreateWormHUDS(IplImage* TempImage, WormAnalysisData* Worm, WormAnalysisPara
 		cvPutText(TempImage,protoNum,cvPoint(20,160),&font,cvScalar(255,255,255));
 
 	}
-	free(protoNum);
 
-
-	char frame[30];
+	char frame[30]; // these are freed automatically 
+					// SEE http://stackoverflow.com/questions/1335230/is-the-memory-of-a-character-array-freed-by-going-out-of-scope
 	sprintf(frame,"%d",Worm->frameNum);
 	cvPutText(TempImage,frame,cvPoint(Worm->SizeOfImage.width- 200,Worm->SizeOfImage.height - 10),&font,cvScalar(255,255,255) );
-	free( frame);
 	return 0;
 }
 

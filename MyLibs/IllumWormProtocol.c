@@ -198,7 +198,6 @@ void LoadProtocolWithDescription(const char* str, Protocol* myP){
 
 void DestroyProtocolObject(Protocol** MyProto){
 	/** **/
-	printf("in DestroyProtocolObject()\n");
 	assert(MyProto!=NULL);
 	if (*MyProto==NULL) return;
 	if  ((*MyProto)->Filename!=NULL ) {
@@ -325,7 +324,7 @@ WormPolygon* CreateWormPolygonFromSeq(CvMemStorage* memory,CvSize GridSize,CvSeq
  *
  */
 void DestroyWormPolygon(WormPolygon** myPoly){
-	free(myPoly);
+	free(myPoly); 
 	*myPoly=NULL;
 }
 
@@ -492,7 +491,6 @@ int CvtPolyMontage2ContourMontage(CvSeq* PolyMontage, CvSeq* ContourMontage){
 	int numOfPolys=PolyMontage->total;
 	CvSeqReader PolyReader;
 	cvStartReadSeq(PolyMontage,&PolyReader);
-
 		int poly;
 		for (poly = 0; poly < numOfPolys; ++poly) {
 			WormPolygon** polygonPtr=(WormPolygon**) PolyReader.ptr;
@@ -522,7 +520,10 @@ int CvtPolyMontage2ContourMontage(CvSeq* PolyMontage, CvSeq* ContourMontage){
 
 			/** Move to the next polygon **/
 			CV_NEXT_SEQ_ELEM(PolyMontage->elem_size,PolyReader);
-			DestroyWormPolygon(&wrappedContour);
+				
+			printf("Leaking memory here IllumWormProtocol.c line 528\n");
+			// DestroyWormPolygon(&wrappedContour);
+
 
 
 		}
@@ -562,9 +563,7 @@ int GenerateSimpleIllumMontage(CvSeq* montage, CvPoint origin, CvSize radius, Cv
 	/** If the y value extends off the worm, we need to crop it.. (otherwise it wraps... weird!)**/
 
 
-
 	cvClearSeq(montage);
-
 	WormPolygon* polygon=CreateWormPolygon(montage->storage,gridSize);
 
 
@@ -586,18 +585,15 @@ int GenerateSimpleIllumMontage(CvSeq* montage, CvPoint origin, CvSize radius, Cv
 	/** Upper Left **/
 	curr=cvPoint(origin.x-radius.width, CropNumber(1,gridSize.height-1,origin.y+radius.height));
 	cvSeqPush(polygon->Points,&curr);
-
+	
 
 	/** Push this sparse polygon onto the temp montage **/
 	CvSeq* tempMontage= CreateIlluminationMontage(montage->storage);
 	cvSeqPush(tempMontage,&polygon);
-
 	/** Convert the sparse polygon into a contour-polygon **/
 	CvtPolyMontage2ContourMontage(tempMontage,montage);
 	cvClearSeq(tempMontage);
-
 	return 1;
-
 
 }
 

@@ -213,7 +213,8 @@ int main (int argc, char** argv){
 				/**Don't perform any analysis**/;
 				continue;
 			}
-
+			
+			
 			/**** Functions to decide if Illumination Should be on Or Off ***/
 			/** Handle Transient Illumination Timing **/
 			HandleIlluminationTiming(exp);
@@ -222,16 +223,18 @@ int main (int argc, char** argv){
 			HandleIlluminationSweep(exp);
 
 
-
+			
 			/** Load Image into Our Worm Objects **/
 
 			if (exp->e == 0) exp->e=RefreshWormMemStorage(exp->Worm);
 			if (exp->e == 0) exp->e=LoadWormImg(exp->Worm,exp->fromCCD->iplimg);
 
+
 			TICTOC::timer().tic("EntireSegmentation");
 			/** Do Segmentation **/
 			DoSegmentation(exp);
 			TICTOC::timer().toc("EntireSegmentation");
+
 
 
 			/** Real-Time Curvature Phase Analysis, and phase induced illumination **/
@@ -250,19 +253,18 @@ int main (int argc, char** argv){
 
 
 
-
 			/*** Do Some Illumination ***/
 			if (exp->e == 0) {
 				/** Clear the illumination pattern **/
 				SetFrame(exp->forDLP,0);
 				SetFrame(exp->IlluminationFrame,0);
 
-
 				if (exp->Params->IllumFloodEverything) {
 					SetFrame(exp->IlluminationFrame,128); // Turn all of the pixels on
 					SetFrame(exp->forDLP,128); // Turn all of the pixels o
 
 				} else {
+
 					if (!(exp->Params->ProtocolUse)) /** if not running the protocol **/{
 						/** Otherwise Actually illuminate the  region of the worm your interested in **/
 						/** Do the Illumination in Camera space for Display **/
@@ -292,14 +294,14 @@ int main (int argc, char** argv){
 			}
 
 
-
 			TICTOC::timer().tic("SendFrameToDLP");
 			if (exp->e == 0 && exp->Params->DLPOn && !(exp->SimDLP)) T2DLP_SendFrame((unsigned char *) exp->forDLP->binary, exp->myDLP); // Send image to DLP
 			TICTOC::timer().toc("SendFrameToDLP");
-
+		
 
 			/*** DIsplay Some Monitoring Output ***/
 			if (exp->e == 0) CreateWormHUDS(exp->HUDS,exp->Worm,exp->Params,exp->IlluminationFrame);
+
 
 			if (exp->e == 0 &&  EverySoOften(exp->Worm->frameNum,exp->Params->DispRate) ){
 				TICTOC::timer().tic("DisplayOnScreen");
@@ -307,8 +309,6 @@ int main (int argc, char** argv){
 				PrepareSelectedDisplay(exp);
 				TICTOC::timer().toc("DisplayOnScreen");
 			}
-
-
 
 
 
@@ -429,9 +429,9 @@ UINT Thread(LPVOID lpdwParam) {
 
 	printf("DispThread: Starting loop\n");
 
-	printf("Waiting a few ms to start the loop.");
+	printf("Waiting a few ms to start the loop.\n");
 	cvWaitKey(50);
-
+	printf("DispThread: Entering display loop.\n");
 	int key;
 	int k=0;
 	while (!MainThreadHasStopped) {

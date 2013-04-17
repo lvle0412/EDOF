@@ -1712,26 +1712,24 @@ void DoWriteToDisk(Experiment* exp) {
  *
  */
 int DoOnTheFlyIllumination(Experiment* exp) {
-
 	CvSeq* montage = CreateIlluminationMontage(exp->Worm->MemScratchStorage);
-
 	/** Note, out of laziness I am hardcoding the grid dimensions to be Numsegments by number of segments **/
-	;
-
+	
 	CvPoint origin = ConvertSlidlerToWormSpace(exp->Params->IllumSquareOrig,exp->Params->DefaultGridSize);
-	GenerateSimpleIllumMontage(montage, origin, exp->Params->IllumSquareRad, exp->Params->DefaultGridSize);
-
+	int tmp;
+	tmp=GenerateSimpleIllumMontage(montage, origin, exp->Params->IllumSquareRad, exp->Params->DefaultGridSize);
 	/** Illuminate the worm **/
 	/** ...in camera space **/
 	IllumWorm(exp->Worm->Segmented, montage, exp->IlluminationFrame->iplimg,
 			exp->Params->DefaultGridSize,exp->Params->IllumFlipLR);
+			
 	LoadFrameWithImage(exp->IlluminationFrame->iplimg, exp->IlluminationFrame);
 	/** ... in DLP space **/
 	IllumWorm(exp->segWormDLP, montage, exp->forDLP->iplimg,
 			exp->Params->DefaultGridSize,exp->Params->IllumFlipLR);
 	LoadFrameWithImage(exp->forDLP->iplimg, exp->forDLP);
-
 	cvClearSeq(montage);
+	return 0;
 
 }
 

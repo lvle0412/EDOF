@@ -28,7 +28,6 @@
 /////////////////
 // Board Types 
 #define BiTypeR2					CISYS_TYPE_R2	// RoadRunner 
-#define BiTypeRv					CISYS_TYPE_RV	// Raven 
 #define BiTypeR64					CISYS_TYPE_R64  // R64 
 #define BiTypeAny					0xFFFFFFFF		// First board seen in the system 
 
@@ -227,7 +226,6 @@ typedef struct _QueueNode
 }BFQNode, *PBFQNode;
 
 
-
 /////////////////////////////////////////////////////////////////////
 // This sturcture is used as a parameter in BiCirWaitNext, BiCirMark, 
 // BiCirStatus and BiCirSetNext, to pass info about the linked list.
@@ -357,6 +355,12 @@ typedef struct _BFBUFARY
 	BFTime			InitTime;					// Initilized time for high res time stamp.
 	BFBOOL			UsingHiResTimer;			// TRUE <=> Use high resolution timer
 
+	// Call back Stuff
+	BFU32			State;						// The state of the call back management thread
+	HANDLE			Thread;						// Handle to call back management thread
+	PBFVOID			FuncPtr;					// Call back function pointer
+	HANDLE			SemHandle;					// Handle to semaphore used to manage call back thread
+
 
 }BIBA, *PBIBA;
 
@@ -368,5 +372,10 @@ typedef struct _BiErrors
 	char	FailureDescript[256];
 
 }BiErrors;
+
+
+// Call Back function pointer
+typedef void (*BiCallBackFuncPtr) (Bd Board, PBIBA pBufArray, BiCirHandle CirHandle);
+
 
 #endif // __BIDEF__ 

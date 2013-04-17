@@ -45,7 +45,7 @@ R64DLL R64RC	R64CAPI R64BrdAqSigGetCur(R64 Board, PBFVOID *pAqSig);
 R64DLL R64RC	R64CAPI R64BrdAqSigSetCur(R64 pBoard, PBFVOID pAqSig);
 
 R64DLL R64RC	R64CAPI R64BrdCamGetCur(R64 Board, PR64CAM *pCam);
-R64DLL R64RC	R64CAPI R64BrdCamGetFileName(R64 Board, BFU32 Num, PBFCHAR CamName);
+R64DLL R64RC	R64CAPI R64BrdCamGetFileName(R64 Board, BFU32 Num, PBFCHAR CamName, BFSIZET CamNameStLen);
 
 R64DLL R64RC	R64CAPI R64DrvOpen(R64 *pBoard, BFU32 Mode);
 R64DLL R64RC	R64CAPI R64DrvClose(R64 Board);
@@ -133,6 +133,7 @@ R64DLL R64RC	R64CAPI R64ConExposureControlSet(Bd Board, BFDOUBLE ExposurePeriod,
 R64DLL R64RC	R64CAPI R64ConExposureControlGet(Bd Board, PBFDOUBLE pExposurePeriod, PBFDOUBLE pLineFramePeriod, PBFU32 pTriggerMode, PBFBOOL pAssertedHigh, PBFU32 pOutputSignal);
 R64DLL R64RC	R64CAPI R64EncoderDividerSet(Bd Board, BFDOUBLE ScaleFactor, BFBOOL ForceDC, BFBOOL OpenLoop, BFU32 ClockSelect);
 R64DLL R64RC	R64CAPI R64EncoderDividerGet(Bd Board, PBFDOUBLE pScaleFactor, PBFBOOL pForceDC, PBFBOOL pOpenLoop, PBFU32 pClockSelect);
+R64DLL R64RC	R64CAPI R64ConQSSetNextFrame(Bd Board, RQTabHeadPtrPtr ChainArray, BFU32 NumInChain, BFU32 ACPL, BFU32 ALPF);
 
 // Control Tables
 

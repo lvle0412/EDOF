@@ -1,13 +1,22 @@
-This file mostly contains the header files from the BitFlow SDK which is normally located at C:/BitFlow SDK 5.20/Include
+This file mostly contains the header files from the BitFlow SDK which is normally located at C:/BitFlow SDK 5.60/Include
 
 It also has the crtdbg.h which is a santdard microsoft header file.
 
-The header files here are all holdovers from the code as it was in Aravi's lab. 
 
-That should have been BitFlow SDK5.2
+NOTE: I have made slight changes to two files to get things to compile:
+-  BFDef.h
+-  BFTypeNT.h
 
-The funny thing is that if I switch my include directory from here to C:/BitFlow SDK 5.20/Include things fail to compile.
+In both cases any line of code that was changed is labeled with the comment //ANDY
 
-I'm not going to deal with it now, but it is weird.
+In BFDef.h
+I changed a typedef from DMAChannel to DMAChannelT. (Note I had to do this for the 5.2 SDK as well). 
 
+In BFTypeNT.h I got rid of some #ifdef that checked to see if we are using Microsoft Visual C. This is a new one for 5.6.
+
+If you look in the source code and search for "ANDY" it should all be clearly labeled.
+
+--Andy
+leifer@princeton.edu
+17 April 2013
 

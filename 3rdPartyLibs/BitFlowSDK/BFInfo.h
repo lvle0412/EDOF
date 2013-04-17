@@ -52,10 +52,11 @@
 #define BFDriverOnly		0
 #define R2DriverOnly		1
 #define R2CLDriverOnly		2
-#define RvDriverOnly		3
-#define R64DriverOnly		4
-#define AltaDriverOnly		5
-#define AltaCODriverOnly	6
+//#define RvDriverOnly		3 // removed, note that these have to be in numeric order for all psued drivers regsitered
+#define R64DriverOnly		3
+#define AltaDriverOnly		4
+#define AltaCODriverOnly	5
+#define KCXPDriverOnly		6
 
 // Registry key paths.
 
@@ -82,7 +83,7 @@
 #endif
 
 #define BFK_DEVICE			"BFDev"
-#define BFK_BOARD			"BoardParam"
+#define BFK_BOARD			"Slot"
 #define BFK_FLASH			"Flash"
 #define BFK_BOARD_NUMBER	"BoardNumber"
 #define BFK_DEVICENAME		"DeviceFileName"
@@ -91,6 +92,7 @@
 #define BFK_CAMLIST			"BFCamList"
 #define BFK_DMATIMEOUT		"DMATimeout"
 #define BFK_DMALATENCY		"DMAMasterLatency"
+#define BFK_CXP_LINKS		"CXPLinkList"
 #define BFK_OTHERLAT		"OtherDMALatency"	    // latency for other bus mastering devices
 #define BFK_VGAADDR			"VGABaseAddress"	    // latency for other bus mastering devices
 #define BFK_NOSNOOPSET		"NoSnoopSet"
@@ -107,11 +109,18 @@
 #define BFK_BUS				"CfgDeviceBus"
 #define BFK_SLOT			"CfgDeviceSlot"
 #define BFK_FUNCTION		"CfgDeviceFunction"
-#define BFK_MASTER_BOARD	"MasterBoardNum"
+#define BFK_MASTER_BOARD	"MasterBoardSlot"
 #define BFK_FLASHMEM_SERIAL	"CfgFMSerial"
 #define BFK_FLASHMEM_REV	"CfgFMRevision"
 #define BFK_FLASHMEM_DATE	"CfgFMDate"
 #define BFK_FLASHMEM_IPL	"CfgFMIPLevel"
+#define BFK_CPLD_REV		"CFGCPLDRevision"
+#define BFK_CPLD_IPL		"CFGCPLDLevel"
+#define BFK_DEFAULT_CAM_CAM		"DefaultCamFile"
+#define BFK_DEFAULT_CAM_RCL		"DefaultRclFile"
+#define BFK_DEFAULT_CAM_R64		"DefaultR64File"
+#define BFK_DEFAULT_CAM_ANLG	"DefaultAnlgFile"
+#define BFK_DEFAULT_CAM_COMP	"DefaultCompFile"
 
 
 #define BFK_FLASH_DELAY		"BFFlashDelay"			// Flash download delay. 
@@ -137,7 +146,8 @@ typedef enum _DrvStates
 	DrvSetupPseudo,									// Perform standard pseudo device setup.
 	DrvSetupPseudoCL,								// Perform CameraLink pseudo device setup.
 	DrvSetupPseudoAnalog,							// Perform Analog pseudo device setup.
-	DrvSetupPseudoAnalogCo							// Perform Analog Composite pseudo device setup.
+	DrvSetupPseudoAnalogCo,							// Perform Analog Composite pseudo device setup.
+	DrvSetupPseudoKCXP,								// Perform Karbon CXP pseudo device setup.
 } DrvStates;
 
 // Driver initialization states.
@@ -456,6 +466,7 @@ typedef struct _BitSetRec
 
 	typedef BFBOOL (*PBFINTENABLE)(Bd Board, BFU32 Type, BFBOOL Enable);	
 
+
     // BitFlow Driver's user level device information record.
 
 	typedef struct _BFInfoUsr			*BFInfoUsrPtr, *pBFInfoUsr;
@@ -469,7 +480,8 @@ typedef struct _BitSetRec
 	    PBFSIGNALLIST		gSignalHead[BFIntCount];	// list of signal for board, needs to be initialize;
 	    HANDLE				hSignalMutex;				// Handle of mutex used to protect interrupt signal linked list
 		BFU32				DmaTimeout;					// Timeout length for DMA operations.
-		BFU32				OldQTabMode;				// set to use old QTAB mode (only works on R3/R3)
+		BFU32				OldQTabMode;				// Set to use old QTAB mode (only works on R3/R3)
+		BFU32				PoCLOpenMode;				// Controls how the PoCL circuit is handled during board open
 
 
 		// Interrupt stuff.
@@ -482,31 +494,8 @@ typedef struct _BitSetRec
 		PBFU32				IntEnableCount;				// Count number of signals created, disable interrupt when last signal is freed.
 		HANDLE				hIntCountMap;				// handle to shared memory used to store IntEnableCount
 
-		// Interrupt GPOUT jitter diagnostics.
-
-		BFU32				IntGPOUT;					// GPOUT line settings for interrupt diagnostic tracing.
-		BFU8				IntGPOUTService;			// GPOUT line for interrupt service routine tracing.
-		BFU8				IntGPOUTDPC;				// GPOUT line for interrupt DPC routine tracing.
-		BFU8				IntGPOUTSignal;				// GPOUT line for interrupt signal routine tracing.
-		BFU8				IntGPOUTQueue;				// GPOUT line for interrupt queue routine tracing.
-
-		BFU32				IntJitterGPOUT;				// GPOUT line settings for jitter detection signalling.
-		BFU8				IntJitterGPOUTService;		// Jitter detection GPOUT line for service interrupts.
-		BFU8				IntJitterGPOUTDPC;			// Jitter detection GPOUT line for DPC interrupts.
-		BFU8				IntJitterGPOUTSignal;		// Jitter detection GPOUT line for signal interrupts.
-		BFU8				IntJitterGPOUTQueue;		// Jitter detection GPOUT line for queue interrupts.
-
-		BFU32				IntJitterThresh;			// Jitter detection thresholds.
-		BFU8				IntJitterThreshService;		// Jitter threshold for service interrupts.
-		BFU8				IntJitterThreshDPC;			// Jitter threshold for DPC interrupts.
-		BFU8				IntJitterThreshSignal;		// Jitter threshold for signal interrupts.
-		BFU8				IntJitterThreshQueue;		// Jitter threshold for queue interrupts.
-
-		BFU64				IntJitterStampSignal;		// Time stamp of last signal interrupt.
-		BFU64				IntJitterDeltaSignal;		// Latency in microseconds before last signal interrupt.
-
-		BFU64				IntJitterStampQueue;		// Time stamp of last queue interrupt.
-		BFU64				IntJitterDeltaQueue;		// Latency in microseconds before last queue interrupt.
+		// Call back stuff
+		CallBackRec			CallBack[BFIntCount];		// Array call back records
 
 		// Device Configuration Information
 
@@ -518,8 +507,9 @@ typedef struct _BitSetRec
 
         BFCHAR				DriverKey[80];				// Driver registry key (BitFlow).
 		BFCHAR				FamilyKey[100];				// Family registry key (BitFlow\<family>).
-        BFCHAR				BoardKey[120];				// Device registry key (BitFlow\<family>\BoardParam#).
-        BFCHAR				FlashKey[140];				// Flash registry key (BitFlow\<family>\BoardParam#\Flash).
+        BFCHAR				BoardKey[120];				// Device registry key (BitFlow\<family>\DevXxXxXx).
+        BFCHAR				FlashKey[140];				// Flash registry key (BitFlow\<family>\DevXxXxXx\Flash).
+        BFCHAR				BoardKeyName[140];			// Flash registry key (DevXxXxXx).
 
         // Translation table to convert a register number to a BitField register Id.
     
@@ -531,10 +521,11 @@ typedef struct _BitSetRec
 		PBFCNF				pCurCam;					// Current camera.
 		POPENCAMLIST		pOpenCamList;				// Open camera files.
 
-		// Interrupt Stuff
+		// Serial port Stuff
 
 		HANDLE				hSerialMap;					// handle to shared memory used to store serial port buffer points
 		BFSerialPortPtr		pBFSerialPort;				// serial port circular buffer
+		BFBOOL				SerialPortOpened;			// Set to true if this open call opened the serial port
 
 		// Host copy of RLE CTabs Stuff (only on RLE CTabs boards)
 
@@ -592,6 +583,7 @@ typedef struct _BitSetRec
         FileHndPtr			Next;						// Pointer to next file handle record in the list.
         PFILE_OBJECT        FileObject;					// File object for file handle that has this device open.
         BFBOOL              DeviceInitializedHandle;	// If True, this file handle initialized the device.
+        BFBOOL              DeviceSerialPortOpenHandle;	// If True, this file handle initialized the device.
     } FileHndRec;
 
     // Interrupt status record used to hold queued interrupt status information.
@@ -647,7 +639,7 @@ typedef struct _BitSetRec
 	typedef struct _PQTabHeadRec
 	{
 		BFU32			Magic;							// Magic number set when quad table is inserted into a quad list.
-		BFUPTR			HashAddress;					// Hash address for this quad table.
+		BFU64			HashAddress;					// Hash address for this quad table.
 		PQSetHeadPtr	PQSetHeader;					// Quad table set header. 
 		BFUPTR			FileId;							// File id number that is unique for each open. 
 		BFU32			FrameNum;						// Frame number for this quad table in a chain or frame table. 
@@ -916,6 +908,8 @@ typedef struct _BitSetRec
 		BFBOOL				DelayedFlash;				// When True, board will be downloaded but not flashed at startup
 		BFU32				DelayedFlashedStatus;		// Flag that tells the delayed flash system the current status of the board
 		PBFVOID				FlashCloseFunction;			// function flash the board if delayed flash is used
+		BFU32				ForceFlashDownload;			// If non-zero, download if forced (even if INFOLO/HI say not to)
+		BFU32				NewUARTInts;				// The number of new UART interrupts have just come in
 
         // Registry key names.
 
@@ -924,6 +918,7 @@ typedef struct _BitSetRec
 		BFCHAR				FamilyKey[100];				// Family key (BitFlow\<family>).
         BFCHAR				BoardKey[120];				// Device key (BitFlow\<family>\BoardParam#).
         BFCHAR				FlashKey[140];				// Flash key (BitFlow\<family>\BoardParam#\Flash).
+        BFCHAR				BoardKeyName[140];			// Flash registry key (DevXxXxXx).
 
 		// Device Configuration Information
 
@@ -1061,32 +1056,6 @@ typedef struct _BitSetRec
 		BFU64				IntStampMax[BFIntCount];	// Maximum time between two stamps.
 		BFU64				IntStampSum[BFIntCount];	// Sum of differences between two time stamps.
 
-		// Interrupt GPOUT jitter diagnostics.
-
-		BFU32				IntGPOUT;					// GPOUT line settings for interrupt diagnostic tracing.
-		BFU8				IntGPOUTService;			// GPOUT line for interrupt service routine tracing.
-		BFU8				IntGPOUTDPC;				// GPOUT line for interrupt DPC routine tracing.
-		BFU8				IntGPOUTSignal;				// GPOUT line for interrupt signal routine tracing.
-		BFU8				IntGPOUTQueue;				// GPOUT line for interrupt queue routine tracing.
-
-		BFU32				IntJitterGPOUT;				// GPOUT line settings for jitter detection signalling.
-		BFU8				IntJitterGPOUTService;		// Jitter detection GPOUT line for service interrupts.
-		BFU8				IntJitterGPOUTDPC;			// Jitter detection GPOUT line for DPC interrupts.
-		BFU8				IntJitterGPOUTSignal;		// Jitter detection GPOUT line for signal interrupts.
-		BFU8				IntJitterGPOUTQueue;		// Jitter detection GPOUT line for queue interrupts.
-
-		BFU32				IntJitterThresh;			// Jitter detection thresholds.
-		BFU8				IntJitterThreshService;		// Jitter threshold for service interrupts.
-		BFU8				IntJitterThreshDPC;			// Jitter threshold for DPC interrupts.
-		BFU8				IntJitterThreshSignal;		// Jitter threshold for signal interrupts.
-		BFU8				IntJitterThreshQueue;		// Jitter threshold for queue interrupts.
-
-		BFU64				IntJitterStampService;		// Time stamp of last service interrupt.
-		BFU64				IntJitterDeltaService;		// Latency in microseconds before last service interrupt.
-
-		BFU64				IntJitterStampDPC;			// Time stamp of last DPC interrupt.
-		BFU64				IntJitterDeltaDPC;			// Latency in microseconds before last DPC interrupt.
-
 		// Start-Stop interrupt processing stuff.
 
 		BFU32				SIPEnable;					// SIP enable flag (inc/dec each time SIP is enabled/disabled).
@@ -1094,6 +1063,7 @@ typedef struct _BitSetRec
 		PQSetHeadPtr		SIPChain;					// SIP quad chain header.
 		BFU32				SIPFrameCount;				// Number of frames in SIP quad chain.
 		PQNumPtr			SIPPhysQTabNum;				// Phys QTab number of quate use for sip
+		BFU32				QSMode;						// Quick Switch mode (0 = normal, 1 = 1 frame DMA operations)
 
 		// DPC timing statistics.
 		//
@@ -1116,6 +1086,7 @@ typedef struct _BitSetRec
 		BFU32				SIPDPCMin;					// SIP DPC duration minimum in microseconds.
 
 		BFU32				SIPSamples;					// SIP latency and DPC duration sample count.
+		BFBOOL				InResetHook;				// set to true if current resetting board
 
 		// Each board needs its own garbage can (for throw away pixels).
 
@@ -1144,13 +1115,14 @@ typedef struct _BitSetRec
         BFU32				DeviceOpensCount;			// Number of open file handles.
         ProcessPtr			DeviceOpensPerProcess;		// First record that stores number of opens for each process.
         FileHndPtr			DeviceFileHndContext;		// First record that stores context information for each file handle.
+		BFU32				DeviceSerialPortOpen;		// When True, this device has been open for serial port access
 
 		// Physical quad table information.
 
 		HashListPtr			PhysQTabHash;				// Hash table that contains all physical quad tables.
 		BFU32				PhysQTabHashCount;			// Number of physical quad tables in the hash table.
-		BFUPTR				PhysQTabHashAddress;		// Hash address of the last physical quad table inserted into the hash table.
-		BFUPTR				PhysQTabHashMask;			// Hash table mask.
+		BFU64				PhysQTabHashAddress;		// Hash address of the last physical quad table inserted into the hash table.
+		BFU64				PhysQTabHashMask;			// Hash table mask.
 		BFU32				PhysQTabHashSize;			// Hash table size (number of entries).
 
 		PQSetHeadPtr		PhysQSetList;				// List of physical quad sets.

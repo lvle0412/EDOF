@@ -358,6 +358,13 @@ typedef enum _BIRC_Enum
 	// BiCamGetFileName
 	BI_ERROR_CAM_FILENAME,			// Error returning the camera file name.
 
+	// BiCallBackAdd
+	BI_CB_NULL_POINTER,				// Call back pointer is null
+	BI_CB_ALREADY_SET,				// Call back is already registered
+	BI_CB_BAD_SEMAPHORE,			// Error creating semaphore needed for call back
+	BI_CB_THREAD_GOING,				// Call back thread is not stopped
+	BI_CB_THREAD_FAIL,				// Error creating call back thread
+
 	// Keep this as the last error
 	BI_ERROR_END,
 	

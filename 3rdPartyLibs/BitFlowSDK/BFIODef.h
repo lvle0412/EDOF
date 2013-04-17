@@ -88,6 +88,10 @@ typedef enum _DiskIOErr
 #define PACK32TO24BIT	4
 #define BOTTOM_UP		8
 #define OVERWRITEFILE	16
+#define AFPDF16FILES	32
+#define AFPDF128FILES	64
+#define AFPDF1024FILES	128
+#define TWOXMODE		256
 
 #ifdef __cplusplus
 }

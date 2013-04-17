@@ -21,5 +21,3 @@
 //
 // 07/17/07     rjd     Created file.
 //
-
-

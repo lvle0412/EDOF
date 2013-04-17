@@ -44,11 +44,15 @@
 #define BF_PCI_KBN_INPUT_SHIFT	0x0000			// Input type shift count
 #define BF_PCI_KBN_SLAVE		0x0010			// Set if configuration is a slave
 #define BF_PCI_KBN_NO_DOWNLOAD	0x0020			// Set if board should not be downloaded
+#define BF_PCI_KBN_BUS			0x3000			// 0x0000 = PCE, 0x1000 = YPC
+#define BF_PCI_KBN_INTERFACE	0xC000			// 0x0000 = CL, 0x4000 = CXP
+
 
 #define BF_PCI_KBN_INPUT_MAX_CL	0x0008			// The maximum value for the INPUT bits that indicate the input is CL
 
 // InfoHi
 #define BF_PCI_KBN_NUM_CFGS		0xF000			// Number of configuration spaces
+#define BF_PCI_KBN_DRCT_DWNLD	0x0800			// Set to 1 for direct download
 #define BF_PCI_KBN_INFO_SRC		0x0010			// Source of INFOLO and INFOHI (1 = downloader, 0 = registry)
 #define BF_PCI_KBN_IP_MASK		0x000f			// Custom MUX tag number bit mask.
 #define BF_PCI_KBN_IP_SHIFT		0				// Custom MUX tag number shift count.
@@ -64,6 +68,7 @@ typedef struct _R64OpsRec
 	BFBOOL	Full;								// True for a full CL board.
 	BFBOOL	Slave;								// True for Slave VFGs on Karbon
 	BFBOOL	NoDownload;							// True if board should not be downloaoded
+	BFBOOL	DirectDownload;						// True if board support direct download (no NIOS downloader)
 	BFU32	MUX;								// MUX tag number.
 	BFU32	DCC;								// DCC tag number.
 } R64OpsRec, *R64OpsPtr;

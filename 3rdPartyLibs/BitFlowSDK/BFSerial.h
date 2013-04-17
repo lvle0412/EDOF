@@ -24,6 +24,13 @@
 	#define BFSERIALCC __cdecl
 #endif
 
+typedef struct _SerialMutexes
+{
+	HANDLE	Open;
+	HANDLE	Write;
+} SerialMutexes, *SerialMutexesPtr;
+
+
 /* Serial Reference Structure */
 typedef struct _SerRefStruc
 {
@@ -31,6 +38,8 @@ typedef struct _SerRefStruc
 	PBFSIGNAL	pCLReadSignal;		// Used by the clSerialRead function
 	PBFSIGNAL	pBFCLReadSignal;	// Used by the BFCLSerialRead function
 	BFU32		serialIndex;
+	HANDLE				SharedMap;
+	SerialMutexesPtr	SharedMutexes;
 		
 } SerRefStruc, *pSerRefStruc;
 

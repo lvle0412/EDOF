@@ -45,7 +45,7 @@ R2DLL R2RC	R2CAPI R2BrdQTabGetCur(RdRn Board, PBFVOID *pQuad, BFU32 QuadBank);
 R2DLL R2RC	R2CAPI R2BrdQTabSetCur(RdRn pBoard, PBFVOID pQuad, BFU32 QuadBank);
 
 R2DLL R2RC	R2CAPI R2BrdCamGetCur(RdRn Board, PR2CAM *pCam);
-R2DLL R2RC	R2CAPI R2BrdCamGetFileName(RdRn Board, BFU32 Num, PBFCHAR CamName);
+R2DLL R2RC	R2CAPI R2BrdCamGetFileName(RdRn Board, BFU32 Num, PBFCHAR CamName, BFSIZET CamNameStLen);
 
 R2DLL R2RC	R2CAPI R2DrvOpen(RdRn *pBoard, BFBOOL CameraLink);
 R2DLL R2RC	R2CAPI R2DrvClose(RdRn Board);

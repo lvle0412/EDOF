@@ -40,6 +40,9 @@ public:
 	// Opens board for acquisition and loads the camera file given.
 	void open(BFU32 brdNumber, PBFCHAR camFileName);
 	
+	// Opens board for acquisition and loads the camera file given with specified options.
+	void open(BFU32 brdNumber, PBFCHAR camFileName, BFU32 options);
+	
 	// Closes board resources.
 	void close(); 
 	

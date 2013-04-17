@@ -17,7 +17,6 @@
 
 #include "BFDef.h"
 #include "R2TabError.h"
-#include "RvTabError.h"
 #include "R64TabError.h"
 
 
@@ -127,7 +126,7 @@ typedef enum _CiTrigSelect
     CiTrigB = BFTrigB					// Select trigger B. 
 } CiTrigSelect, *CiTrigSelectPtr;
 
-// These are hack for now
+// Ci to BF defines
 
 #define CiConWait						BFConWait
 #define CiConAsync						BFConAsync
@@ -146,6 +145,9 @@ typedef enum _CiTrigSelect
 #define CiSysNoCameraOpen				BFSysNoCameraOpen		// do not open any configured cameras
 #define CiSysNoAlreadyOpenMess			BFSysNoAlreadyOpenMess	// no already open message (suppress only the warning)
 #define CiSysNoOpenErrorMess			BFSysNoOpenErrorMess	// suppress all dialogs in open function
+#define CISysNoPoCLChange				BFSysNoPoCLChange		// don't change PoCL power state on board open
+#define CISysPoCLUpOnly					BFSysPoCLUpOnly			// Power up pocl but don't reset it on board open
+#define CiSysPoCLCycle					BFSysPoCLCycle			// Power cycle the PoCL circuitn
 
 
 // parameters for CiBrdInquire()
@@ -200,9 +202,9 @@ typedef enum _CiTrigSelect
 
 // QTAB Modes			
 			
-#define	CiQTabModeOneBank				RvQTabModeOneBank
-#define	CiQTabModeTwoBanks				RvQTabModeTwoBanks
-#define	CiQTabModeFourBanks				RvQTabModeFourBanks
+#define	CiQTabModeOneBank				BFQTabModeOneBank
+#define	CiQTabModeTwoBanks				BFQTabModeTwoBanks
+#define	CiQTabModeFourBanks				BFQTabModeFourBanks
 									
 // Trigger Modes
 

@@ -45,7 +45,7 @@ OPENCV2_BUILD_DIR=C:/OpenCV2x/build_mingw64
 OPENCV2_SOURCE_DIR=C:/OpenCV2x/source
 
 #BitFlow (frame grabber SDK)
-BitFlow_DIR = C:/BitFlow\ SDK\ 5.20/
+BitFlow_DIR = C:/BitFlow\ SDK\ 5.60/
 
 #Git Version control
 GIT=C:/Progra~2/Git/bin/git
@@ -171,7 +171,6 @@ BFObj = $(BitFlow_DIR)/Lib/BFD.lib \
 	$(BitFlow_DIR)/Lib/R2Cam.lib \
 	$(BitFlow_DIR)/Lib/R2D.lib \
 	$(BitFlow_DIR)/Lib/R64D.lib \
-	$(BitFlow_DIR)/Lib/RvD.lib \
 	$(BitFlow_DIR)/Lib/clallserial.lib \
 	$(BitFlow_DIR)/Lib/clserbit.lib \
 	$(BitFlow_DIR)/Lib/DispSurf.lib
@@ -212,7 +211,7 @@ MatlabIncDir=$(MATLAB_DIR)/include
 #=================================
 # MindContorl API
 #================================
-API_DLL_dir=bin
+API_DLL_dir=API/bin
 API_Linker_Command= -Lbin -lmc_api
 
 #=================================
@@ -220,7 +219,7 @@ API_Linker_Command= -Lbin -lmc_api
 #=================================
 
 #Librariers (.lib or .a)
-mylibraries=  version.o AndysComputations.o $(API_DLL_dir)/mc_api.dll Talk2DLP.o Talk2Camera.o Talk2FrameGrabber.o AndysOpenCVLib.o Talk2Matlab.o TransformLib.o IllumWormProtocol.o
+mylibraries=  version.o AndysComputations.o $(targetDir)/mc_api.dll Talk2DLP.o Talk2Camera.o Talk2FrameGrabber.o AndysOpenCVLib.o Talk2Matlab.o TransformLib.o IllumWormProtocol.o
 
 WormSpecificLibs= WormAnalysis.o WriteOutWorm.o experiment.o 
 
@@ -265,8 +264,9 @@ $(targetDir)/colbert.exe : colbert.o \
 		$(ALP_OBJS) \
 		DontTalk2Camera.o \
 		$(openCVobjs) \
+		$(targetDir)/mc_api.dll \
 		$(hw_ind)	
-	$(CXX) -o $(targetDir)/colbert.exe  colbert.o $(API_DLL_dir)/mc_api.dll Talk2FrameGrabber.o Talk2Stage.o DontTalk2Camera.o $(BFObj) Talk2DLP.o   $(ALP_STATIC) $(hw_ind) $(LinkerWinAPILibObj) 
+	$(CXX) -o $(targetDir)/colbert.exe  colbert.o $(targetDir)/mc_api.dll Talk2FrameGrabber.o Talk2Stage.o DontTalk2Camera.o $(BFObj) Talk2DLP.o   $(ALP_STATIC) $(hw_ind) $(LinkerWinAPILibObj) 
 
 
 
@@ -290,12 +290,7 @@ $(MyLibs)/TransformLib.h $(MyLibs)/Talk2Camera.h $(MyLibs)/AndysOpenCVLib.h $(My
 $(MyLibs)/Talk2Matlab.h $(MyLibs)/AndysComputations.h $(MyLibs)/WormAnalysis.h \
 $(MyLibs)/WriteOutWorm.h $(MyLibs)/IllumWormProtocol.h $(MyLibs)/TransformLib.h \
 $(MyLibs)/experiment.h
-<<<<<<< HEAD
 	$(CCC) $(COMPFLAGS) -o colbert.o main.cpp -I$(MyLibs) $(openCVinc) -I$(bfIncDir) 
-=======
-	$(CCC) $(COMPFLAGS) main.cpp -I$(MyLibs) $(openCVinc) -I$(bfIncDir) 
->>>>>>> 92ef97fc408184b72ac5f7e8bfe52032f3600383
-	
 
 
 testFG.o : $(MyLibs)/Talk2FrameGrabber.h testFG.cpp
@@ -387,10 +382,10 @@ DontTalk2Camera.o : $(MyLibs)/DontTalk2Camera.c $(MyLibs)/Talk2Camera.h
 #=============================
 	
 ## Mind Control API
-$(API_DLL_dir)/mc_api.dll: API/bin/mc_api.dll
-	cp API/bin/mc_api.dll $(API_DLL_dir)/mc_api.dll
+$(targetDir)/mc_api.dll: $(API_DLL_dir)/mc_api.dll
+	cp API/bin/mc_api.dll $(targetDir)/mc_api.dll
 
-API/bin/mc_api.dll: API/makefile
+$(API_DLL_dir)/mc_api.dll: API/makefile
 	cd API && make clean && make all && cd ..
 
 	

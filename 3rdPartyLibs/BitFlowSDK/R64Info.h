@@ -34,6 +34,13 @@
 	#define R64K_CONFIG_PATH				"GingaDGe"
 	#define R64_CAMFILE_EXT					".gdg"
 	#define R64_CAMFILE_FOLDER				"\\GingaDGe"
+
+	// NEEDSWORK: get real names from LinX
+	#define KCXP_FAMILY						"KCXP"
+	#define KCXP_TOKEN						"KCXP"
+	#define KCXP_CONFIG_PATH				"KCXP"
+	#define KCXP_CAMFILE_EXT				".kcxp"
+	#define KCXP_CAMFILE_FOLDER				"\\KCXP"
 	
 	#define ALTA_FAMILY						"GingaPPe"
 	#define ALTA_TOKEN						"GINGAPPe"
@@ -55,6 +62,12 @@
 	#define R64K_CONFIG_PATH				"R64"
 	#define R64_CAMFILE_EXT					".r64"
 	#define R64_CAMFILE_FOLDER				"\\R64"
+
+	#define KCXP_FAMILY						"KCXP"
+	#define KCXP_TOKEN						"KCXP"
+	#define KCXP_CONFIG_PATH				"KCXP"
+	#define KCXP_CAMFILE_EXT				".kcxp"
+	#define KCXP_CAMFILE_FOLDER				"\\KCXP"
 	
 	#define ALTA_FAMILY						"Alta-AN"
 	#define ALTA_TOKEN						"ALTA"
@@ -85,13 +98,21 @@
 #define ALTA_PSEUDO_INFO_HI				0x1000
 #define ALTA_PSEUDO_INFO_LO				0x0000
 
-// Alta-CI Psuedo Device
+// Alta-CO Psuedo Device
 #define ALTACO_PSEUDO_VENDOR_ID			BF_PCI_VEN_ID
 #define ALTACO_PSEUDO_DEVICE_ID			0x6000
 #define ALTACO_PSEUDO_SUB_VENDOR_ID		0x0000
 #define ALTACO_PSEUDO_SUB_SYSTEM_ID		0x0000
 #define ALTACO_PSEUDO_INFO_HI			0x1000
 #define ALTACO_PSEUDO_INFO_LO			0x0000
+
+// Karbon-CXP Psuedo Device
+#define KCXP_PSEUDO_VENDOR_ID			BF_PCI_VEN_ID
+#define KCXP_PSEUDO_DEVICE_ID			0x3001
+#define KCXP_PSEUDO_SUB_VENDOR_ID		0x0000
+#define KCXP_PSEUDO_SUB_SYSTEM_ID		0x0000
+#define KCXP_PSEUDO_INFO_HI				0x0000
+#define KCXP_PSEUDO_INFO_LO				0x0000
 
 // Interrupt Flag Bits
 

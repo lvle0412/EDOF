@@ -235,7 +235,7 @@ hw_ind= version.o AndysComputations.o AndysOpenCVLib.o TransformLib.o IllumWormP
 #=========================
 
 #CoLBeRT is the whole megillah: BitFlow FrameGrabber, DLP, OpenCV, Stage Control
-makecolbert: $(targetDir)/colbert.exe
+makecolbert: $(targetDir)/colbert.exe $(targetDir)/calibrate_colbert.exe
 
 
 all_tests: test_DLP test_CV test_FG
@@ -266,15 +266,42 @@ $(targetDir)/colbert.exe : colbert.o \
 		$(openCVobjs) \
 		$(targetDir)/mc_api.dll \
 		$(hw_ind)	
-	$(CXX) -o $(targetDir)/colbert.exe  colbert.o $(targetDir)/mc_api.dll Talk2FrameGrabber.o Talk2Stage.o DontTalk2Camera.o $(BFObj) Talk2DLP.o   $(ALP_STATIC) $(hw_ind) $(LinkerWinAPILibObj) 
+	$(CXX) $(LINKFLAGS) -o $(targetDir)/colbert.exe  colbert.o $(targetDir)/mc_api.dll Talk2FrameGrabber.o Talk2Stage.o DontTalk2Camera.o $(BFObj) Talk2DLP.o   $(ALP_STATIC) $(hw_ind) $(LinkerWinAPILibObj) 
 
+$(targetDir)/calibrate_colbert.exe : calibrate_colbert.o \
+		Talk2FrameGrabber.o \
+		$(BFobj) \
+		Talk2DLP.o \
+		Talk2Stage.o \
+		$(ALP_OBJS) \
+		DontTalk2Camera.o \
+		$(openCVobjs) \
+		$(targetDir)/mc_api.dll \
+		Talk2Matlab.o \
+		$(MatlabLibs) \
+		$(hw_ind)	
+	$(CXX) $(LINKFLAGS) -o $(targetDir)/calibrate_colbert.exe \
+		calibrate_colbert.o \
+		$(targetDir)/mc_api.dll \
+		Talk2FrameGrabber.o \
+		Talk2Stage.o \
+		DontTalk2Camera.o \
+		$(BFObj) \
+		Talk2DLP.o  \
+		$(ALP_STATIC) \
+		Talk2Matlab.o \
+		$(MatlabLibs) \
+		$(hw_ind) \
+		$(LinkerWinAPILibObj) 
 
+	
+	
 
 $(targetDir)/testDLP.exe : testDLP.o Talk2DLP.o 
-		$(CXX) -o $(targetDir)/testDLP.exe testDLP.o  Talk2DLP.o  $(ALP_STATIC) $(LinkerWinAPILibObj) 
+		$(CXX) $(LINKFLAGS) -o $(targetDir)/testDLP.exe testDLP.o  Talk2DLP.o  $(ALP_STATIC) $(LinkerWinAPILibObj) 
 
 $(targetDir)/testFG.exe : testFG.o Talk2FrameGrabber.o Talk2DLP.o $(BFobj)  $(ALP_OBJS) $(openCVobjs)
-	$(CXX) -o $(targetDir)/testFG.exe testFG.o   Talk2FrameGrabber.o $(BFObj) Talk2DLP.o   $(ALP_STATIC) $(openCVlibs) $(LinkerWinAPILibObj) 
+	$(CXX) $(LINKFLAGS) -o $(targetDir)/testFG.exe testFG.o   Talk2FrameGrabber.o $(BFObj) Talk2DLP.o   $(ALP_STATIC) $(openCVlibs) $(LinkerWinAPILibObj) 
 
 
 $(targetDir)/testCV.exe : testCV.o  $(openCVobjs)
@@ -285,12 +312,37 @@ $(targetDir)/testCV.exe : testCV.o  $(openCVobjs)
 # Top-level Compile Source
 #=========================
 
-colbert.o : main.cpp  $(MyLibs)/Talk2DLP.h $(MyLibs)/Talk2Camera.h \
-$(MyLibs)/TransformLib.h $(MyLibs)/Talk2Camera.h $(MyLibs)/AndysOpenCVLib.h $(MyLibs)/Talk2FrameGrabber.h \
-$(MyLibs)/Talk2Matlab.h $(MyLibs)/AndysComputations.h $(MyLibs)/WormAnalysis.h \
-$(MyLibs)/WriteOutWorm.h $(MyLibs)/IllumWormProtocol.h $(MyLibs)/TransformLib.h \
-$(MyLibs)/experiment.h
-	$(CCC) $(COMPFLAGS) -o colbert.o main.cpp -I$(MyLibs) $(openCVinc) -I$(bfIncDir) 
+colbert.o : main.cpp  \
+		$(MyLibs)/Talk2DLP.h \
+		$(MyLibs)/Talk2Camera.h \
+		$(MyLibs)/TransformLib.h \
+		$(MyLibs)/Talk2Camera.h \
+		$(MyLibs)/AndysOpenCVLib.h \
+		$(MyLibs)/Talk2FrameGrabber.h \
+		$(MyLibs)/Talk2Matlab.h \
+		$(MyLibs)/AndysComputations.h \
+		$(MyLibs)/WormAnalysis.h \
+		$(MyLibs)/WriteOutWorm.h \
+		$(MyLibs)/IllumWormProtocol.h \
+		$(MyLibs)/TransformLib.h \
+		$(MyLibs)/experiment.h
+	$(CXX) $(COMPFLAGS) -o colbert.o main.cpp -I$(MyLibs) $(openCVinc) -I$(bfIncDir) 
+
+calibrate_colbert.o : calibrateFG.cpp \
+		$(MyLibs)/Talk2DLP.h \
+		$(MyLibs)/Talk2Camera.h \
+		$(MyLibs)/TransformLib.h \
+		$(MyLibs)/Talk2Camera.h \
+		$(MyLibs)/AndysOpenCVLib.h \
+		$(MyLibs)/Talk2FrameGrabber.h \
+		$(MyLibs)/Talk2Matlab.h \
+		$(MyLibs)/AndysComputations.h \
+		$(MyLibs)/WormAnalysis.h \
+		$(MyLibs)/WriteOutWorm.h \
+		$(MyLibs)/IllumWormProtocol.h \
+		$(MyLibs)/TransformLib.h \
+		$(MyLibs)/experiment.h
+	$(CXX) $(COMPFLAGS) calibrateFG.cpp -o calibrate_colbert.o -I$(MyLibs) -I$(bfIncDir) -I$(MatlabIncDir) $(openCVinc)
 
 
 testFG.o : $(MyLibs)/Talk2FrameGrabber.h testFG.cpp

@@ -53,12 +53,13 @@
 
 
 int T2Matlab_GenLookUpTable(CvSeq *CalibSeq, int *CCD2DLPLookUp, int nsizex, int nsizey,int CCDsizex, int CCDsizey){
+	printf("In T2Matlab_GenLookUpTable..\n");
 	//Matlab Test
 	Engine *ep;
-	if (!(ep = engOpen(NULL))) {
+	printf("Opening Matlab Engine. If crash, have you run matlab /regserver (on windows)?\n");
+	ep = engOpen(NULL);
+	if (!(ep)) {
 		printf("Can't start MATLAB engine\n");
-	} else {
-		printf("Opening Matlab Engine\n");
 	}
 	engSetVisible(ep, 0);
 	engEvalString(ep, "clear all; close all;");

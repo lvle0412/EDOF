@@ -248,7 +248,8 @@ test_CV: $(targetDir)/testCV.exe
 # This tests the frame grabber, openCV and DLP
 test_FG :  $(targetDir)/testFG.exe  
 
-
+#This tests matlab
+test_matlab : $(targetDir)/testMATLAB.exe
 
 
 #=========================
@@ -306,7 +307,9 @@ $(targetDir)/testFG.exe : testFG.o Talk2FrameGrabber.o Talk2DLP.o $(BFobj)  $(AL
 
 $(targetDir)/testCV.exe : testCV.o  $(openCVobjs)
 	$(CXX) $(LINKFLAGS) testCV.o -o $(targetDir)/testCV.exe $(openCVlibs) $(LinkerWinAPILibObj) 
-	
+
+$(targetDir)/testMATLAB.exe : testMATLAB.o $(MatlabLibs)
+	$(CXX) $(LINKFLAGS) testMATLAB.o -o $(targetDir)/testMATLAB.exe $(MatlabLibs) $(LinkerWinAPILibObj) 	
 
 #=========================
 # Top-level Compile Source
@@ -353,6 +356,9 @@ testDLP.o : testDLP.cpp $(MyLibs)/Talk2DLP.h
 		
 testCV.o : testCV.c
 	$(CCC) $(COMPFLAGS) testCV.c $(openCVinc)
+	
+testMATLAB.o : testMATLAB.c
+	$(CCC) $(COMPFLAGS) testMATLAB.c -I$(MatlabIncDir)
 	
 	
 	

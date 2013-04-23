@@ -66,5 +66,9 @@
  */
 int T2Matlab_GenLookUpTable(CvSeq *CalibPoints, int *CCD2DLPLookUp, int nsizex, int nsizey, int CCDsizex, int CCDsizey);
 
+/** Test code **/
+void T2Matlab_ArrayTest();
+
+
 #endif /* TALK2MATLAB_H_ */
 

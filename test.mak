@@ -15,7 +15,7 @@
 # e.g. running echo $PATH should show /c/mingw64/bin NOT
 # /c/mingw/bin
 #
-# also ensure to invoke this makefile in the msys bash shell
+# also ensure to invoke this makefile in the msys bash shell (not windows cmd, nor in git Bash)
 
 # You say you want to compile from source?
 # Before attempting to compile you need to be 
@@ -26,10 +26,10 @@
 # - the difference betwen statically linked and dynamically linked libraries
 # - using git and git submodules
 # - how to use the GNU toolchain on windows
-# - specifically how to use msys and mingw
-# - a thorough understanding of how to work with 32 bit and 64 bit binaries and libraries and when and how the can play together
+# - specifically how to use msys and mingw and how to use mingw-w64
+# - a thorough understanding of how to work with 32 bit and 64 bit binaries and libraries and how they cannot play together
 # - a thorough understanding of the differences between C and C++ and when and how they can be mixed and matched
-# - a working knolwedge of stnadard windows libraries
+# - a working knolwedge of standard windows libraries
 
 
 
@@ -278,8 +278,6 @@ $(targetDir)/calibrate_colbert.exe : calibrate_colbert.o \
 		DontTalk2Camera.o \
 		$(openCVobjs) \
 		$(targetDir)/mc_api.dll \
-		Talk2Matlab.o \
-		$(MatlabLibs) \
 		$(hw_ind)	
 	$(CXX) $(LINKFLAGS) -o $(targetDir)/calibrate_colbert.exe \
 		calibrate_colbert.o \
@@ -290,8 +288,6 @@ $(targetDir)/calibrate_colbert.exe : calibrate_colbert.o \
 		$(BFObj) \
 		Talk2DLP.o  \
 		$(ALP_STATIC) \
-		Talk2Matlab.o \
-		$(MatlabLibs) \
 		$(hw_ind) \
 		$(LinkerWinAPILibObj) 
 

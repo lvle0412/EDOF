@@ -144,7 +144,7 @@ WriteOut* SetUpWriteToDisk(const char* dirfilename, const char* outfilename,  Cv
 
 
 	/** Write the header for the YAML data file **/
-	cvWriteComment(DataWriter->fs, "Remote Control Worm Experiment Data Log\nMade by OpticalMindControl software\nleifer@fas.harvard.edu\n",0);
+	cvWriteComment(DataWriter->fs, "Remote Control Worm Experiment Data Log\nMade by OpticalMindControl software\nleifer@princeton.edu\n",0);
 	cvWriteString(DataWriter->fs, "gitHash", build_git_sha,0);
 	cvWriteString(DataWriter->fs, "gitBuildTime",build_git_time,0);
 

@@ -239,7 +239,18 @@ int cvtPtCam2DLP(CvPoint camPt, CvPoint* DLPpt,CalibData* Calib) {
 
 	const int XOUT = 0;
 	const int YOUT = 1;
-
+	
+	/* Looking back at this code three years later, it appears that the format
+	/* for the CCD2DLPLookup is such:
+	/* It is a 1 x n array. The First nsizey*nsizex eleemtns represent X values 
+	/* the second nsizex*nsizex elemetns represent Y values
+	/*
+	/* By looking at the equations below you can see how things are indexed   */
+	/* To get the DLP x coordinate out for a a camera pt (camPt.x, camPt.y)
+	/* DLP.x = CCD2DLPLookup[camPt.x*nsizey+camPt.y]
+	/* DLP.y = CCD2DLPLookup[nsizey * nsizex +  camPt.x*nsizey+camPt.y]  */
+	
+	
 	if (XOUT * nsizey * nsizex + camPt.x * nsizey + camPt.y >= nsizex* nsizey * 2) {
 		printf(" In accessing lookup table, we are out of bounds!!\n");
 		return 0;

@@ -412,7 +412,12 @@ void WriteCalibrationToFile(int* CCD2DLPLookup, CvSize size, const char * filena
 
 
 
-
+/*
+/* Write out the raw calibrated points to disk as a YAML fil
+/* MATLAB will later read this file in and generated a lookup table that is to be provided
+/* to the main colbert soffware.
+/*
+/*  (This is is all to correctly register the DLP and CCD */
 int WriteOutCalibPointPairs(CvSeq *CalibSeq, int nsizex, int nsizey,int CCDsizex, int CCDsizey){
 
 
@@ -452,7 +457,7 @@ int WriteOutCalibPointPairs(CvSeq *CalibSeq, int nsizex, int nsizey,int CCDsizex
 	cvWriteInt(fs,"DLPheight", nsizey);
 	cvWriteInt(fs,"CCDwidth", CCDsizex);
 	cvWriteInt(fs,"CCDheight", CCDsizey);
-
+	cvWriteInt(fs,"SizeOfInt",sizeof(int));
 
 	/** Begin Writing out Pairs of Points **/
 	int PairCount; // Current pair 

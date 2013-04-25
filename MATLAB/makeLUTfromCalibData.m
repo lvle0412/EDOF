@@ -83,7 +83,9 @@ size(LookUp);
 
 % Write out the LookUp Vector as a binary file in the appropriate format
 
-if ~(isfield(D,'SizeOfInt'))
+if (isfield(D,'SizeOfInt'))
+    SizeOfInt=D.SizeOfInt;
+else
     SizeOfInt=4; %Default int size is 4 bits
 end
 

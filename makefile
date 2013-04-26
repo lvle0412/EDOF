@@ -309,7 +309,7 @@ colbert.o : main.cpp  \
 		$(MyLibs)/experiment.h
 	$(CXX) $(COMPFLAGS) -o colbert.o main.cpp -I$(MyLibs) $(openCVinc) -I$(bfIncDir) 
 
-calibrate_colbert.o : calibrateFG.cpp \
+calibrate_colbert_first.o : calibrateFG.cpp \
 		$(MyLibs)/Talk2DLP.h \
 		$(MyLibs)/Talk2Camera.h \
 		$(MyLibs)/TransformLib.h \
@@ -322,7 +322,7 @@ calibrate_colbert.o : calibrateFG.cpp \
 		$(MyLibs)/IllumWormProtocol.h \
 		$(MyLibs)/TransformLib.h \
 		$(MyLibs)/experiment.h
-	$(CXX) $(COMPFLAGS) calibrateFG.cpp -o calibrate_colbert.o -I$(MyLibs) -I$(bfIncDir) -I $(openCVinc)
+	$(CXX) $(COMPFLAGS) calibrateFG.cpp -o calibrate_colbert_first.o -I$(MyLibs) -I$(bfIncDir) -I $(openCVinc)
 
 
 testFG.o : $(MyLibs)/Talk2FrameGrabber.h testFG.cpp

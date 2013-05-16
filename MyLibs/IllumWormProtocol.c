@@ -513,8 +513,7 @@ int CvtPolyMontage2ContourMontage(CvSeq* PolyMontage, CvSeq* ContourMontage){
 			 *
 			 */
 			WormPolygon* wrappedContour= CreateWormPolygonFromSeq(ContourMontage->storage,polygon->GridSize,newcontour);
-
-
+		
 			/** Push the new contour onto the ContourMontage **/
 			cvSeqPush(ContourMontage,&wrappedContour);
 
@@ -524,7 +523,7 @@ int CvtPolyMontage2ContourMontage(CvSeq* PolyMontage, CvSeq* ContourMontage){
 			//I needed to comment this out to get the program to stop crashing
 			// But it was added to stop a memory leak.
 			//So I suspect now I have a memory leak.
-			// DestroyWormPolygon(&wrappedContour);
+			//DestroyWormPolygon(&wrappedContour);
 
 
 

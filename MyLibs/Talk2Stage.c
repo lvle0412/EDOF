@@ -2,7 +2,9 @@
 // usb_rcfg.cpp : A simple USB DOS console application. Sample code.
 // Author: Doug Lovett
 // Birth: 02/07/2000
-// Written by Andrew Leifer
+// 
+// 
+// Heavily modified  by Andrew Leifer
 
 /*
  * Compile by running:
@@ -125,7 +127,8 @@ HANDLE InitializeUsbStage(){
 		//CBR_9600 works
 		//dcbSerialParams.BaudRate=CBR_9600;
 		//CBR_115200 also works.
-		dcbSerialParams.BaudRate=CBR_256000;
+		//CBR_256000 also works
+		dcbSerialParams.BaudRate=CBR_115200; //This matches what LUDL Says
 		dcbSerialParams.ByteSize=8;
 		dcbSerialParams.StopBits=TWOSTOPBITS;
 		dcbSerialParams.Parity=NOPARITY;
@@ -158,11 +161,21 @@ HANDLE InitializeUsbStage(){
  *
  */
 int spinStage(HANDLE s, int xspeed,int yspeed){
+	//Error handling modeled off of http://msdn.microsoft.com/en-us/library/windows/hardware/bb540534(v=vs.85).aspx
+	BOOL bErrorFlag = FALSE;
+
+
 	DWORD Length;
 	char* buff=(char*) malloc(sizeof(char)*1024);
 	sprintf(buff,"SPIN X=%d Y=%d\r",xspeed,yspeed);
-	WriteFile(s, buff, strlen(buff), &Length, NULL);
+	bErrorFlag=WriteFile(s, buff, strlen(buff), &Length, NULL);
 	free(buff);
+
+	if (FALSE == bErrorFlag)
+    {
+        printf("Failure: Unable to write to serial port.\n");
+    }
+
 	return 0;
 
 }
@@ -256,8 +269,8 @@ void steerStageFromNumberPad(HANDLE s, int speed, int input){
 
 
 
-
-
+// OLD WINXP PROPRIETORY DRIVER  INTERFACE:
+//
 // ------------------------------------------------------------------------ //
 // UsbScan() - Scan for first USB device with a GUID that matches the one
 // passed. Return 1 if device found, else 0.

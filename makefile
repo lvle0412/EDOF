@@ -29,8 +29,10 @@
 # - specifically how to use msys and mingw and how to use mingw-w64
 # - a thorough understanding of how to work with 32 bit and 64 bit binaries and libraries and how they cannot play together
 # - a thorough understanding of the differences between C and C++ and when and how they can be mixed and matched
-# - a working knolwedge of standard windows libraries
-
+# - a working knowledge of standard windows libraries
+#
+# Andrew Leifer is happy to help explain the code, but cannot be responsible for 
+# teaching others about these core concepts.
 
 
 #=================================
@@ -67,12 +69,11 @@ targetDir=bin
 # Compiler & Linker Flags
 #=========================
 
-#Note it seems to work well to use gcc for compiling the c code but g++ for linking
 CCC=x86_64-w64-mingw32-g++.exe
 COMPFLAGS= -v  -O2 -c
-#-c option means link only
+#-c option means compile only (do not link)
 
-CXX = x86_64-w64-mingw32-g++.exe
+CXX = $(CCC)
 LINKFLAGS=  -v -W  -O2 -DNDEBUG 
 
 
@@ -234,6 +235,8 @@ test_CV: $(targetDir)/testCV.exe
 # This tests the frame grabber, openCV and DLP
 test_FG :  $(targetDir)/testFG.exe  
 
+# This tests the ludl stage and also uses OpenCV
+test_Stage : $(targetDir)/testStage.exe
 
 
 #=========================
@@ -288,6 +291,9 @@ $(targetDir)/testFG.exe : testFG.o Talk2FrameGrabber.o Talk2DLP.o $(BFobj)  $(AL
 $(targetDir)/testCV.exe : testCV.o  $(openCVobjs)
 	$(CXX) $(LINKFLAGS) testCV.o -o $(targetDir)/testCV.exe $(openCVlibs) $(LinkerWinAPILibObj) 
 
+$(targetDir)/testStage.exe : testStage.o talk2stage.o 
+	$(CXX) $(LINKFLAGS) testStage.o -o $(targetDir)/testStage.exe Talk2Stage.o $(LinkerWinAPILibObj) 
+
 
 
 #=========================
@@ -334,6 +340,8 @@ testDLP.o : testDLP.cpp $(MyLibs)/Talk2DLP.h
 testCV.o : testCV.c
 	$(CCC) $(COMPFLAGS) testCV.c $(openCVinc)
 
+testStage.o: testStage.c
+	$(CCC) $(COMPFLAGS) testStage.c $(openCVinc)
 	
 	
 	

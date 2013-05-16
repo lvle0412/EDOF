@@ -636,7 +636,7 @@ void resampleSeqConstPtsPerArcLength(CvSeq* sequence, CvSeq* ResampledSeq, int N
 			/** t is the arc length beyond the previous vertex (s=prevVertex->sum+t)**/
 			t = (double) s - prevVertex->sum; //Think of t as the parameter in a parametric equation
 
-			if (t<0) printf("ERROR! This should never happen!\n");
+			if (t<0) printf("ERROR! This should never happen! t= %d\n",t);
 
 
 

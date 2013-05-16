@@ -268,7 +268,7 @@ int cvtPtCam2DLP(CvPoint camPt, CvPoint* DLPpt,CalibData* Calib) {
 
 
 	if (DLPpt->x < 0 || DLPpt->y < 0 || DLPpt->x >= nsizex || DLPpt->y >= nsizey) {
-		printf ("ERROR: Worm is out of the field of the DLP.\n");
+		printf ("ERROR: Illumination pattern is out of the field of the DLP.\n");
 		return 0;
 	}
 

@@ -291,6 +291,8 @@ int main (int argc, char** argv){
 				}
 				/** If InvertIllumination is on, then do that now in both cam space and DLP space**/
 				if (exp->Params->IllumInvert) InvertIllumination(exp);
+			} else {
+				printf("Error in exp->e in the mainloop! code line 295\n");
 			}
 
 
@@ -329,10 +331,7 @@ int main (int argc, char** argv){
 
 			if (exp->e != 0) {
 				printf("\nError in main loop. :(\n");
-				if (exp->stageIsPresent) {
-					printf("\tAuto-safety STAGE SHUTOFF!\n");
-					ShutOffStage(exp);
-				}
+				//where emergency stage shutoff used to go
 
 			}
 
@@ -470,7 +469,7 @@ UINT Thread(LPVOID lpdwParam) {
 			TICTOC::timer().toc("DisplayThreadGuts");
 			UpdateGUI(exp);
 
-			key=cvWaitKey(100);
+			key=cvWaitKey(10); //This is 20 in the dualmag system
 
 
 			if (MainThreadHasStopped==1) continue;
@@ -496,12 +495,19 @@ UINT Thread(LPVOID lpdwParam) {
 			UpdateGUI(exp);
 
 			if(EverySoOften(k,1)){ //This determines how often the stage is updated
-
-				/** Do the Stage Tracking **/
-				TICTOC::timer().tic("HandleStageTracker()");
-				HandleStageTracker(exp);
-				TICTOC::timer().toc("HandleStageTracker()");
-
+				
+				
+				if (exp->e != 0 && exp->stageIsPresent) {
+					printf("\tAuto-safety STAGE SHUTOFF from dispThread!\n");
+					ShutOffStage(exp);
+				} else {
+				
+					/** Do the Stage Tracking **/
+					TICTOC::timer().tic("HandleStageTracker()");
+					HandleStageTracker(exp);
+					TICTOC::timer().toc("HandleStageTracker()");
+				
+				}
 
 				/** Write the Recent Frame Number to File to be accessed by the Annotation System **/
 				TICTOC::timer().tic("WriteRecentFrameNumberToFile()");

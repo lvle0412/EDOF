@@ -1192,7 +1192,7 @@ int GrabFrame(Experiment* exp) {
 		LoadFrameWithImage(tempImgGray, exp->fromCCD);
 		cvReleaseImage(&tempImgGray);
 		/*
-		 * Note: for some reason thinks crash when you go cvReleaseImage(&tempImg)
+		 * Note: for some reason thingt crash when you go cvReleaseImage(&tempImg)
 		 * And there don't seem to be memory leaks if you leave it. So I'm going to leave it in place.
 		 *
 		 */
@@ -1842,7 +1842,7 @@ CvPoint AdjustStageToKeepObjectAtTarget(HANDLE stage, CvPoint* obj,CvPoint targe
 	vel.x=diff.x*speed;
 	vel.y=diff.y*(speed+ speed/2);
 
-	//printf("SpinStage: vel.x=%d, vel.y=%d\n",vel.x,vel.y);
+	printf("SpinStage: vel.x=%d, vel.y=%d\n",vel.x,vel.y);
 	spinStage(stage,vel.x,vel.y);
 
 	return vel;
@@ -1889,6 +1889,7 @@ int HandleStageTracker(Experiment* exp){
 				/** Turn the stage off **/
 				exp->stageIsTurningOff=1;
 				exp->Params->stageTrackingOn=0;
+				printf("Setting flags to turn stage off in HandleStageTracker()\n");
 			} else {
 			/** Move the stage to keep the worm centered in the field of view **/
 			printf(".");
@@ -1899,6 +1900,7 @@ int HandleStageTracker(Experiment* exp){
 			}
 		}
 		if (exp->Params->stageTrackingOn==0){/** Tracking Should be off **/
+			printf("Tracking is off in HandleStageTracker()\n");
 			/** If we are in the process of turning tacking off **/
 			if (exp->stageIsTurningOff==1){
 				/** Tell the stage to Halt **/
@@ -1908,6 +1910,7 @@ int HandleStageTracker(Experiment* exp){
 				exp->stageIsTurningOff=0;
 			}
 			/** The stage is already halted, so there is nothing to do. **/
+			printf("The stage is already halted in HandleStageTracker()\n.");
 		}
 
 	}

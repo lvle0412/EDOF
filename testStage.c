@@ -3,7 +3,6 @@
 #include <windows.h>
 #include "MyLibs/Talk2Stage.h"
 
-//rzingel@ludl.com
 
 int main(){
 	printf("Testing the Ludl stage.\nWait\n");

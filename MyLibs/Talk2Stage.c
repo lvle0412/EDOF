@@ -126,9 +126,9 @@ HANDLE InitializeUsbStage(){
 
 		//CBR_9600 works
 		//dcbSerialParams.BaudRate=CBR_9600;
-		//CBR_115200 also works.
+		//CBR_115200 also works. //This matches what LUDL Says
 		//CBR_256000 also works
-		dcbSerialParams.BaudRate=CBR_115200; //This matches what LUDL Says
+		dcbSerialParams.BaudRate=CBR_256000; 
 		dcbSerialParams.ByteSize=8;
 		dcbSerialParams.StopBits=TWOSTOPBITS;
 		dcbSerialParams.Parity=NOPARITY;

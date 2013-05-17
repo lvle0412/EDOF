@@ -291,7 +291,7 @@ $(targetDir)/testFG.exe : testFG.o Talk2FrameGrabber.o Talk2DLP.o $(BFobj)  $(AL
 $(targetDir)/testCV.exe : testCV.o  $(openCVobjs)
 	$(CXX) $(LINKFLAGS) testCV.o -o $(targetDir)/testCV.exe $(openCVlibs) $(LinkerWinAPILibObj) 
 
-$(targetDir)/testStage.exe : testStage.o talk2stage.o 
+$(targetDir)/testStage.exe : testStage.o Talk2Stage.o 
 	$(CXX) $(LINKFLAGS) testStage.o -o $(targetDir)/testStage.exe Talk2Stage.o $(LinkerWinAPILibObj) 
 
 

@@ -469,7 +469,7 @@ UINT Thread(LPVOID lpdwParam) {
 			TICTOC::timer().toc("DisplayThreadGuts");
 			UpdateGUI(exp);
 
-			key=cvWaitKey(10); //This is 20 in the dualmag system
+			key=cvWaitKey(20); //This is the time between stage & screen updates
 
 
 			if (MainThreadHasStopped==1) continue;

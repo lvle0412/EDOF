@@ -1842,7 +1842,7 @@ CvPoint AdjustStageToKeepObjectAtTarget(HANDLE stage, CvPoint* obj,CvPoint targe
 	vel.x=diff.x*speed;
 	vel.y=diff.y*(speed+ speed/2);
 
-	printf("SpinStage: vel.x=%d, vel.y=%d\n",vel.x,vel.y);
+	//printf("SpinStage: vel.x=%d, vel.y=%d\n",vel.x,vel.y);
 	spinStage(stage,vel.x,vel.y);
 
 	return vel;
@@ -1900,7 +1900,7 @@ int HandleStageTracker(Experiment* exp){
 			}
 		}
 		if (exp->Params->stageTrackingOn==0){/** Tracking Should be off **/
-			printf("Tracking is off in HandleStageTracker()\n");
+		//	printf("Tracking is off in HandleStageTracker()\n");
 			/** If we are in the process of turning tacking off **/
 			if (exp->stageIsTurningOff==1){
 				/** Tell the stage to Halt **/
@@ -1910,7 +1910,7 @@ int HandleStageTracker(Experiment* exp){
 				exp->stageIsTurningOff=0;
 			}
 			/** The stage is already halted, so there is nothing to do. **/
-			printf("The stage is already halted in HandleStageTracker()\n.");
+			//printf("The stage is already halted in HandleStageTracker()\n.");
 		}
 
 	}

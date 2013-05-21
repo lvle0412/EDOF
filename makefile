@@ -225,7 +225,7 @@ hw_ind= version.o AndysComputations.o AndysOpenCVLib.o TransformLib.o IllumWormP
 makecolbert: $(targetDir)/colbert.exe $(targetDir)/calibrate_colbert_first.exe
 
 
-all_tests: test_DLP test_CV test_FG
+all_tests: test_DLP test_CV test_FG test_Stage
 
 # Executables for testing different dependencies
 test_DLP: $(targetDir)/testDLP.exe  

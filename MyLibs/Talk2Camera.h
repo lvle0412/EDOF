@@ -87,8 +87,7 @@ void T2Cam_CloseLib();
  * CamData data type.
  *
  */
-void _cdecl callback(HGRABBER hGrabber, unsigned char* pData,
-		unsigned long frameNumber, void*);
+void _cdecl callback(HGRABBER hGrabber, unsigned char* pData, unsigned long frameNumber, void*);
 
 /*
  * Given a pointer to a CamData type, this function will allocate

@@ -77,7 +77,8 @@
 	#define except __except
 #endif
 
-typedef void ***Bd;             // BitFlow board handle.
+typedef void ***Bd;					// BitFlow board handle.
+typedef void *** POINTER_32 BdWOW64;   // BitFlow board handle for WOW64
 
 #if !defined(RAP_UBER_DRIVER)
 	typedef BFU32 BFRC;			// BitFlow return code.

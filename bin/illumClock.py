@@ -35,15 +35,15 @@
 import string, sys, time
 import msvcrt #note windows/DOS only
 
-print 'Welcome to the Optical Mind Control Illumination Clock.'
+print('Welcome to the Optical Mind Control Illumination Clock.')
 
 
 # Handle Command Line Arguments
 if len(sys.argv)!=2:
-	print 'Optical Mind Control Illumination Clock.\n'
-	print 'by Andrew Leifer, leifer@fas.harvard.edu\n\n'
-	print 'This script must be run with a command-line argument specifying the location of the recent frame information, which is outputted by the mindcontrol software.\n'
-	print '\n\tillumClock.py D:/Path/To/recentframe.txt' 
+	print('Optical Mind Control Illumination Clock.\n')
+	print('by Andrew Leifer, leifer@fas.harvard.edu\n\n')
+	print('This script must be run with a command-line argument specifying the location of the recent frame information, which is outputted by the mindcontrol software.\n')
+	print('\n\tillumClock.py D:/Path/To/recentframe.txt')
 	sys.exit(0)
 
 recentframefile=sys.argv[1]
@@ -61,7 +61,7 @@ while not msvcrt.kbhit(): #While the user doesn't hit any key
 	try:
 		r=open(recentframefile,'r')
 	except:
-		print '\tError! ' +recentframefile + ' not found!\n'
+		print('\tError! ' +recentframefile + ' not found!\n')
 		continue
 
 
@@ -87,5 +87,5 @@ while not msvcrt.kbhit(): #While the user doesn't hit any key
 	sys.stdout.write('\t\t')
 
 
-print "\rGood bye!"
+print("\rGood bye!")
 

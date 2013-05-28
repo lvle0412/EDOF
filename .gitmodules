@@ -1,6 +1,6 @@
 [submodule "AccessUtils/MATLAB"]
 	path = AccessUtils/MATLAB
-	url = git@github.com:samuellab/MindControlAccessUtils.git
+	url = https://github.com/leiferlab/MindControlAccessUtils.git
 [submodule "API"]
 	path = API
-	url = git@github.com:samuellab/internal.mindcontrolAPI.git
+	url = https://github.com/leiferlab/internal.mindcontrolAPI.git

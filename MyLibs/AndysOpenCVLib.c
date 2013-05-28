@@ -35,13 +35,17 @@
  *      Author: Andy
  */
 
-#include <highgui.h>
-#include <cxcore.h>
+#include <math.h>
+
+#include "opencv2/highgui/highgui_c.h"
+//#include <cxcore.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 #include "AndysOpenCVLib.h"
 #include <limits.h>
+
 
 #define PRINTOUT 0
 
@@ -290,6 +294,37 @@ void DisplayOpenCVInstall(){
 	printf("Libraries: %s\nModules: %s\n", libraries, modules);
 }
 
+
+
+/*
+ * A cvSeq can be used as a buffer. This function allows one to push an element
+ * onto the front of a cvSeq buffer.
+ *
+ * If the buffer is full, it automatically tosses the oldest
+ * element in the buffer.
+ */
+int PushToSeqBuffer(CvSeq* seq, void* element, int MaxBuffSize){
+	if (seq==0 || element==0 || MaxBuffSize<1) return A_ERROR;
+
+	/** push the value on **/
+	cvSeqPushFront(seq, element);
+
+	/** if full, pop off the last value **/
+	void* popped_pt;
+	while (seq->total > MaxBuffSize){
+		cvSeqPop(seq, popped_pt);
+	} ;
+
+	return A_OK;
+}
+
+
+
+
+/*******************************************************************************/
+/**************************** Working with Sequences of Points *****************/
+/*******************************************************************************/
+
 /*
  *
  * Given a sequence of x,y CvPoints, this function returns a point
@@ -324,87 +359,86 @@ CvPoint  GetMedianOfPoints(CvSeq* seq){
 }
 
 
-
 /*
- * Given a list of contours, this finds the contour with the longest perimiter and points ContourOfInterst to this contour.
- *
- * Note this uses the same memory storage for the contourOfInterst, as that of the contour.
-*/
-void LongestContour(CvSeq* contours, CvSeq** ContourOfInterest){
-	CvSeq* biggestContour;
-	//printf("---Finding Longest Contour---\n");
-	int biggest=0;
-		for (contours; contours!=NULL; contours=contours->h_next){
-		//printf("%d elements\n",contours->total);
-		if (contours->total > biggest){
-			biggest=contours->total;
-			biggestContour=contours;
-			//printf("Currently the biggest!\n");
-		}
+ * Print out a sequence of CvPoints to stdout
+ * expects int's
+ */
+
+void printSeq(CvSeq* Seq){
+	int i;
+	for (i = 0; i < Seq->total; i++) {
+		CvPoint* tempPt = (CvPoint*) cvGetSeqElem(Seq, i);
+		printf("%d: ( %d, %d)\n",i,tempPt->x,tempPt->y);
 	}
-	*ContourOfInterest=cvCloneSeq(biggestContour);
-}
-
-/*
- * Takes the cross product of two vectors representated in cartesian coordinates as CvPoint (x,y)
- *
- */
-int PointCross(CvPoint* VecA, CvPoint* VecB){
-	return (VecA->x)*(VecB->y) - (VecA->y)*(VecB->x);
-
-}
-
-
-
-
-/*
- * Takes the dot product of two vectors representated in cartesian coordinates as CvPoint (x,y)
- *
- */
-int PointDot(CvPoint* VecA, CvPoint* VecB){
-	return (VecA->x)*(VecB->x) + (VecA->y)*(VecB->y);
-
 }
 
 
 /*
- * Normalizes vectors representated in cartesian coordinates as CvPoint (x,y) and takes the cross product.
- *
+ * Print sequences of double points (CvPoint2D64f)
  */
-float NormPointCross(CvPoint* VecA, CvPoint* VecB){
-	float Ax = (float) VecA->x;
-	float Ay = (float) VecA->y;
-	float Bx = (float) VecB->x;
-	float By = (float) VecB->y;
-	return (Ax*By -  Ay*Bx) / ( cvSqrt(Ax*Ax+Ay*Ay)*cvSqrt(Bx*Bx+By*By) ) ;
-
+void printSeqDouble(CvSeq* Seq){
+	int i;
+	for (i = 0; i < Seq->total; i++) {
+		CvPoint2D64f* tempPt = (CvPoint2D64f*) cvGetSeqElem(Seq, i);
+		printf("%d: ( %f, %f)\n",i,tempPt->x,tempPt->y);
+	}
 }
 
+/*
+ * Print out a sequence of Scalar Doubles to stdout
+ */
 
+void printSeqScalarDoubles(CvSeq* Seq){
+	int i;
+	double* tempPt ;
+	for (i = 0; i < Seq->total; i++) {
+		tempPt = (double *) cvGetSeqElem(Seq, i);
+		printf("%d: %f\n",i,*tempPt);
+	}
+}
 
 
 /*
- * Normalizes two vectors representated in cartesian coordinates as CvPoint (x,y) and returns their dot ptorduct.
- *
+ * Converts a CvSeq of doubles into an array.
+ * Allocates memory for the array.
  */
-float NormPointDot(CvPoint* VecA, CvPoint* VecB){
-	float Ax = (float) VecA->x;
-	float Ay = (float) VecA->y;
-	float Bx = (float) VecB->x;
-	float By = (float) VecB->y;
+int SeqDoublesToArr(const CvSeq* seq, double** arr){
+	if (seq->elem_size!=sizeof(double)) return A_ERROR;
 
-	return ( (Ax*Bx+Ay*By) /  ( cvSqrt(Ax*Ax+Ay*Ay)*cvSqrt(Bx*Bx+By*By) ) );
+	int PO=0; //print out?
 
+	/** If the sequence is empty return the null pointer **/
+	if (seq->total<1) {
+		*arr=NULL;
+		return A_OK;
+	}
+
+	*arr= (double*) malloc(seq->total*sizeof(double));
+
+	int i;
+	double* tempPt ;
+	for (i = 0; i < seq->total; i++) {
+		tempPt = (double *) cvGetSeqElem(seq, i);
+		(*arr)[i]=*tempPt;
+		if (PO!=0) printf("%d: %f\n",i,*tempPt);
+	}
+
+
+//	*arr= (double*) malloc(seq->total*sizeof(double));
+//	int i;
+//	double* temp;
+//	for (i = 0; i < seq->total; i++) {
+//			temp= (double*) cvGetSeqElem(seq, i);
+//			(*arr)[i]=*temp;
+//			printf("In SeqDoublesToArr: *temp=%f\n",i,*temp);
+//		}
+	return A_OK;
 }
 
-
-
-
-/* Function Draws a Sequence of CvPoint's with little cirlces.
+/* Function Draws a Sequence of CvPoint's with little circles.
  * This function uses only a sequence and an image.
- *
- */
 
+ */
 void DrawSequence(IplImage** image, CvSeq* Seq) {
 	int i;
 	for (i = 0; i < Seq->total; i++) {
@@ -602,7 +636,7 @@ void resampleSeqConstPtsPerArcLength(CvSeq* sequence, CvSeq* ResampledSeq, int N
 			/** t is the arc length beyond the previous vertex (s=prevVertex->sum+t)**/
 			t = (double) s - prevVertex->sum; //Think of t as the parameter in a parametric equation
 
-			if (t<0) printf("ERROR! This should never happen!\n");
+			if (t<0) printf("ERROR! This should never happen! t= %d\n",t);
 
 
 
@@ -673,6 +707,61 @@ void resampleSeq(CvSeq* sequence, CvSeq* ResampledSeq, int Numsegments) {
 
 
 
+
+/*******************************************************************************/
+/**************************** Working with Points ******************************/
+/*******************************************************************************/
+
+
+
+/*
+ * Takes the cross product of two vectors representated in cartesian coordinates as CvPoint (x,y)
+ *
+ */
+int PointCross(CvPoint* VecA, CvPoint* VecB){
+	return (VecA->x)*(VecB->y) - (VecA->y)*(VecB->x);
+}
+
+
+/*
+ * Takes the dot product of two vectors representated in cartesian coordinates as CvPoint (x,y)
+ */
+int PointDot(CvPoint* VecA, CvPoint* VecB){
+	return (VecA->x)*(VecB->x) + (VecA->y)*(VecB->y);
+
+}
+
+
+/*
+ * Normalizes vectors representated in cartesian coordinates as CvPoint (x,y) and takes the cross product.
+ *
+ */
+float NormPointCross(CvPoint* VecA, CvPoint* VecB){
+	float Ax = (float) VecA->x;
+	float Ay = (float) VecA->y;
+	float Bx = (float) VecB->x;
+	float By = (float) VecB->y;
+	return (Ax*By -  Ay*Bx) / ( cvSqrt(Ax*Ax+Ay*Ay)*cvSqrt(Bx*Bx+By*By) ) ;
+
+}
+
+
+
+
+/*
+ * Normalizes two vectors representated in cartesian coordinates as
+ *  CvPoint (x,y) and returns their dot ptorduct.
+ */
+float NormPointDot(CvPoint* VecA, CvPoint* VecB){
+	float Ax = (float) VecA->x;
+	float Ay = (float) VecA->y;
+	float Bx = (float) VecB->x;
+	float By = (float) VecB->y;
+
+	return ( (Ax*Bx+Ay*By) /  ( cvSqrt(Ax*Ax+Ay*Ay)*cvSqrt(Bx*Bx+By*By) ) );
+
+}
+
 /*
  *
  * Returns the squared distance between two points
@@ -691,8 +780,46 @@ float dist(CvPoint a, CvPoint b){
 	return ( sqrt( (float) sqDist(a,b))  );
 }
 
+
+
+
+
+/*******************************************************************************/
+/**************************** Working with cvContours ****************************/
+/*******************************************************************************/
+
+
+
 /*
- * WHOA!! THIS FUNCTION IS ALL SCREWED UP AND CAUSING PROBLEMS!!
+ * Given a list of contours, this finds the contour with the longest perimiter and points ContourOfInterst to this contour.
+ *
+ * Note this uses the same memory storage for the contourOfInterst, as that of the contour.
+*/
+void LongestContour(CvSeq* contours, CvSeq** ContourOfInterest){
+	CvSeq* biggestContour;
+	//printf("---Finding Longest Contour---\n");
+	int biggest=0;
+		for (contours; contours!=NULL; contours=contours->h_next){
+		//printf("%d elements\n",contours->total);
+		if (contours->total > biggest){
+			biggest=contours->total;
+			biggestContour=contours;
+			//printf("Currently the biggest!\n");
+		}
+	}
+	*ContourOfInterest=cvCloneSeq(biggestContour);
+}
+
+
+
+
+/*******************************************************************************/
+/**************************** Working with Polygon Contours****************************/
+/*******************************************************************************/
+
+
+
+/*
  *
  * Given two points a and b , and a sequence of CvPoints
  * this function will find the points that walk the line
@@ -700,6 +827,9 @@ float dist(CvPoint a, CvPoint b){
  * the end of the sequence
  *
  * Note that the output  includes point a, but not point b.
+ *
+ * See my StackOverflow Question:
+ * http://stackoverflow.com/q/1959551/200688
  */
 int GetLineFromEndPts(CvPoint a, CvPoint b, CvSeq* contour){
 	if (contour==NULL) {
@@ -819,6 +949,11 @@ int CvtPolySeq2ContourSeq(CvSeq* polygon, CvSeq* contour ){
 }
 
 
+/*******************************************************************************/
+/*******  Higher Level Feature Extraction with Sequence of Pts *****************/
+/*******************************************************************************/
+
+
 
 
 /*
@@ -862,6 +997,151 @@ void FindCenterline(CvSeq* NBoundA, CvSeq* NBoundB, CvSeq* centerline) {
 	cvEndWriteSeq(&writer);
 
 }
+
+
+/*
+ * extractCurvatureOfSeq
+ *
+ * No Smoothing.
+ * Find curvature at each point.
+ *
+ * seq is sequence of double points, CvPoint2D64f (double)
+ * k is an array of doubles. with two less element than CvPoint.
+ *
+ * Defined as difference in angle between adjacent tangent vectors.
+ * The curvature sequence has one less element than the original sequence.
+ *
+ * Sigma is the size of the gaussian kernal.
+ *
+ */
+int extractCurvatureOfSeqDouble(const CvSeq* seq, double* curvature, double sigma,CvMemStorage* mem){
+
+	int DEBUG_FLAG=1;
+
+	if (seq== NULL || curvature == NULL) return A_ERROR;
+
+	/** Smooth the sequence **/
+//	CvSeq* sseq=smoothPtSequenceIntToDouble(seq, sigma, mem);
+	const CvSeq* sseq= seq;
+	int N=sseq->total;
+
+	double *x = (double *) malloc (N * sizeof(double));
+	double *y = (double *) malloc (N * sizeof(double));
+
+	double *diff_x = (double *) malloc( (N-1) * sizeof(double));  /* difference of adjacent x coordinate */
+	double *diff_y = (double *) malloc( (N-1)* sizeof(double)); /* difference of adjacent y coordinate */
+	double *theta = (double *) malloc( (N-1) * sizeof(double)); /* angle of the tangent vector */
+
+
+	double *k= (double *) malloc( (N-2) * sizeof(double));
+
+
+	/** Generate array of floats from inputs **/
+	int j;
+	for (j = 0; j < N; j++) {
+		x[j] = (double) ((CvPoint2D64f *) cvGetSeqElem(sseq, j))->x;
+		y[j] = (double) ((CvPoint2D64f *) cvGetSeqElem(sseq, j))->y;
+		if (DEBUG_FLAG) printf("Double %d: ( %f , %f)\n",j,x[j],y[j]);
+	}
+
+	/** Calculate tangent vectors **/
+     int i;
+	 for (i=0;i< N-1;i++){
+		 *(diff_x+i) = *(x+i+1)-*(x+i);
+		 *(diff_y+i) = *(y+i+1)-*(y+i);
+		 if (DEBUG_FLAG) printf("Diff %d: %f, %f\n",i, *(diff_x+i), *(diff_y+i));
+		 *(theta+i) = atan2(-*(diff_y+i),*(diff_x+i)); /* calculate the angle of tangent vector */
+		 }
+
+	 for (i=0; i<N-2; i++){
+		 *(k+i)=*(theta+i+1)-*(theta+i); /* calculate the curvature */
+		 if (DEBUG_FLAG) printf("k[%d] = %f\n",i,k[i]);
+	 }
+
+	memcpy((void*) curvature ,(const void*) k, (N-2)*sizeof(double) );
+
+	free(k);
+	free(x);
+	free(y);
+	return A_OK;
+}
+
+/*
+ * extractCurvatureOfSeq
+ *
+ *
+ * Find curvature at each point.
+ *
+ * seq is sequence of points, CvPoint (int)
+ * k is an array of doubles. with two less element than CvPoint.
+ *
+ * Defined as difference in angle between adjacent tangent vectors.
+ * The curvature sequence has one less element than the original sequence.
+ *
+ * Sigma is the size of the gaussian kernal.
+ *
+ */
+int extractCurvatureOfSeq(const CvSeq* seq, double* curvature, double sigma,CvMemStorage* mem){
+
+	int DEBUG_FLAG=0;
+
+	if (seq== NULL || curvature == NULL) return A_ERROR;
+	if (seq->elem_size!=sizeof(CvPoint)) return A_ERROR;
+
+	if (DEBUG_FLAG) {
+		printf("Before smoothing:\n");
+		printSeq((CvSeq*)seq);
+	}
+
+	/** Smooth the sequence **/
+	CvSeq* sseq=smoothPtSequenceIntToDouble(seq, sigma, mem);
+	if (DEBUG_FLAG) {
+		printf("After smoothing:\n");
+		printSeqDouble(sseq);
+	}
+	int N=sseq->total;
+
+	double *x = (double *) malloc (N * sizeof(double));
+	double *y = (double *) malloc (N * sizeof(double));
+
+	double *diff_x = (double *) malloc( (N-1) * sizeof(double));  /* difference of adjacent x coordinate */
+	double *diff_y = (double *) malloc( (N-1)* sizeof(double)); /* difference of adjacent y coordinate */
+	double *theta = (double *) malloc( (N-1) * sizeof(double)); /* angle of the tangent vector */
+
+
+	double *k= (double *) malloc( (N-2) * sizeof(double));
+
+
+	/** Generate array of floats from inputs **/
+	int j;
+	for (j = 0; j < N; j++) {
+		x[j] = (double) ((CvPoint2D64f *) cvGetSeqElem(sseq, j))->x;
+		y[j] = (double) ((CvPoint2D64f *) cvGetSeqElem(sseq, j))->y;
+		if (DEBUG_FLAG) printf("Double %d: ( %f , %f)\n",j,x[j],y[j]);
+	}
+
+	/** Calculate tangent vectors **/
+     int i;
+	 for (i=0;i< N-1;i++){
+		 *(diff_x+i) = *(x+i+1)-*(x+i);
+		 *(diff_y+i) = *(y+i+1)-*(y+i);
+		 if (DEBUG_FLAG) printf("Diff %d: %f, %f\n",i, *(diff_x+i), *(diff_y+i));
+		 *(theta+i) = atan2(-*(diff_y+i),*(diff_x+i)); /* calculate the angle of tangent vector */
+		 }
+
+	 for (i=0; i<N-2; i++){
+		 *(k+i)=*(theta+i+1)-*(theta+i); /* calculate the curvature */
+		 if (DEBUG_FLAG) printf("k[%d] = %f\n",i,k[i]);
+	 }
+
+	memcpy((void*) curvature ,(const void*) k, (N-2)*sizeof(double) );
+
+	free(k);
+	free(x);
+	free(y);
+	return A_OK;
+}
+
 
 
 
@@ -932,10 +1212,10 @@ CvPoint FindNormalPt(CvPoint* Centerline, CvPoint* CenterVec, CvSeq* Contour){
 
 
 
-/*
+/*********************************************************************
  *
  * Marc's Functions
- *
+ ***********************************************************************
  */
 
 /*void SegmentSides (const CvSeq *contourA, const CvSeq *contourB, const CvSeq *centerline, CvSeq *segmentedA, CvSeq *segmentedB) {
@@ -1100,6 +1380,50 @@ void ConvolveInt1D (const int *src, int *dst, int length, int *kernel, int kleng
 	}
 }
 
+
+
+/* Does a 1D convolution
+ * on floats.
+ */
+void ConvolveFloat1D (const float *src, float *dst, int length, int *kernel, int klength, int normfactor) {
+	int j, k, ind;
+	int anchor;
+	float sum;
+	anchor = klength/2;
+	for (j = 0; j < length; j++) {
+		sum = 0;
+		for (k = 0; k < klength; k++) {
+			ind = j + k - anchor;
+			ind = ind > 0 ? ind : 0;
+			ind = ind < length ? ind : (length - 1);
+			sum = sum + src[ind]*kernel[k];
+		}
+		dst[j] = (float) (1.0*sum/normfactor + 0.5);
+	}
+}
+
+/* Does a 1D convolution
+ * on doubles.
+ */
+void ConvolveDouble1D (const double *src, double *dst, int length, int *kernel, int klength, int normfactor) {
+	int j, k, ind;
+	int anchor;
+	double sum;
+	anchor = klength/2;
+	for (j = 0; j < length; j++) {
+		sum = 0;
+		for (k = 0; k < klength; k++) {
+			ind = j + k - anchor;
+			ind = ind > 0 ? ind : 0;
+			ind = ind < length ? ind : (length - 1);
+			sum = sum + src[ind]*kernel[k];
+		}
+		dst[j] = (double) (1.0*sum/normfactor + 0.5);
+	}
+}
+
+
+/* See ConvolveCvPtSeq32f for floats **/
 void ConvolveCvPtSeq (const CvSeq *src, CvSeq *dst, int *kernel, int klength, int normfactor) {
 	int j, *x, *y, *xc, *yc;
 	CvPoint pt;
@@ -1116,6 +1440,57 @@ void ConvolveCvPtSeq (const CvSeq *src, CvSeq *dst, int *kernel, int klength, in
 	ConvolveInt1D(x, xc, src->total, kernel, klength, normfactor);
 	ConvolveInt1D(y, yc, src->total, kernel, klength, normfactor);
 
+	for (j = 0; j < src->total; j++) {
+		pt.x = xc[j];
+		pt.y = yc[j];
+		cvSeqPush(dst, &pt);
+	}
+
+	free(x);
+	free(y);
+	free(xc);
+	free(yc);
+}
+
+/*
+ *  PRIVATE FUNCTION
+ * Convolves a CvPoint Sequence with a kernel.
+ *
+ *  Expects input CvSeq *src to have element type CvPoint (int).
+ *  Output is to CvSeq *dst which must have element type CvPoint2d32f (float).
+ */
+int ConvolveCvPtSeqInt2Double (const CvSeq *src, CvSeq *dst, int *kernel, int klength, int normfactor) {
+	if ( src==NULL || dst==NULL) return A_ERROR;
+	if (dst->elem_size != sizeof(CvPoint2D64f) ){
+		printf("Error in ConvolveCvPtSeqInt2Double. Destination CvSeq should have elements of size CvPoint2D32f");
+		return A_ERROR;
+	}
+
+	if (src->elem_size != sizeof(CvPoint) ){
+		printf("Error in ConvolveCvPtSeqInt2Double. Source CvSeq should have elements of size CvPoint");
+		return A_ERROR;
+	}
+
+
+	int j;
+	double *x, *y, *xc, *yc;
+	CvPoint2D64f pt;
+
+	x = (double*) malloc (src->total * sizeof(double));
+	y = (double *) malloc (src->total * sizeof(double));
+	xc = (double *) malloc (src->total * sizeof(double));
+	yc = (double *) malloc (src->total * sizeof(double));
+
+	/** Generate array of floats from inputs **/
+	for (j = 0; j < src->total; j++) {
+		x[j] = (double) ((CvPoint *) cvGetSeqElem(src, j))->x;
+		y[j] = (double) ((CvPoint *) cvGetSeqElem(src, j))->y;
+	}
+	/** Do convolution **/
+	ConvolveDouble1D(x, xc, src->total, kernel, klength, normfactor);
+	ConvolveDouble1D(y, yc, src->total, kernel, klength, normfactor);
+
+	/** Push result from convolution onto destination **/
 	for (j = 0; j < src->total; j++) {
 		pt.x = xc[j];
 		pt.y = yc[j];
@@ -1158,8 +1533,22 @@ CvSeq *smoothPtSequence (const CvSeq *src, double sigma, CvMemStorage *mem) {
 }
 
 
+/*
+ * Do a gaussian smooth on a CvSeq of CvPoints (int) and return a CvSeq of 64 bit floats (doubles)
+ * So that we can use non-integer values.
+ */
+CvSeq *smoothPtSequenceIntToDouble (const CvSeq *src, double sigma, CvMemStorage *mem) {
+	int *kernel, klength, normfactor;
+	CvSeq *dst = cvCreateSeq(0, sizeof(CvSeq), sizeof(CvPoint2D64f), mem);
+	CreateGaussianKernel(sigma, &kernel, &klength, &normfactor);
+	ConvolveCvPtSeqInt2Double(src, dst, kernel, klength, normfactor);
+	free(kernel);
+	return dst;
+}
 
-/*** Testing Functions ***/
+
+
+/*** Testing Functions ****************************************************/
 /*
  * Check's to see if sequence exists
  * Exists=nonzero

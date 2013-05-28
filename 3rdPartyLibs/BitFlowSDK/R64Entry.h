@@ -96,6 +96,74 @@ R64EntComment,			"COMMENTS",			BFCNFDATA_STRING,									BFCNF_OWNER_MAXCOM,	// 
 0,						"",					0,													0
 };
 
+static BFCNFENTRY KCXPentries[KCXPCNF_ENTRIES_TOTAL] = 
+{
+// ID					keyname				type												size				comment
+R64EntR64,				KCXP_TOKEN,			BFCNFDATA_STRINGSZX,								BFCNF_OWNER_MAXC,	// value must be camera
+R64EntMake,				"MAKE",				BFCNFDATA_STRINGSZX,								BFCNF_OWNER_MAXC,	// Manafacturer of camera			//NEEDWORK, must be bigger
+R64EntModel,			"MODEL",			BFCNFDATA_STRINGSZX,								BFCNF_LINE_MAXC,	// Model of camera					//NEEDWORK, must be bigger
+R64EntMode,				"MODE",				BFCNFDATA_STRINGSZX,								BFCNF_LINE_MAXC,	// Mode camera is in				//NEEDWORK, must be bigger
+R64EntOwner,			"OWNER",			BFCNFDATA_STRINGSZX,								BFCNF_OWNER_MAXC,	// origonal builder
+R64EntFileRev,			"REVISION",			BFCNFDATA_BFU32,									1,					// how many times been changed
+R64EntModelComp,		"MODELCOMP",		BFCNFDATA_BFU32,									1,					// HW model compatibility value
+R64EntRevComp,			"REVCOMP",			BFCNFDATA_BFU32,									1,					// HW revision compatibility value
+R64EntAqTimeout,		"AQTIMEOUT",		BFCNFDATA_BFU32,									1,					// Acquistion timeout
+R64EntFormat,			"FORMAT",			BFCNFDATA_BFU32,									1,					// Camera format
+R64EntFlashMux,			"FLASHMUX",			BFCNFDATA_STRINGSZX,								BFCNF_OWNER_MAXC,	// required flash file for MUX
+R64EntFlashDCC,			"FLASHDCC",			BFCNFDATA_STRINGSZX,								BFCNF_OWNER_MAXC,	// required flash file for DCC
+R64EntPixBitDepth,		"PIXBITDEPTH",		BFCNFDATA_BFU32,									1,					// Pixel depth
+R64EntXSize,			"XSIZE",			BFCNFDATA_BFU32,									1,					// X size
+R64EntYSize,			"YSIZE",			BFCNFDATA_BFU32,									1,					// Y size
+R64EntExpMod,			"EXPMOD",			BFCNFDATA_BFU32|BFCNFDATA_PAIR,						1,					// Exposure model parameters
+R64EntCon0,				"CON0"	,			BFCNFDATA_BFU32|BFCNFDATA_PAIR,						1,					// Register
+R64EntCon1,				"CON1"	,			BFCNFDATA_BFU32|BFCNFDATA_PAIR,						1,					// Register
+R64EntCon2,				"CON2"	,			BFCNFDATA_BFU32|BFCNFDATA_PAIR,						1,					// Register
+R64EntCon3,				"CON3"	,			BFCNFDATA_BFU32|BFCNFDATA_PAIR,						1,					// Register
+R64EntCon4,				"CON4"	,			BFCNFDATA_BFU32|BFCNFDATA_PAIR,						1,					// Register
+R64EntCon5,				"CON5"	,			BFCNFDATA_BFU32|BFCNFDATA_PAIR,						1,					// Register
+R64EntCon6,				"CON6"	,			BFCNFDATA_BFU32|BFCNFDATA_PAIR,						1,					// Register
+R64EntCon7,				"CON7"	,			BFCNFDATA_BFU32|BFCNFDATA_PAIR,						1,					// Register
+R64EntCon8,				"CON8"	,			BFCNFDATA_BFU32|BFCNFDATA_PAIR,						1,					// Register
+R64EntCon9,				"CON9"	,			BFCNFDATA_BFU32|BFCNFDATA_PAIR,						1,					// Register
+R64EntCon10,			"CON10"	,			BFCNFDATA_BFU32|BFCNFDATA_PAIR,						1,					// Register
+R64EntCon11,			"CON11"	,			BFCNFDATA_BFU32|BFCNFDATA_PAIR,						1,					// Register
+R64EntCon12,			"CON12"	,			BFCNFDATA_BFU32|BFCNFDATA_PAIR,						1,					// Register
+R64EntCon13,			"CON13"	,			BFCNFDATA_BFU32|BFCNFDATA_PAIR,						1,					// Register
+R64EntCon14,			"CON14"	,			BFCNFDATA_BFU32|BFCNFDATA_PAIR,						1,					// Register
+R64EntCon15,			"CON15"	,			BFCNFDATA_BFU32|BFCNFDATA_PAIR,						1,					// Register
+R64EntCon16,			"CON16"	,			BFCNFDATA_BFU32|BFCNFDATA_PAIR,						1,					// Register
+R64EntCon17,			"CON17"	,			BFCNFDATA_BFU32|BFCNFDATA_PAIR,						1,					// Register
+R64EntCon18,			"CON18"	,			BFCNFDATA_BFU32|BFCNFDATA_PAIR,						1,					// Register
+R64EntCon19,			"CON19"	,			BFCNFDATA_BFU32|BFCNFDATA_PAIR,						1,					// Register
+R64EntCon20,			"CON20"	,			BFCNFDATA_BFU32|BFCNFDATA_PAIR,						1,					// Register
+R64EntCon21,			"CON21"	,			BFCNFDATA_BFU32|BFCNFDATA_PAIR,						1,					// Register
+R64EntCon22,			"CON22"	,			BFCNFDATA_BFU32|BFCNFDATA_PAIR,						1,					// Register
+R64EntCon23,			"CON23"	,			BFCNFDATA_BFU32|BFCNFDATA_PAIR,						1,					// Register
+R64EntCon24,			"CON24"	,			BFCNFDATA_BFU32|BFCNFDATA_PAIR,						1,					// Register
+R64EntCon25,			"CON25"	,			BFCNFDATA_BFU32|BFCNFDATA_PAIR,						1,					// Register
+R64EntCon26,			"CON26"	,			BFCNFDATA_BFU32|BFCNFDATA_PAIR,						1,					// Register
+R64EntCon27,			"CON27"	,			BFCNFDATA_BFU32|BFCNFDATA_PAIR,						1,					// Register
+R64EntCTab,				"CTAB"	,			BFCNFDATA_BFU32|BFCNFDATA_LIST|BFCNFDATA_PAIR,		R64ENT_CTAB_MAXE,	// CTAB
+R64EntQMod,				"QTABMODEL"	,		BFCNFDATA_BFU32|BFCNFDATA_LIST|BFCNFDATA_PAIR,		BFENT_QMOD_MAXE,	// QMOD
+IOEntCon60,				"CON60"	,			BFCNFDATA_BFU32|BFCNFDATA_PAIR,						1,					// Register
+IOEntCon61,				"CON61"	,			BFCNFDATA_BFU32|BFCNFDATA_PAIR,						1,					// Register
+IOEntCon62,				"CON62"	,			BFCNFDATA_BFU32|BFCNFDATA_PAIR,						1,					// Register
+IOEntCon63,				"CON63"	,			BFCNFDATA_BFU32|BFCNFDATA_PAIR,						1,					// Register
+IOEntCon64,				"CON64"	,			BFCNFDATA_BFU32|BFCNFDATA_PAIR,						1,					// Register
+IOEntCon65,				"CON65"	,			BFCNFDATA_BFU32|BFCNFDATA_PAIR,						1,					// Register
+IOEntCon66,				"CON66"	,			BFCNFDATA_BFU32|BFCNFDATA_PAIR,						1,					// Register
+IOEntCon67,				"CON67"	,			BFCNFDATA_BFU32|BFCNFDATA_PAIR,						1,					// Register
+CXPNumLinks,			"NUMLINKS"	,		BFCNFDATA_BFU32,									1,					// Number of CXP Links
+CXPLinkOrder,			"LINKORDER"	,		BFCNFDATA_BFU32,									1,					// CXP Link Order
+CXPCamPwrTimeout,		"CAMTIMEOUT",		BFCNFDATA_BFU32,									1,					// Camera Time Out
+CXPEntConList,			"CONLIST"	,		BFCNFDATA_BFU32|BFCNFDATA_LIST|BFCNFDATA_PAIR,		CXP_ENTRIES_MAX_CON_REGS,	// CXP CON register List
+CXPEntStrmToDma,		"STRMTODMA"	,		BFCNFDATA_BFU32|BFCNFDATA_LIST|BFCNFDATA_PAIR,		CXP_ENTRIES_MAX_S2D,		// Stream to DMA List
+CXPEntCamRegBefore,		"CAMREGBEFORE",		BFCNFDATA_BFU32|BFCNFDATA_LIST|BFCNFDATA_PAIR,		CXP_ENTRIES_MAX_CAM_REGS,	// Camera Register List before CXP links programed
+CXPEntCamRegAfter,		"CAMREGAFTER",		BFCNFDATA_BFU32|BFCNFDATA_LIST|BFCNFDATA_PAIR,		CXP_ENTRIES_MAX_CAM_REGS,	// Camera Register List after CXP links programed
+CXPEntComment,			"COMMENTS"	,		BFCNFDATA_STRING,									BFCNF_OWNER_MAXCOM,			// Commments
+0,						"",					0,													0
+};
+
 static BFCNFENTRY AltaEntries[ALTACNF_ENTRIES_TOTAL] = 
 {
 // ID					keyname				type												size				comment

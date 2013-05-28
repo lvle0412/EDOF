@@ -49,9 +49,9 @@
 
 #include "AndysOpenCVLib.h"
 
-#include <highgui.h>
-#include <cv.h>
-#include <cxcore.h>
+#include "opencv2/highgui/highgui_c.h"
+//#include <cv.h>
+//#include <cxcore.h>
 
 
 
@@ -65,6 +65,10 @@
  *
  */
 int T2Matlab_GenLookUpTable(CvSeq *CalibPoints, int *CCD2DLPLookUp, int nsizex, int nsizey, int CCDsizex, int CCDsizey);
+
+/** Test code **/
+void T2Matlab_ArrayTest();
+
 
 #endif /* TALK2MATLAB_H_ */
 

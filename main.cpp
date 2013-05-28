@@ -68,9 +68,8 @@ using namespace std;
 
 
 //OpenCV Headers
-#include <highgui.h>
-#include <cv.h>
-#include <cxcore.h>
+#include "opencv2/highgui/highgui_c.h"
+
 
 //Andy's Personal Headers
 #include "MyLibs/AndysOpenCVLib.h"
@@ -83,6 +82,7 @@ using namespace std;
 #include "MyLibs/WriteOutWorm.h"
 #include "MyLibs/IllumWormProtocol.h"
 #include "MyLibs/TransformLib.h"
+#include "API/mc_api_dll.h"
 #include "MyLibs/experiment.h"
 
 
@@ -201,7 +201,7 @@ int main (int argc, char** argv){
 
 
 			/** Calculate the frame rate and every second print the result **/
-			CalculateAndPrintFrameRate(exp);
+			CalculateAndPrintFrameRateAndInfo(exp);
 
 
 			/** Do we even bother doing analysis?**/
@@ -209,7 +209,9 @@ int main (int argc, char** argv){
 				/**Don't perform any analysis**/;
 				continue;
 			}
-
+			
+			
+			/**** Functions to decide if Illumination Should be on Or Off ***/
 			/** Handle Transient Illumination Timing **/
 			HandleIlluminationTiming(exp);
 
@@ -217,10 +219,7 @@ int main (int argc, char** argv){
 			HandleIlluminationSweep(exp);
 
 
-			/** If the DLP is not displaying right now, than turn off the mirrors */
-			ClearDLPifNotDisplayingNow(exp);
-
-
+			
 			/** Load Image into Our Worm Objects **/
 
 			if (exp->e == 0) exp->e=RefreshWormMemStorage(exp->Worm);
@@ -235,25 +234,36 @@ int main (int argc, char** argv){
 			DoSegmentation(exp);
 			TICTOC::timer().toc("EntireSegmentation");
 
+
+
+			/** Real-Time Curvature Phase Analysis, and phase induced illumination **/
+		    HandleCurvaturePhaseAnalysis(exp);
+
+			/** If the DLP is not displaying right now, than turn off the mirrors */
+			ClearDLPifNotDisplayingNow(exp);
+
+
+
 			TICTOC::timer().tic("TransformSegWormCam2DLP");
 			if (exp->e == 0){
 				TransformSegWormCam2DLP(exp->Worm->Segmented, exp->segWormDLP,exp->Calib);
 			}
 			TICTOC::timer().toc("TransformSegWormCam2DLP");
 
-			/*** Do Some Illumination ***/
 
+
+			/*** Do Some Illumination ***/
 			if (exp->e == 0) {
 				/** Clear the illumination pattern **/
 				SetFrame(exp->forDLP,0);
 				SetFrame(exp->IlluminationFrame,0);
-
 
 				if (exp->Params->IllumFloodEverything) {
 					SetFrame(exp->IlluminationFrame,128); // Turn all of the pixels on
 					SetFrame(exp->forDLP,128); // Turn all of the pixels o
 
 				} else {
+
 					if (!(exp->Params->ProtocolUse)) /** if not running the protocol **/{
 						/** Otherwise Actually illuminate the  region of the worm your interested in **/
 						/** Do the Illumination in Camera space for Display **/
@@ -280,18 +290,20 @@ int main (int argc, char** argv){
 				}
 				/** If InvertIllumination is on, then do that now in both cam space and DLP space**/
 				if (exp->Params->IllumInvert) InvertIllumination(exp);
+			} else {
+				printf("Error in exp->e in the mainloop! code line 295\n");
 			}
-
 
 
 			TICTOC::timer().tic("SendFrameToDLP");
 			if (exp->e == 0 && exp->Params->DLPOn && !(exp->SimDLP)) T2DLP_SendFrame((unsigned char *) exp->forDLP->binary, exp->myDLP); // Send image to DLP
 			TICTOC::timer().toc("SendFrameToDLP");
-
+		
 
 			/*** DIsplay Some Monitoring Output ***/
 			if (exp->e == 0) CreateWormHUDS(exp->HUDS,exp->Worm,exp->Params,exp->IlluminationFrame);
 			if (exp->e==0 && exp->stageIsPresent==1) MarkRecenteringTarget(exp);
+
 
 			if (exp->e == 0 &&  EverySoOften(exp->Worm->frameNum,exp->Params->DispRate) ){
 				TICTOC::timer().tic("DisplayOnScreen");
@@ -302,21 +314,24 @@ int main (int argc, char** argv){
 
 
 
-
-
 			if (exp->e == 0) {
+
+				/** Send and Receive Values from API / Shared Memory **/
+				TICTOC::timer().tic("SyncAPI");
+				SyncAPI(exp);
+				TICTOC::timer().tic("SyncAPI");
+
+				/** Write Values to Disk **/
 				TICTOC::timer().tic("DoWriteToDisk()");
 				DoWriteToDisk(exp);
 				TICTOC::timer().toc("DoWriteToDisk()");
+
 			}
 
 
 			if (exp->e != 0) {
 				printf("\nError in main loop. :(\n");
-				if (exp->stageIsPresent) {
-					printf("\tAuto-safety STAGE SHUTOFF!\n");
-					ShutOffStage(exp);
-				}
+				//where emergency stage shutoff used to go
 
 			}
 
@@ -413,6 +428,9 @@ UINT Thread(LPVOID lpdwParam) {
 
 	printf("DispThread: Starting loop\n");
 
+	printf("Waiting a few ms to start the loop.\n");
+	cvWaitKey(50);
+	printf("DispThread: Entering display loop.\n");
 	int key;
 	int k=0;
 	while (!MainThreadHasStopped) {
@@ -477,12 +495,19 @@ UINT Thread(LPVOID lpdwParam) {
 			UpdateGUI(exp);
 
 			if(EverySoOften(k,1)){ //This determines how often the stage is updated
-
-				/** Do the Stage Tracking **/
-				TICTOC::timer().tic("HandleStageTracker()");
-				HandleStageTracker(exp);
-				TICTOC::timer().toc("HandleStageTracker()");
-
+				
+				
+				if (exp->e != 0 && exp->stageIsPresent) {
+					printf("\tAuto-safety STAGE SHUTOFF from dispThread!\n");
+					ShutOffStage(exp);
+				} else {
+				
+					/** Do the Stage Tracking **/
+					TICTOC::timer().tic("HandleStageTracker()");
+					HandleStageTracker(exp);
+					TICTOC::timer().toc("HandleStageTracker()");
+				
+				}
 
 				/** Write the Recent Frame Number to File to be accessed by the Annotation System **/
 				TICTOC::timer().tic("WriteRecentFrameNumberToFile()");

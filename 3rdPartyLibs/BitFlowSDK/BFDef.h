@@ -8,7 +8,7 @@
 // BitFlow Public Definitions
 //
 // History:
-//  Note: Andy Commented out some things that the compiler doesn't like. Search for andy within the file.
+//
 // 08/21/97     rbs     Created file.
 //
 
@@ -61,7 +61,8 @@ typedef enum _DMAChannel
 	DMAChannel1,
 	DMAChannel2,
 	DMAChannel3
-} DMAChannelT; /** changed the type name to have a T on the end so that it compiles. **/
+} DMAChannelT; //ANDY edited this to add the T so that it will compile
+//ANDY also propogated this change elsewhere in this header file. Every change has been noted with a comment labeled ANDY
 
 // LUT Mode Types
 
@@ -141,6 +142,7 @@ typedef struct _BFENTRY
 	BFU32	Bus;
 	BFU32	Slot;
 	BFU32	Family; // only used by CiFunctions
+	BFU32	Function;
 } BFENTRY, *PBFENTRY;
 
 // Error Dialog Responses
@@ -212,7 +214,7 @@ typedef struct _BFFlashRec
     BFBOOL                  Active;                 // Flash file is active in the registry when true. 
 	BFU32					Family;					// Flash family.
 	BFU32					Bytes;					// Flash file default number of data bytes.
-    BFUPTR                   FileId;					// Flash file identification number (BitSet).
+    BFUPTR                  FlashFileId;			// Flash file identification number (BitSet).
     BFU32                   FlashId;                // Flash type identification number.
 	BFU32					PPC;					// Flash pixels per clock.
 	BFCHAR					Root[MIN_STRING];		// Flash root name.
@@ -220,6 +222,27 @@ typedef struct _BFFlashRec
 	BFCHAR	                Name[MAX_STRING];	    // Flash file name.
     BFCHAR                  Comment[MAX_STRING];    // Flash file description.
 } BFFlashRec, *BFFlashPtr, **BFFlashTab;
+
+typedef struct _BFFlashRec32
+{
+    BFU32					Next;				    // Link to next flash file record or BFNULL no used in user land (WOW64) issue
+    BFBOOL                  Active;                 // Flash file is active in the registry when true. 
+	BFU32					Family;					// Flash family.
+	BFU32					Bytes;					// Flash file default number of data bytes.
+    BFU32		            FlashFileId;			// Flash file identification number (BitSet) not use in user land (WOW64 issue)
+    BFU32                   FlashId;                // Flash type identification number.
+	BFU32					PPC;					// Flash pixels per clock.
+	BFCHAR					Root[MIN_STRING];		// Flash root name.
+	BFCHAR					Folder[MIN_STRING];		// Flash folder name.
+	BFCHAR	                Name[MAX_STRING];	    // Flash file name.
+    BFCHAR                  Comment[MAX_STRING];    // Flash file description.
+} BFFlashRec32, *BFFlashPtr32, **BFFlashTab32;
+
+typedef struct _BFFlashWOW64LLRec
+{
+    struct _BFFlashWOW64LLRec   *Next;				// Link to next list in list
+	BFFlashPtr32				Flash32;			// the actual entry
+} BFFlashWOW64LLRec, *BFFlashWOW64LLPtr, **BFFlashWOW64LLTab;
 
 // Flash options record.
 
@@ -239,6 +262,19 @@ typedef struct _BFDeviceRec
 	Bd					KernelId;					// Kernel Board Id if known or BFNULL.
 	VFORec				VFO;						// VFO record for this device.
 } BFDeviceRec, *BFDevicePtr;
+
+typedef struct _BFDeviceRec32
+{
+    struct _BFDeviceRec	*POINTER_32 Next;			// Link to the next device record or BFNULL.
+	BdWOW64				KernelId;					// Kernel Board Id if known or BFNULL.
+	VFORec				VFO;						// VFO record for this device.
+} BFDeviceRec32, *BFDevicePtr32;
+
+typedef struct _BFDeviceRec32Rec
+{
+    struct _BFDeviceRec32Rec	*Next;			// Link to the next device record or BFNULL.
+	BFDevicePtr32				ThePtr;
+} BFDeviceRec32Rec, *BFDevicePtr32Ptr;
 
 // Registry Enumeration State Record For BFRegistry EnumKey functions.
 
@@ -459,7 +495,11 @@ typedef enum _BOD_OPTIONS
 
 // BitFlow Quad Definitions
 
+#ifdef OLD_WAY
 typedef void						*****PQNumPtr, ******PPQNumPtr;
+#else
+typedef BFU64						PQNumPtr;
+#endif
 
 // Legacy (Relative) Quad Definitions
 
@@ -473,6 +513,15 @@ typedef	struct _RQTabRec
 	BFU32 TransferSize;
 	BFU32 NextQuad;
 } RQTabRec;
+
+typedef	struct _RQTabRec32			*RQTabPtr32;
+typedef	struct _RQTabRec32
+{
+	PBFU32WOW64 PCIAddress;	//64BITMOD
+	BFU32 LocalAddress;
+	BFU32 TransferSize;
+	BFU32 NextQuad;
+} RQTabRec32;
 
 // Physical Quad Definitions
 // These are mainly used in the kernel, but we need
@@ -558,11 +607,34 @@ typedef	struct _VQTabRec
 	BFBOOL		Force32:1;							// Force 32 bit PCI accesses.
 	AqEngine	Engine;								// Acquire engine.
 	BFFifo		Fifo;								// Data fifo.
-	DMAChannelT	DMAChannel;							// DMA channel.
+	DMAChannelT	DMAChannel;	 //ANDY added T				// DMA channel.
 	BFLutMode	LutMode;							// Lut mode.
 	BFLutBank	LutBank;							// Lut bank.
 	BFU32		VTap;								// Virtual tap number.
 } VQTabRec;
+
+typedef	struct _VQTabRec32			*VQTabPtr32;
+typedef	struct _VQTabRec32
+{
+	PBFU32WOW64	pSource;							// Source data address.
+	PBFU32WOW64	pDestination;						// Destination data address.
+	BFU32		Size;								// Transfer size in bytes.
+	AddrType	SrcType;							// Source data address type.
+	AddrType	DstType;							// Destination data address type.
+	BFBOOL		FieldStart:1;						// First quad in a field.
+	BFBOOL		FieldEnd:1;							// Last quad in a field.
+	BFBOOL		Margin:1;							// Margin quad (executed only once after an engage).
+	BFBOOL		Garbage:1;							// Garbage quad (data is sent to a garbage can).
+	BFBOOL		Mutant:1;							// Special non-image data quad. Data is embedded in target buffer.
+	BFBOOL		ToBoard:1;							// Quad is directing data from the host to the board.
+	BFBOOL		Force32:1;							// Force 32 bit PCI accesses.
+	AqEngine	Engine;								// Acquire engine.
+	BFFifo		Fifo;								// Data fifo.
+	DMAChannelT	DMAChannel;		//ANDY added T	// DMA channel.
+	BFLutMode	LutMode;							// Lut mode.
+	BFLutBank	LutBank;							// Lut bank.
+	BFU32		VTap;								// Virtual tap number.
+} VQTabRec32;
 
 // Virtual Quad Header
 
@@ -586,6 +658,28 @@ typedef struct _VQTabHeadRec
 	BFU32		VTapCount;							// Virtual tap count. 
 	BFU32		LineCount;							// Number of transfer lines.
 } VQTabHeadRec;
+
+typedef struct _VQTabHeadRec32		*VQTabHeadPtr32, **VQTabHeadPtrPtr32,*RQTabHeadPtr32, **RQTabHeadPtrPtr32; 
+
+typedef struct _VQTabHeadRec32
+{
+	BFU32			NumEntries;							// number of QUADs
+	BFU32			Size;								// actual size of the QUAD table (in bytes)
+	PBFVOIDWOW64	BufferBaseAddress;					// pointer to the base address of the destination buffer
+	BFU32			BufferSize;							// actual size is of the desitnation buffer
+	VQTabRec32		*POINTER_32 VQuads;					// pointer to virtual quads
+	RQTabRec32		*POINTER_32 RQuads;					// pointer to relative quads
+    PQNumPtr		PhysQTabNum;						// associated physical QTAB number
+	BFU32			Engine;								// Acquire engine quad was built for.
+	BFU32			Channel;							// DMA channel quad was built for.
+	BFU32			Bank;								// Bank quad was written to.
+	BFU32			BankCount;							// Total bank count when quad was written.
+	BFU32			BankSize;							// Maximum bank size when quad was written.
+	BFU32			DestType;
+	BFU32			VTapInterleave;						// Virtual tap quads must be split and interleaved.
+	BFU32			VTapCount;							// Virtual tap count. 
+	BFU32			LineCount;							// Number of transfer lines.
+} VQTabHeadRec32;
 
 // Quad information record.
 
@@ -617,7 +711,7 @@ typedef struct _BFQuadInfoRec
 	BFU32		FieldFirst;							// First field of frame.
 	BFU32		FieldNum;							// This quad's field number. 
 	PQNumPtr	PhysQTabNum;						// This quad's quad table number.
-	BFUPTR		HashAddress;						// This quad's hash address.
+	BFU64		HashAddress;						// This quad's hash address.
 	BFU32		PhysAddressHi;						// High 32 bits of this quad's physical address.
 	BFU32		PhysAddressLo;						// Low 32 bits of this quad's physical address.
 //	RQTabRec	Quad;								// The quad. 
@@ -760,6 +854,29 @@ typedef enum _BFGPOutPin
 // Build targets
 #define BUILD_TARGET_BITFLOW	0
 #define BUILD_TARGET_LINX		1
+
+#define INT_STOP_TIMEOUT	5000		// Interrupt thread stop request timeout in milliseconds.
+
+// Function type for BF signal call back
+
+typedef void (*BFCallBackFuncPtr) (Bd Board, BFU32 Num);
+
+typedef struct _CallBackThreadRec
+{
+	Bd			Board;
+	BFU32		SignalType;
+} CallBackThreadRec, *CallBackThreadPtr;
+
+typedef struct _CallBackRec
+{
+	HANDLE				Thread;		// Array of handles to call back threads
+	BFCallBackFuncPtr	Function;	// Array of Signals that have a call back attached, 0 - no call back, 
+	BFU32				State;		// State of the call back thread
+	BFSIGNAL			Signal;		// Array of signals used for callbacks
+	BFBOOL				OnlyInGrab;	// Set to true if callback should only be called when board is grabbing
+	CallBackThreadRec	ThreadStruc;// Structure used to start thread
+}CallBackRec, *CallBackPtr;
+
 
 #endif
 

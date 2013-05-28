@@ -20,7 +20,6 @@
 #include "BFVersion.h"
 
 #include "R2Api.h"
-#include "RvApi.h"
 #include "R64Api.h"
 
 #include "CiDef.h"

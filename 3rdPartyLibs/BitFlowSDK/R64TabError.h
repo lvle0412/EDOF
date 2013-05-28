@@ -122,6 +122,9 @@ typedef enum _R64RC_Enum
 	R64_ENCDIV_NOT_SUPPORTED,		// Board does not support the encoder divider
 	R64_ENCDIV_OUT_OF_RANGE,		// The request encoder divider scale factor is too big
 	R64_ENCDIV_UNKNOWN_CLK,			// The request clock frequency is not supported the encoder divder
+	R64_NOT_IN_QS_MODE,				// The driver is not in quick switch mode
+	R64_CXP_CANT_SET_SPEED,			// Error setting CXP download speed
+	R64_CXP_POWER_ERROR,			// Error powering link
 
     R64_ERROR_END
 } R64RC_Enum;

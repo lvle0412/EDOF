@@ -31,7 +31,10 @@
 #include    <stdio.h>
 #include    <conio.h>
 
+
 /** BitFlow SDK includes **/
+
+
 #include    "CiApi.h"
 #include	"BFApi.h"
 #include	"BFErApi.h"
@@ -226,7 +229,7 @@ int PrepareFrameGrabberForAcquire(FrameGrabber* fg){
 
 		// Set the timout to be very short
 		printf("Setting acquisition timeout time.\n");
-		setAcquisitionTimeout(fg, 4);
+		setAcquisitionTimeout(fg, 10); //in Aravis lab this was 4
 
 
 		printf("Prepare frame grabber for acquire completed.");
@@ -264,6 +267,7 @@ int AcquireFrame(FrameGrabber* fg){
 	if (ret!=CI_OK) {
 				// check for overflow
 				printf("Acquire command failed.\n");
+				printf("Could the camera's exposure time be greater than the time specified in setAcquisitionTimeout()?\n");
 				//BiErrorShow(fg->hBoard, ret);
 				if (CiAqCommand(fg->hBoard, CiConReset, CiConWait, CiQTabBank0, AqEngJ)) {
 							printf("Board reset failed.\n");

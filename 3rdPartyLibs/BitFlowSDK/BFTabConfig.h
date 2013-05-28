@@ -46,7 +46,7 @@ typedef enum _FF_BITFLOW_DEVICES
 	FF_DRIVER			= 0x00000002,			// Driver open, board closed.
 	FF_BITFLOW			= 0x00000004,			// BitFlow family.
     FF_ROADRUNNER		= 0x00000010,			// RoadRunner family. 
-	FF_RAVEN			= 0x00000020,			// Raven family.
+	FF_RAVEN			= 0x00000020,			// Raven family.// depreciated but left here so the order make sense
 #ifdef BUILD_TARGET_LINX
 	FF_R64				= 0x00000080,			// Ginga family
 #else
@@ -55,23 +55,24 @@ typedef enum _FF_BITFLOW_DEVICES
 	FF_STANDARD			= 0x00010000,			// Standard version of the root family.
 	FF_CAMERALINK		= 0x00020000,			// Special CamerLink version of the root family.
 	FF_ANALOG			= 0x00040000,			// Special Analog version of the root family.
-	FF_COMPOSITE		= 0x00080000			// Special Composite version of the root family.
+	FF_COMPOSITE		= 0x00080000,			// Special Composite version of the root family.
+	FF_CXP				= 0x00100000,			// Special CXP version of the root family.
 } FF_BITFLOW_DEVICES;
 
 #define FF_LO16					0x0000ffff		// Low 16 bits.
 #define FF_HI16					0xffff0000		// Hi 16 bits.
 #define	FF_MODS					FF_HI16			// Modification bits.
 
-#define FF_BITFLOW_SUPPORTS		(FF_ROADRUNNER | FF_RAVEN | FF_R64)
-#define FF_BITFLOW_MODERN		(FF_ROADRUNNER | FF_RAVEN | FF_R64)
-#define FF_R2_RV				(FF_ROADRUNNER | FF_RAVEN)
+#define FF_BITFLOW_SUPPORTS		(FF_ROADRUNNER | FF_R64)
+#define FF_BITFLOW_MODERN		(FF_ROADRUNNER | FF_R64)
+#define FF_R2_RV				(FF_ROADRUNNER)
 #define FF_ROADRUNNER_CL		(FF_ROADRUNNER | FF_CAMERALINK)
 #define FF_R64_ALTA				(FF_R64 | FF_ANALOG)
 #define FF_R64_ALTA_CO			(FF_R64 | FF_ANALOG | FF_COMPOSITE)
+#define FF_R64_CXP				(FF_R64 | FF_CXP)
 #define FF_BITFLOW_DRIVER		(FF_BITFLOW | FF_DRIVER)
 #define FF_ROADRUNNER_DRIVER	(FF_ROADRUNNER | FF_DRIVER)
 #define FF_ROADRUNNER_CL_DRIVER	(FF_ROADRUNNER_CL | FF_DRIVER)
-#define FF_RAVEN_DRIVER			(FF_RAVEN | FF_DRIVER)
 #define FF_R64_DRIVER			(FF_R64 | FF_DRIVER)
 
 // Enumerated type version of the main flags to make debugging easier.
@@ -82,11 +83,9 @@ typedef enum _BF_Families
 	FF_BitFlowDriver		=	FF_BITFLOW_DRIVER,
 	FF_RoadRunner			=	FF_ROADRUNNER,
 	FF_RoadRunnerCL			=	FF_ROADRUNNER_CL,
-	FF_Raven				=	FF_RAVEN,
 	FF_RoadRunner64			=	FF_R64,
 	FF_RoadRunnerDriver		=	FF_ROADRUNNER_DRIVER,
 	FF_RoadRunnerCLDriver	=	FF_ROADRUNNER_CL_DRIVER,
-	FF_RavenDriver			=	FF_RAVEN_DRIVER,
 	FF_RoadRunner64Driver	=	FF_R64_DRIVER
 } BF_Families;
 
@@ -105,7 +104,8 @@ typedef enum _KBN_DEV_BRDS
 // Modern Device IDs
 
 #define BF_PCI_R64				0x2000			// R64 Device ID
-#define BF_PCI_KBN				0x3000			// Karbon Device ID
+#define BF_PCI_KBN				0x3000			// Karbon CL Device ID
+#define BF_PCI_KBN_CXP			0x3001			// Karbon CXP Device ID
 #define BF_PCI_NEO				0x4000			// Neon Device ID
 #define BF_PCI_ALT_AN			0x5000			// Alta-AN Device ID
 #define BF_PCI_ALT_CO			0x6000			// Alta-CO Device ID
@@ -131,7 +131,8 @@ typedef enum _FF_INTEL
 #define DID_MASK				0xffff			// All device ID bits.
 #define SID_MASK				0xffff			// All sub-vendor ID bits.
 
-#define DID_BF_MASK				0xf000			// Device Id bits used to identify BitFlow families.
+#define DID_BF_R23V_MASK		0xf000			// Device Id bits used to identify BitFlow families.
+#define DID_BF_R64_MASK			0xffff			// Device Id bits used to identify BitFlow families.
 
 // Vendor IDs
 

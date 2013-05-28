@@ -47,9 +47,9 @@
 #include <string.h>
 
 //OpenCV Headers
-#include <cxcore.h>
-#include <highgui.h>
-#include <cv.h>
+//#include <cxcore.h>
+#include "opencv2/highgui/highgui_c.h"
+//#include <cv.h>
 
 // Andy's Libraries
 
@@ -91,7 +91,6 @@ char* CreateFileName(const char* dir, const char* core, const char* suffix){
 	strcat(filename,suffix);
 	printf("Preparing filename: %s\n",filename);
 
-	free(&timestamp);
 	return filename;
 }
 
@@ -145,7 +144,7 @@ WriteOut* SetUpWriteToDisk(const char* dirfilename, const char* outfilename,  Cv
 
 
 	/** Write the header for the YAML data file **/
-	cvWriteComment(DataWriter->fs, "Remote Control Worm Experiment Data Log\nMade by OpticalMindControl software\nleifer@fas.harvard.edu\n",0);
+	cvWriteComment(DataWriter->fs, "Remote Control Worm Experiment Data Log\nMade by OpticalMindControl software\nleifer@princeton.edu\n",0);
 	cvWriteString(DataWriter->fs, "gitHash", build_git_sha,0);
 	cvWriteString(DataWriter->fs, "gitBuildTime",build_git_time,0);
 
@@ -273,6 +272,17 @@ int AppendWormFrameToDisk(WormAnalysisData* Worm, WormAnalysisParam* Params, Wri
 				cvWriteInt(fs,"i",Worm->stageVelocity.x);
 				cvWriteInt(fs,"j",Worm->stageVelocity.y);
 			cvEndWriteStruct(fs);
+		}
+
+		cvStartWriteStruct(fs,"LaserPower",CV_NODE_MAP,NULL);
+			cvWriteInt(fs,"Green",Params->GreenLaser);
+			cvWriteInt(fs,"Blue",Params->BlueLaser);
+		cvEndWriteStruct(fs);
+
+		/** Head Curvature Information **/
+		if (Params->CurvatureAnalyzeOn){
+			cvWriteReal(fs,"HeadCurv",(float) Worm->TimeEvolution->currMeanHeadCurvature);
+			cvWriteReal(fs,"HeadCurvDeriv",(float) Worm->TimeEvolution->derivativeOfHeadCurvature);
 		}
 
 		/** Protocol Information **/

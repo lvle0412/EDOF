@@ -33,12 +33,12 @@
 
 //Standard C headers
 #include <stdio.h>
-#include <ctime>
-#include <time.h>
-#include <conio.h>
-#include <math.h>
-#include <string.h>
-#include <stdlib.h>
+//#include <ctime>
+//#include <time.h>
+//#include <conio.h>
+//#include <math.h>
+//#include <string.h>
+//#include <stdlib.h>
 
 
 //C++ header
@@ -55,14 +55,14 @@
 
 
 //Andy's Headers
-#include "MyLibs/AndysOpenCvLib.h"
-#include "MyLibs/WormAnalysis.h"
-#include "MyLibs/IllumWormProtocol.h"
-#include "MyLibs/version.h"
-#include "MyLibs/Talk2Stage.h" 	
+//#include "MyLibs/AndysOpenCvLib.h"
+//#include "MyLibs/WormAnalysis.h"
+//#include "MyLibs/IllumWormProtocol.h"
+//#include "MyLibs/version.h"
+//#include "MyLibs/Talk2Stage.h" 	
 
 //3rd Party Libraries
-#include "3rdPartyLibs/tictoc.h"
+//#include "3rdPartyLibs/tictoc.h"
 
 // Protocol* CreateTestProtocol(char* name){
 
@@ -158,8 +158,17 @@
 
 int main(){
 	
+		printf("Points between line test\n");
+//	CvMemStorage* mem= cvCreateMemStorage();
+//	CvSeq* test=cvCreateSeq(CV_SEQ_ELTYPE_POINT, sizeof(CvSeq), sizeof(CvPoint),mem);
+//	GetLineFromEndPts(cvPoint(0,0),cvPoint(10,15),test);
+//cvNamedWindow("RectWorm");
+//cvWaitKey();
+	return 0;
+	
+	
 	/* Check for Intel Integrated Performance Primitives */
-	printf("Checking intel integrated perforumance  primitives...\n");
+/*	printf("Checking intel integrated perforumance  primitives...\n");
 	int NumUploadedFunction = 0;
 	NumUploadedFunction = cvUseOptimized(1);
 	printf("\t NumUploadedFunction = %d \n\n", NumUploadedFunction);
@@ -169,16 +178,16 @@ int main(){
 	cvGetModuleInfo(0, &opencv_lib,&add_modules);
 	printf("\t opencv_lib = %s,\n\t add_modules = %s\n\n", opencv_lib,add_modules);
 	
+	/*
 	
 	//char* name = (char*) malloc(sizeof(char)*50);
 
 
 
 //	printf(copyString("Hello you World\n"));
-
+/*
 	HANDLE stage= InitializeUsbStage(); 
 	if (stage==NULL) printf("Stage is NULL!\n");
-//	int c;
 
 	Sleep(1000);
 	printf("Spin Stage...");
@@ -189,10 +198,10 @@ int main(){
 	printf("Stop..");
 		 haltStage(stage);
 
-
+*/
 	
-	printf("Goodbye");
-	return 0;
+//	printf("Goodbye");
+//	return 0;
 
 	
 /*	

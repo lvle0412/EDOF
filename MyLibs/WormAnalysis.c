@@ -31,9 +31,11 @@
 
 
 //OpenCV Headers
-#include <cxcore.h>
-#include <highgui.h>
-#include <cv.h>
+//#include <cxcore.h>
+#include "opencv2/highgui/highgui_c.h"
+#include "opencv/cv.h"
+#include "opencv/cxcore.h"
+//#include <cv.h>
 
 //Timer Lib
 #include "../3rdPartyLibs/tictoc.h"
@@ -111,6 +113,9 @@ WormAnalysisData* CreateWormAnalysisDataStruct(){
 	/*** Create Segmented Worm Object ***/
 	WormPtr->Segmented= CreateSegmentedWormStruct();
 
+	/** Create Time Evolution Worm Object **/
+	WormPtr->TimeEvolution= CreateWormTimeEvolution();
+
 	/** Position on plate information **/
 	WormPtr->stageVelocity=cvPoint(0,0);
 
@@ -132,6 +137,7 @@ void DestroyWormAnalysisDataStruct(WormAnalysisData* Worm){
 	cvReleaseMemStorage(&((Worm)->MemScratchStorage));
 	cvReleaseMemStorage(&((Worm)->MemStorage));
 	free((Worm)->Segmented);
+	DestroyWormTimeEvolution(&(Worm->TimeEvolution));
 	free(Worm);
 	Worm=NULL;
 }
@@ -293,6 +299,26 @@ WormAnalysisParam* CreateWormAnalysisParam(){
 	ParamPtr->IllumSegCenter=25;
 	ParamPtr->IllumFloodEverything=0;
 
+	/** Laser Power **/
+	ParamPtr->GreenLaser=-1;
+	ParamPtr->BlueLaser=-1;
+
+	/** Real Time Curvature Analysis **/
+	ParamPtr->CurvatureAnalyzeOn = 0;
+
+	/** Trigger Illumination Based on Phase of Curvature **/
+	ParamPtr->CurvaturePhaseTriggerOn = 0;
+	ParamPtr->CurvaturePhaseThreshold = 0;
+	ParamPtr->CurvaturePhaseThresholdPositive = 1;
+	ParamPtr->CurvaturePhaseDerivThresholdPositive = 1;
+	ParamPtr->CurvaturePhaseNumFrames = 10;
+	ParamPtr->CurvaturePhaseVisualaziationFactor=100;  //this is just for printfs and for the GUI because the numbers are too hard to read by eye
+
+	/** Timing for Phase & Curvature Based Triggering **/
+	ParamPtr->StayOnAndRefract=0; //Stay On for the time IllumDuration and wait to turn on again a time specified below
+	ParamPtr->IllumRefractoryPeriod= 0; //Amount of time to wait to turn on again in tenths of Seconds
+
+
 	/** Illum Head-Tail Sweep **/
 	ParamPtr->IllumSweepHT = 1;
 	ParamPtr->IllumSweepOn=0;
@@ -416,6 +442,66 @@ void ClearSegmentedInfo(SegmentedWorm* SegWorm){
 		}
 
 
+}
+
+
+/************************************************************/
+/* Creating, Destroying and updating TimeEvolution Structure	*/
+/*  					 									*/
+/*															*/
+/************************************************************/
+
+/*
+ * Creates and allocates memory for a WormTimeEvolution Structure
+ * (which contains information about the worm that extends in time
+ * beyond just this frame, e.g. the mean haead curvature of the past
+ * few frames )
+ */
+WormTimeEvolution* CreateWormTimeEvolution(){
+	WormTimeEvolution* TimeEv;
+	TimeEv= (WormTimeEvolution*) malloc(sizeof(WormTimeEvolution));
+
+	/*** Setup Memory storage ***/
+	TimeEv->MemTimeEvolutionStorage=cvCreateMemStorage(0);
+	TimeEv->MeanHeadCurvatureBuffer=cvCreateSeq(0,sizeof(CvSeq),sizeof(double),TimeEv->MemTimeEvolutionStorage);
+	TimeEv->derivativeOfHeadCurvature=0;
+	TimeEv->currMeanHeadCurvature=0;
+
+	return TimeEv;
+}
+
+int DestroyWormTimeEvolution(WormTimeEvolution** TimeEvolution){
+	(*TimeEvolution)->MeanHeadCurvatureBuffer=NULL;
+	cvReleaseMemStorage(&( (*TimeEvolution)->MemTimeEvolutionStorage ));
+	free(*TimeEvolution);
+	*TimeEvolution=NULL;
+}
+
+int AddMeanHeadCurvature(WormTimeEvolution* TimeEvolution, double CurrHeadCurvature, WormAnalysisParam* AnalysisParam){
+	if (TimeEvolution==NULL || AnalysisParam==NULL) {
+		printf("AddMeanHeadCurvature Error!");
+				return A_ERROR;
+	}
+
+	int DEBUG_INFO=0; // print out
+
+	int MaxBuff;
+	if (DEBUG_INFO!=0) printf("CurvaturePhaseNumFrames=%d\n",AnalysisParam->CurvaturePhaseNumFrames);
+	if (AnalysisParam->CurvaturePhaseNumFrames>0){
+		MaxBuff=AnalysisParam->CurvaturePhaseNumFrames;
+	}else{
+		MaxBuff=1;
+	}
+
+	if (DEBUG_INFO!=0) printf("MaxBuff=%d\n",MaxBuff);
+
+	/** Push onto Bufeer **/
+	PushToSeqBuffer(TimeEvolution->MeanHeadCurvatureBuffer,(void*) &CurrHeadCurvature,MaxBuff);
+
+	/** Set Current Mean Head Curvature **/
+	TimeEvolution->currMeanHeadCurvature = CurrHeadCurvature;
+
+	return A_OK;
 }
 
 
@@ -964,7 +1050,7 @@ int SegmentWorm(WormAnalysisData* Worm, WormAnalysisParam* Params){
  *
  *
  */
-int CreateWormHUDS(IplImage* HUDSimg, WormAnalysisData* Worm, WormAnalysisParam* Params, Frame* IlluminationFrame){
+int CreateWormHUDS(IplImage* TempImage, WormAnalysisData* Worm, WormAnalysisParam* Params, Frame* IlluminationFrame){
 
 	int CircleDiameterSize=10;
 
@@ -972,18 +1058,18 @@ int CreateWormHUDS(IplImage* HUDSimg, WormAnalysisData* Worm, WormAnalysisParam*
 
 	double weighting=0.20; //Alpha blend weighting
 	if (Params->DLPOn) weighting=0.45; // if DLP is on make the illumination pattern more opaque
-	cvAddWeighted(Worm->ImgOrig,1,IlluminationFrame->iplimg,weighting,0,HUDSimg);
+	cvAddWeighted(Worm->ImgOrig,1,IlluminationFrame->iplimg,weighting,0,TempImage);
 
 	//Want to also display boundary!
-	//cvDrawContours(HUDSimg, Worm->Boundary, cvScalar(255,0,0),cvScalar(0,255,0),100);
+	//cvDrawContours(TempImage, Worm->Boundary, cvScalar(255,0,0),cvScalar(0,255,0),100);
 
-	DrawSequence(&HUDSimg,Worm->Boundary);
+	DrawSequence(&TempImage,Worm->Boundary);
 
-//	DrawSequence(&HUDSimg,Worm->Segmented->LeftBound);
-//	DrawSequence(&HUDSimg,Worm->Segmented->RightBound);
+//	DrawSequence(&TempImage,Worm->Segmented->LeftBound);
+//	DrawSequence(&TempImage,Worm->Segmented->RightBound);
 
-	cvCircle(HUDSimg,*(Worm->Tail),CircleDiameterSize,cvScalar(255,255,255),1,CV_AA,0);
-	cvCircle(HUDSimg,*(Worm->Head),CircleDiameterSize/2,cvScalar(255,255,255),1,CV_AA,0);
+	cvCircle(TempImage,*(Worm->Tail),CircleDiameterSize,cvScalar(255,255,255),1,CV_AA,0);
+	cvCircle(TempImage,*(Worm->Head),CircleDiameterSize/2,cvScalar(255,255,255),1,CV_AA,0);
 
 	/** Prepare Text **/
 	CvFont font;
@@ -991,36 +1077,34 @@ int CreateWormHUDS(IplImage* HUDSimg, WormAnalysisData* Worm, WormAnalysisParam*
 
 	/** Display DLP On Off **/
 	if (Params->DLPOn) {
-		cvPutText(HUDSimg,"DLP ON",cvPoint(20,70),&font,cvScalar(255,255,255));
+		cvPutText(TempImage,"DLP ON",cvPoint(20,70),&font,cvScalar(255,255,255));
 	}
 	/** Display Recording if we are recording **/
 	if (Params->Record){
-		cvPutText(HUDSimg,"Recording",cvPoint(20,100),&font,cvScalar(255,255,255));
+		cvPutText(TempImage,"Recording",cvPoint(20,100),&font,cvScalar(255,255,255));
 
 	} else {
-		if (Params->DLPOn) cvPutText(HUDSimg,"Did you forget to record?",cvPoint(20,100),&font,cvScalar(255,255,255));
+		if (Params->DLPOn) cvPutText(TempImage,"Did you forget to record?",cvPoint(20,100),&font,cvScalar(255,255,255));
 	}
 
 
 	/*** Let the user know if the illumination flood light is on ***/
 	if (Params->IllumFloodEverything){
-		cvPutText(HUDSimg,"Floodlight",cvPoint(20,130),&font,cvScalar(255,255,255));
+		cvPutText(TempImage,"Floodlight",cvPoint(20,130),&font,cvScalar(255,255,255));
 	}
 
 	char protoNum[20];
 	/** If we are using protocols, display the protocol number **/
 	if (Params->ProtocolUse){
 		sprintf(protoNum,"Step %d",Params->ProtocolStep);
-		cvPutText(HUDSimg,protoNum,cvPoint(20,160),&font,cvScalar(255,255,255));
+		cvPutText(TempImage,protoNum,cvPoint(20,160),&font,cvScalar(255,255,255));
 
 	}
-	free(protoNum);
 
-
-	char frame[30];
+	char frame[30]; // these are freed automatically 
+					// SEE http://stackoverflow.com/questions/1335230/is-the-memory-of-a-character-array-freed-by-going-out-of-scope
 	sprintf(frame,"%d",Worm->frameNum);
-	cvPutText(HUDSimg,frame,cvPoint(Worm->SizeOfImage.width- 200,Worm->SizeOfImage.height - 10),&font,cvScalar(255,255,255) );
-	free( frame);
+	cvPutText(TempImage,frame,cvPoint(Worm->SizeOfImage.width- 200,Worm->SizeOfImage.height - 10),&font,cvScalar(255,255,255) );
 	return 0;
 }
 

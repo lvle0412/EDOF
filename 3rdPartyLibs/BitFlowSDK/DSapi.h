@@ -37,6 +37,7 @@ BFDLL BOOL BFCAPI DispSurfDisableClose(BFS32 DspSurfHandle, BFBOOL Enabled);
 BFDLL BOOL BFCAPI DispSurfVersion(PBFU32 pMajorVersion,PBFU32 pMinorVersion);
 
 BFDLL BOOL BFCAPI DispSurfOffset(BFS32 DspSurfHandle,BFS32 DX,BFS32 DY);
+BFDLL BOOL BFCAPI DispSurfSetWindow(BFS32 DspSurfHandle, BFU32 Left,BFU32 Top, BFU32 Width, BFU32 Height);
 BFDLL BOOL BFCAPI DispSurfTitle(BFS32 DspSurfHandle,PBFCHAR Title);
 
 // if the application object is needed in the DLL, call this function to attach

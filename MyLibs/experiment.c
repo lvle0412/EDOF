@@ -1903,8 +1903,8 @@ CvPoint AdjustStageToKeepObjectAtTarget(HANDLE stage, CvPoint* obj,CvPoint targe
 	/** (stage-obj)*speed **/
 //	printf("obj= (%d, %d), target =(%d, %d)\n",obj->x, obj->y, target->x, target->y);
 
-	diff.y=target.x-obj->x;
-	diff.x=target.y-obj->y;
+	diff.x=target.x-obj->x;
+	diff.y=target.y-obj->y;
 
 	//printf("About to Multiply!\n");
 	vel.x= CropNumber(-activeZoneRadius,activeZoneRadius, diff.x)*speed;

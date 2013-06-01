@@ -707,10 +707,15 @@ int GivenBoundaryFindWormHeadTail(WormAnalysisData* Worm, WormAnalysisParam* Par
 	/* **********************************************************************/
 
 	float SecondMostCurvy = 1000;
-	int SecondMostCurvyIndex = 0;
 	int DistBetPtsOnBound;
 	DistBetPtsOnBound = 0;
 
+	/* Set the fallback head location to be halfway away from the tail along the boundary. 	*/
+	/* That way, if for some reason there is no reasonable head found, the default 			*/
+	/* will at least be a pretty good gueess												*/
+	int SecondMostCurvyIndex = (Worm->TailIndex+ TotalBPts/2)%TotalBPts;
+	
+	
 
 	for (i = 0; i < TotalBPts; i++) {
 		DotProdPtr =(int*) cvGetSeqElem(DotProds,i);
@@ -727,7 +732,7 @@ int GivenBoundaryFindWormHeadTail(WormAnalysisData* Worm, WormAnalysisParam* Par
 	}
 
 	Worm->Head = (CvPoint*) cvGetSeqElem(Worm->Boundary,
-			SecondMostCurvyIndex);
+			SecondMostCurvyIndex);  
 
 	Worm->HeadIndex = SecondMostCurvyIndex;
 	cvClearMemStorage(Worm->MemScratchStorage);

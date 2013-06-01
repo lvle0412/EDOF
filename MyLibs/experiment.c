@@ -842,7 +842,7 @@ void SetupGUI(Experiment* exp) {
 
 	/****** Setup Debug Control Panel ******/
 	cvNamedWindow(exp->WinCon2);
-	cvResizeWindow(exp->WinCon2, 450, 400);
+	cvResizeWindow(exp->WinCon2, 450, 800);
 	cvCreateTrackbar("FloodLight", exp->WinCon2,
 			&(exp->Params->IllumFloodEverything), 1, (int) NULL);
 

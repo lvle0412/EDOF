@@ -845,6 +845,7 @@ int IlluminateFromProtocol(SegmentedWorm* SegWorm,Frame* dest, Protocol* p,WormA
 	IplImage* TempImage=cvCreateImage(cvGetSize(dest->iplimg), IPL_DEPTH_8U, 1);
 
 	/** Grab a montage for the selected step **/
+	//printf("Params->ProtocolStep=%d\n",Params->ProtocolStep);
 	CvSeq* montage=GetMontageFromProtocolInterp(p,Params->ProtocolStep);
 	IllumWorm(SegWorm,montage,TempImage,p->GridSize,Params->IllumFlipLR);
 	LoadFrameWithImage(TempImage,dest);

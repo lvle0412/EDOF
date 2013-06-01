@@ -983,6 +983,7 @@ int SegmentWorm(WormAnalysisData* Worm, WormAnalysisParam* Params){
 		printf("Error in SegmentWorm():\n\tWhen splitting  the original boundary into two, one or the other has less than the number of desired segments!\n");
 		printf("OrigBoundA->total=%d\nOrigBoundB->total=%d\nParams->NumSegments=%d\n",OrigBoundA->total,OrigBoundB->total,Params->NumSegments);
 		printf("Worm->HeadIndex=%d\nWorm->TailIndex=%d\n",Worm->HeadIndex,Worm->TailIndex);
+		printf("It could be that your worm is just too small\n");
 		return -1; /** Andy make this return -1 **/
 
 	}

@@ -35,18 +35,20 @@
 %    ------------> x
 %
 % Note also, you can walk off the worm in x (but not in y).
-
+% Note too that x here is different from the convention used in the GUI.
+% The silly sliders that I use in the GUI for on-the-fly illumination 
+% can't do negative numbers. So x=0 on the GUI is actually x=-10 here. 
+% And x=10 on the GUI is actualy x=0 here.
 
 clear all; close all;
 
 
 % Header informatoin
-filename='mec4_rig3.yml';
+filename='simple_mec4_nervering.yml';
 gridHeight=100;
 gridWidth=21; %must be odd
 %Note: No carriage return at the end of the description
-description= sprintf('Illuminate ALM, AVM, PLM, PVM, & nerve ringt. This is based off fluorescent imaging data taken in D:\WormIllum\100521\Analysis\worm11');
-
+description= sprintf('Illuminate (ALM & AVM) or nerve ring, or entire posterior.');
 
 
 
@@ -55,8 +57,12 @@ description= sprintf('Illuminate ALM, AVM, PLM, PVM, & nerve ringt. This is base
 X=1; Y=2;
 
 %Defualt Radii
+dRadFullWorm=10;
 dRad(X)=6;
 dRad(Y)=4;
+
+  
+
 
 %We have to convert from the slider bar manual illumination coordinate convention
 %To the protocol illumiantion convention.
@@ -80,10 +86,20 @@ AFD(Y)=11;
 %predefine protocol
 protocol=cell(0);
 
-% Protocol = [x1, y1, x2,y2, etc..]
+% Protocol = [x1, y1, x2,y2, x3,y3, x4,y4]
+% This can be generated using the rect(x1,y1,x4,y4) function if the
+% rectangle lies on a grid
 
-%AVM
-protocol{end+1}=rect(AVM(X)-dRad(X), AVM(Y)-dRad(Y), AVM(X)+dRad(X), AVM(Y)+dRad(Y) );
+
+%Entire Anterior
+protocol{end+1}=rect(-10, 52,  10, 0 );
+
+%AVM + ALM
+protocol{end+1}=rect(-10, 52, 10,30);
+
+%Nerve Ring
+protocol{end+1}=rect(-10, 7, 10,15);
+
 
 %ALM
 protocol{end+1}=rect(ALM(X)-dRad(X), ALM(Y)-dRad(Y), ALM(X)+dRad(X), ALM(Y)+dRad(Y) );
@@ -94,8 +110,7 @@ protocol{end+1}=rect(PVM(X)-dRad(X), PVM(Y)-dRad(Y), PVM(X)+dRad(X), PVM(Y)+dRad
 %PLM
 protocol{end+1}=rect(PLM(X)-dRad(X), PLM(Y)-dRad(Y), PLM(X)+dRad(X), PLM(Y)+dRad(Y) );
 
-%AFD/NerveRing
-protocol{end+1}=rect(AFD(X)-dRad(X), AFD(Y)-dRad(Y), AFD(X)+dRad(X), AFD(Y)+dRad(Y) );
+
 
 writeProto(filename,description,gridWidth,gridHeight,protocol)
 

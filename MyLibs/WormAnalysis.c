@@ -527,6 +527,10 @@ int GivenBoundaryFindWormHeadTail(WormAnalysisData* Worm, WormAnalysisParam* Par
 	 */
 	CvSeq* DotProds= cvCreateSeq(CV_32SC1,sizeof(CvSeq),sizeof(int),Worm->MemScratchStorage);
 
+	/* Create A Matrix to store all of the cross products along the boundary.
+	 */
+	CvSeq* CrossProds= cvCreateSeq(CV_32SC1,sizeof(CvSeq),sizeof(int),Worm->MemScratchStorage);
+	
 	//We walk around the boundary using the high-speed reader and writer objects.
 	CvSeqReader ForeReader; //ForeReader reads delta pixels ahead
 	CvSeqReader Reader; 	//Reader reads delta pixels behind
@@ -548,6 +552,7 @@ int GivenBoundaryFindWormHeadTail(WormAnalysisData* Worm, WormAnalysisParam* Par
 	int Ptr=0;
 	int* DotProdPtr;
 	int DotProdVal;
+	int CrossProdVal;
 
 
 	/*
@@ -580,6 +585,11 @@ int GivenBoundaryFindWormHeadTail(WormAnalysisData* Worm, WormAnalysisParam* Par
 		/** Store the Dot Product in our Mat **/
 		DotProdVal=PointDot(&AheadVec,&BehindVec);
 		cvSeqPush(DotProds,&DotProdVal); //<--- ANDY CONTINUE HERE!
+		
+		/** Store the Cross Product in our Mat **/
+		CrossProdVal=PointCross(&AheadVec,&BehindVec);
+		cvSeqPush(CrossProds,&CrossProdVal);
+		
 
 	//	printf("i= %d, DotProdVal=%d\n", i, DotProdVal);
 	//	cvWaitKey(0);
@@ -604,7 +614,7 @@ int GivenBoundaryFindWormHeadTail(WormAnalysisData* Worm, WormAnalysisParam* Par
 
 	for (i = 0; i < TotalBPts; i++) {
 		DotProdPtr = (int*) cvGetSeqElem(DotProds,i);
-		if (*DotProdPtr < MostCurvy) { //If this locaiton is curvier than the previous MostCurvy location
+		if (*DotProdPtr < MostCurvy && *CrossProdPtr > 0) { //If this locaiton is curvier than the previous MostCurvy location
 			MostCurvy = *DotProdPtr; //replace the MostCurvy point
 			MostCurvyIndex = i;
 		}

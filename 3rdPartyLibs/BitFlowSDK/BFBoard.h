@@ -43,7 +43,10 @@
 #define BFSysNoOpenErrorMess				0x00000040	// Supress all error popups in open function
 #define BFSysSecondProcessOpen				0x000000E8	// Allow the board to be opened twice in the same process (includes some of the above modes).
 #define BFSysAllowTwoOpens					0x00000100  // Allow the board to be opened twic ein the same process, and initialized.
-
+#define BFSysNoPoCLChange					0x00000200  // This flag forces the system to leave the PoCL system as is (don't change its state).
+#define BFSysPoCLUpOnly						0x00000400  // This flag will power up PoCL if it is off, but won't turn it off, if it is on (this is the default)
+#define BFSysPoCLCycle						0x00000800  // Power cycle the PoCL circuit
+#define BFSysSerialPortOpen					0x000010E8  // used when opening the serial port, included some of the above flags
 // Camera open options.
 
 #define BFSysConfigure						1
@@ -75,6 +78,12 @@
 #define BFConDMAAbort						11
 #define	BFConDMAReset						12
 
+// QTAB modes
+#define BFQTabModeOneBank					1
+#define BFQTabModeTwoBanks					2
+#define BFQTabModeFourBanks					4
+
+
 // Interrupt enable/disable flags.
 
 #define BFIntTypeAll						0x0000
@@ -97,6 +106,9 @@
 // Interrupt modes
 #define BFIntModeDefault					0x0030	// Interrupts happen on the default schedule
 #define BFIntModeEOFAq						0x0031	// EOF interrupts only during grab
+
+// Callback modifiers
+#define BFCBModeGrabOnly					0x00010000 // call the Call Back only if board is in grab mode
 
 // Maximum number of interrupt types for all boards. Note that this constant
 // should always be set to a number larger than the last interrupt defined above.
@@ -406,6 +418,13 @@ enum _ENCDIV_CLK_SEL
 {
 	BFEncDiv50MHz = 0,
 };
+
+// Quick switch modes
+typedef enum _QSModes
+{
+	QSNormal,		// normal DMA operations
+	QSOneFrame,		// DMA one selected frame then stop
+} QSModes;
 
 #endif
 

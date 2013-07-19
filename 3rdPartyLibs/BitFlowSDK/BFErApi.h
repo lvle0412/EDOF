@@ -30,6 +30,9 @@ BFDLL BFUPTR BFCAPI DoBrdOpenDialog(BFU32 Options, BFU32 FamilyFilter, PBFU32 pF
 BFDLL BFBOOL BFCAPI WaitDialogOpen(PBFCHAR Msg, HWND *pHandle);
 BFDLL BFBOOL BFCAPI WaitDialogClose(HWND Handle);
 BFDLL BFBOOL BFCAPI DisplayQuestionDialog(PBFCHAR Question,PBFCHAR Answer,BFSIZET AnswerSize);
+BFDLL BFBOOL BFCAPI ProgressDailogClose(HWND Handle);
+BFDLL BFBOOL BFCAPI ProgressDailogUpdate(HWND Handle, BFU32 Progress);
+BFDLL BFBOOL BFCAPI ProgressDailogOpen(PBFCHAR Msg, BFU32 ProgessMax, HWND *pHandle);
 
 #ifdef __cplusplus
 }

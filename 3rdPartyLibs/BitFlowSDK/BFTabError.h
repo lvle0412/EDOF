@@ -169,7 +169,7 @@ typedef enum _BFRC_Enum
 	BF_ID_INUSE,						// This configuration ID is already in use.
 	BF_BAD_ALLOC,						// Cannot allocate memory for structure.
 	BF_BAD_SEMAPHORE,					// Error creating or using semaphore.
-	BF_BAD_SIGNAL,						// Interrupt signal unkown.
+	BF_BAD_SIGNAL,						// Interrupt signal unknown.
 	BF_WAIT_FAILED,						// Wait for object failed.
     BF_THREAD_GOING,					// The interrupt notification thread is already running.
     BF_THREAD_NOT_GOING,				// The interrupt notification thread is not running.
@@ -418,6 +418,15 @@ typedef enum _BFRC_Enum
 	BF_REGISTRY_ERROR,					// Error parsing registry entries
 	BF_CFG_SPACE_TIMEOUT,				// Time out waiting to read/write PCI configure space
 	BF_FLASH_MEM_TIMEOUT,				// Time out waiting for flash memory operation to complete
+	BF_QS_MODE_SET_ERR,					// QSModeSet Error
+	BF_QS_MODE_GET_ERR,					// QSModeGet Error
+	BF_BUFFER_TOO_SMALL,				// User buffer to small to hold requested information
+	BF_BRD_NOT_CXP,						// Board is not CoaXPress
+	BF_BRD_CXP_COM_TIMEOUT,				// Timeout waiting for CXP response
+	BF_BRD_CXP_COM_BAD_ACK,				// Illformed acknowledgement from camera
+	BF_CB_ALREADY_SET,					// Call back for this signal is already added
+	BF_BRD_CXP_LINK_ERROR,				// Error with CXP Link
+	BF_ALREADY_OPEN_SERIAL,				// Serial port already opened 
 	BF_ERROR_END
 } BFRC_Enum;
 

@@ -43,7 +43,7 @@ leifer@fas.harvard.edu
 #include <windows.h>
 #include <stdio.h>
 #include <conio.h>
-#include "../3rdPartyLibs/alpbasic.h"
+#include "alpbasic.h"
 #include "Talk2DLP.h"
 
 

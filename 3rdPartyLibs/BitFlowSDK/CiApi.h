@@ -21,7 +21,6 @@
 
 #include "R2Type.h"
 #include "R2Board.h"
-#include "RvBoard.h"
 
 #include "CiDef.h"
 
@@ -45,7 +44,7 @@ BFDLL BFRC		BFCAPI CiBrdAqTimeoutSet(Bd Board, BFU32 Timeout);
 BFDLL BFU32		BFCAPI CiBrdType(Bd Board);
 BFDLL BFRC		BFCAPI CiBrdAqSigSetCur(Bd Board, PBFVOID pAqSig, BFU32 AqEngine);
 BFDLL BFRC		BFCAPI CiBrdAqSigGetCur(Bd Board, PBFVOID pAqSig, BFU32 AqEngine);
-BFDLL BFRC		BFCAPI CiBrdCamGetFileName(Bd Board, BFU32 Num, PBFCHAR CamName);
+BFDLL BFRC		BFCAPI CiBrdCamGetFileName(Bd Board, BFU32 Num, PBFCHAR CamName, BFSIZET CamNameStLen);
 
 // Acquisition
 
@@ -85,6 +84,8 @@ BFDLL BFRC		BFCAPI CiSignalCancel(Bd Board,PCiSIGNAL pSignal);
 BFDLL BFRC		BFCAPI CiSignalQueueSize(Bd Board,PCiSIGNAL pSignal,PBFU32  pNumInts);
 BFDLL BFRC		BFCAPI CiSignalQueueClear(Bd Board,PCiSIGNAL pSignal);
 BFDLL BFRC		BFCAPI CiSignalFree(Bd Board,PCiSIGNAL pSignal);
+BFDLL BFRC		BFCAPI CiCallBackAdd(Bd Board, BFU32 SignalType, BFCallBackFuncPtr CallBackFunc);
+BFDLL BFRC		BFCAPI CiCallBackRemove(Bd Board, BFU32 SignalType);
 
 // Control Table functions
 
@@ -122,6 +123,7 @@ BFDLL BFRC		BFCAPI CiConExposureControlSet(Bd Board, BFDOUBLE ExposurePeriod, BF
 BFDLL BFRC		BFCAPI CiConExposureControlGet(Bd Board, PBFDOUBLE pExposurePeriod, PBFDOUBLE pLineFramePeriod, PBFU32 pTriggerMode, PBFBOOL pAssertedHigh, PBFU32 pOutputSignal);
 BFDLL BFRC		BFCAPI CiEncoderDividerSet(Bd Board, BFDOUBLE ScaleFactor, BFBOOL ForceDC, BFBOOL OpenLoop, BFU32 ClockSelect);
 BFDLL BFRC		BFCAPI CiEncoderDividerGet(Bd Board, PBFDOUBLE pScaleFactor, PBFBOOL pForceDC, PBFBOOL pOpenLoop, PBFU32 pClockSelect);
+BFDLL BFRC		BFCAPI CiConQSSetNextFrame(Bd Board, RQTabHeadPtrPtr ChainArray, BFU32 NumInChain, BFU32 ACPL, BFU32 ALPF);
 
 // Quad Table Functions
 

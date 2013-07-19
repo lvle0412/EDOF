@@ -49,6 +49,11 @@
 
 
 typedef struct WormAnalysisParamStruct{
+	/* WormAnalyisisParam is a structure containing inputs
+	 * to the analysis machinery. As a general principle it
+	 * should not contain outputs or computed values.
+	 */
+
 	/** Turn Analysis On Generally **/
 	int OnOff;
 
@@ -100,11 +105,31 @@ typedef struct WormAnalysisParamStruct{
 
 	/** Timed DLP On **/
 	int IllumDuration; // in tenthsOfSeconds
-	int DLPOnFlash;
+	int DLPOnFlash;  // (see also IllumRefractoryPeriod and StayOnAndRefrat)
 
+	/** Use Protocols? **/
 	int ProtocolUse;
 	int ProtocolStep;
 	int ProtocolTotalSteps;
+
+	/** Laser Power **/
+	int GreenLaser;
+	int BlueLaser;
+
+	/** Real Time Curvature Analysis **/
+	int CurvatureAnalyzeOn;
+
+	/** Trigger Illumination Based on Phase of Curvature **/
+	int CurvaturePhaseTriggerOn;
+	int CurvaturePhaseThreshold;
+	int CurvaturePhaseThresholdPositive;
+	int CurvaturePhaseDerivThresholdPositive;
+	int CurvaturePhaseNumFrames; // Number of frames back (in time) to store
+	int CurvaturePhaseVisualaziationFactor; //Factor by which we are multiplying for the GUI and for human readability.
+
+	/** Timing for Phase & Curvature Based Triggering **/
+	int StayOnAndRefract; //Stay On for the time IllumDuration and wait to turn on again a time specified below
+	int IllumRefractoryPeriod; //Amount of time to wait to turn on again in tenths of Seconds
 
 	/** Stage Control Parameters **/
 	int stageTrackingOn;
@@ -118,6 +143,7 @@ typedef struct WormAnalysisParamStruct{
 
 } WormAnalysisParam;
 
+/** These are computed and segmented information about the worm at the current frame**/
 typedef struct SegmentedWormStruct{
 	CvSeq* Centerline;
 	CvSeq* LeftBound;
@@ -131,8 +157,23 @@ typedef struct SegmentedWormStruct{
 
 
 
+typedef struct WormTimeEvolutionStruct{
+	/*
+	 * This information about the worm
+	 * that is derived from observing the worm
+	 * over a period of time.
+	 */
+
+	/** Phase and Curvature Analysis **/
+	CvSeq* MeanHeadCurvatureBuffer;
+	double derivativeOfHeadCurvature;
+	double currMeanHeadCurvature;
+	CvMemStorage* MemTimeEvolutionStorage;
+}WormTimeEvolution;
 
 
+
+/** This is the image and the extracted data related to a worm at a single frame in time **/
 typedef struct WormImageAnalysisStruct{
 	CvSize SizeOfImage;
 
@@ -163,12 +204,18 @@ typedef struct WormImageAnalysisStruct{
 	/** Segmented Worm **/
 	SegmentedWorm* Segmented;
 
+	/** Time Evolution Structure **/
+	WormTimeEvolution* TimeEvolution;
+
 	/** Information about location on plate **/
 	CvPoint stageVelocity; //compensating velocity of stage.
 
 
 	//WormIlluminationData* Illum;
 }WormAnalysisData;
+
+
+
 
 
 
@@ -317,6 +364,28 @@ void DestroySegmentedWormStruct(SegmentedWorm* SegWorm);
  * Data object.
  */
 void ClearSegmentedInfo(SegmentedWorm* SegWorm);
+
+
+
+/************************************************************/
+/* Creating, Destroying and updating SegmentedWormStruct	*/
+/*  					 									*/
+/*															*/
+/************************************************************/
+
+/*
+ * Creates and allocates memory for a WormTimeEvolution Structure
+ * (which contains information about the worm that extends in time
+ * beyond just this frame, e.g. the mean haead curvature of the past
+ * few frames )
+ */
+WormTimeEvolution* CreateWormTimeEvolution();
+
+int DestroyWormTimeEvolution(WormTimeEvolution** TimeEvolution);
+
+int AddMeanHeadCurvature(WormTimeEvolution* TimeEvolution, double CurrHeadCurvature, WormAnalysisParam* AnalysisParam);
+
+
 
 
 

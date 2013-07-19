@@ -62,6 +62,26 @@
 
 		typedef BFU16				BFWCHAR,	*PBFWCHAR;
 
+//#if defined(_MSC_VER) //ANDY REMOVED THIS IF STATEMET
+		
+		// this definition needed for WOW64 support
+		// only really needed at the driver level
+		#if !defined(POINTER_32)
+			#define POINTER_32
+		#endif
+
+		// These are WOW64 types
+        typedef void					*POINTER_32	PBFVOIDWOW64;
+		typedef unsigned __int64        *POINTER_32	PBFU64WOW64;
+		typedef __int64                 *POINTER_32	PBFS64WOW64;
+        typedef unsigned __int32        *POINTER_32	PBFU32WOW64;
+        typedef __int32                 *POINTER_32	PBFS32WOW64;
+        typedef unsigned __int16        *POINTER_32	PBFU16WOW64;
+        typedef __int16                 *POINTER_32	PBFS16WOW64;
+        typedef unsigned __int8         *POINTER_32	PBFU8WOW64;
+        typedef __int8                  *POINTER_32	PBFS8WOW64;
+// #endif //ANDY also removed this
+
 		// BFUPTR is used when storing a pointer in an integer
 		// and accounts for the pointer size of the machine.
 
@@ -71,6 +91,10 @@
 			typedef UINT_PTR				BFUPTR,		*PBFUPTR;
 			typedef INT_PTR					BFSPTR,		*PBFSPTR;
 			typedef size_t					BFSIZET,	*PBFSIZET;
+
+			// These are WOW64 types
+			typedef UINT_PTR				BFUPTRWOW64,	*POINTER_32 PBFUPTRWOW64;
+
 		#endif
 
     #endif

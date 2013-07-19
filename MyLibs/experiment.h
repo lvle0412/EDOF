@@ -65,6 +65,10 @@
 #ifndef ANDYSOPENCVLIB_H_
  #error "#include AndysOpenCVLib.h" must appear in source files before "#include experiment.h"
 #endif
+#ifndef MC_API_DLL_H_
+ #error "#include API/mc_api_dll.h" must appear in source files before "#include experiment.h"
+#endif
+
 
 
 #define EXP_ERROR -1
@@ -148,7 +152,9 @@ typedef struct ExperimentStruct{
 	clock_t last;
 
 	/** Illumination Timer **/
-	double illumStart;
+	double illumStart; //Time that the illumination began
+	double illumFinished;  //Time that the illumination finished
+
 
 	/** Illum Head-To-Tail Sweep Internal Variables **/
 	double illumSweepHTtimer;
@@ -170,6 +176,13 @@ typedef struct ExperimentStruct{
 	CvPoint stageCenter; // Point indicating center of stage.
 	CvPoint stageFeedbackTarget; //Target of the stage feedback loop as a point in the image
 	int stageIsTurningOff; //1 indicates stage is turning off. 0 indicates stage is on or off.
+
+
+	/** MindControl API **/
+	SharedMemory_handle sm;
+
+	/** Scratch CvMemoryStorage **/
+	CvMemStorage* scratchMem;
 
 	/** Error Handling **/
 	int e;
@@ -203,6 +216,19 @@ int HandleCommandLineArguments(Experiment* exp);
  * increment an on-the-fly illumination step by step across the worm
  */
 int HandleIlluminationSweep(Experiment* exp);
+
+
+/*
+ * Calculate the Mean Curvature of the Head and Analyze the Phase of the
+ * worm's sinusoidal body motions.
+ *
+ * Put this is in a buffer that includes prior curvatures over the last 20 frames or so.
+ *
+ * If we are trigging based on the phase of the worm's motion, turn the DLP on if we are
+ * in the triggering region.
+ *
+ */
+int HandleCurvaturePhaseAnalysis(Experiment* exp);
 
 /** Handle Transient Illumination Timing **/
 int HandleIlluminationTiming(Experiment* exp);
@@ -335,10 +361,10 @@ void StartFrameRateTimer(Experiment* exp);
 
 /*
  * If more than a second has elapsed
- * Calculate the frame rate and print i tout
- *
+ * Calculate the frame rate and print it out
+ * Also print out information about curvature, if thats relevant.
  */
-void CalculateAndPrintFrameRate(Experiment* exp);
+void CalculateAndPrintFrameRateAndInfo(Experiment* exp);
 
 
 
@@ -398,6 +424,16 @@ void InvertIllumination(Experiment* exp);
  *
  */
 int HandleKeyStroke(int c, Experiment* exp);
+
+/*
+ * Write out current values to MindControl API and read in
+ * values set by external processes.
+ *
+ * At the moment, MindControl writes out the current frame and the
+ * status of the DLP. It reads in the laser power values.
+ */
+void SyncAPI(Experiment* exp);
+
 
 /*
  * Write video and data to Disk

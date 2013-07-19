@@ -46,9 +46,9 @@
 #include <stdlib.h>
 
 //OpenCV Headers
-#include <cxcore.h>
-#include <highgui.h>
-#include <cv.h>
+//#include <cxcore.h>
+#include "opencv2/highgui/highgui_c.h"
+//#include <cv.h>
 
 // Andy's Libraries
 
@@ -198,7 +198,6 @@ void LoadProtocolWithDescription(const char* str, Protocol* myP){
 
 void DestroyProtocolObject(Protocol** MyProto){
 	/** **/
-	printf("in DestroyProtocolObject()\n");
 	assert(MyProto!=NULL);
 	if (*MyProto==NULL) return;
 	if  ((*MyProto)->Filename!=NULL ) {
@@ -325,7 +324,7 @@ WormPolygon* CreateWormPolygonFromSeq(CvMemStorage* memory,CvSize GridSize,CvSeq
  *
  */
 void DestroyWormPolygon(WormPolygon** myPoly){
-	free(myPoly);
+	free(myPoly); 
 	*myPoly=NULL;
 }
 
@@ -492,7 +491,6 @@ int CvtPolyMontage2ContourMontage(CvSeq* PolyMontage, CvSeq* ContourMontage){
 	int numOfPolys=PolyMontage->total;
 	CvSeqReader PolyReader;
 	cvStartReadSeq(PolyMontage,&PolyReader);
-
 		int poly;
 		for (poly = 0; poly < numOfPolys; ++poly) {
 			WormPolygon** polygonPtr=(WormPolygon**) PolyReader.ptr;
@@ -515,14 +513,18 @@ int CvtPolyMontage2ContourMontage(CvSeq* PolyMontage, CvSeq* ContourMontage){
 			 *
 			 */
 			WormPolygon* wrappedContour= CreateWormPolygonFromSeq(ContourMontage->storage,polygon->GridSize,newcontour);
-
-
+		
 			/** Push the new contour onto the ContourMontage **/
 			cvSeqPush(ContourMontage,&wrappedContour);
 
 			/** Move to the next polygon **/
 			CV_NEXT_SEQ_ELEM(PolyMontage->elem_size,PolyReader);
-			DestroyWormPolygon(&wrappedContour);
+				
+			//I needed to comment this out to get the program to stop crashing
+			// But it was added to stop a memory leak.
+			//So I suspect now I have a memory leak.
+			//DestroyWormPolygon(&wrappedContour);
+
 
 
 		}
@@ -562,9 +564,7 @@ int GenerateSimpleIllumMontage(CvSeq* montage, CvPoint origin, CvSize radius, Cv
 	/** If the y value extends off the worm, we need to crop it.. (otherwise it wraps... weird!)**/
 
 
-
 	cvClearSeq(montage);
-
 	WormPolygon* polygon=CreateWormPolygon(montage->storage,gridSize);
 
 
@@ -586,18 +586,15 @@ int GenerateSimpleIllumMontage(CvSeq* montage, CvPoint origin, CvSize radius, Cv
 	/** Upper Left **/
 	curr=cvPoint(origin.x-radius.width, CropNumber(1,gridSize.height-1,origin.y+radius.height));
 	cvSeqPush(polygon->Points,&curr);
-
+	
 
 	/** Push this sparse polygon onto the temp montage **/
 	CvSeq* tempMontage= CreateIlluminationMontage(montage->storage);
 	cvSeqPush(tempMontage,&polygon);
-
 	/** Convert the sparse polygon into a contour-polygon **/
 	CvtPolyMontage2ContourMontage(tempMontage,montage);
 	cvClearSeq(tempMontage);
-
 	return 1;
-
 
 }
 
@@ -848,6 +845,7 @@ int IlluminateFromProtocol(SegmentedWorm* SegWorm,Frame* dest, Protocol* p,WormA
 	IplImage* TempImage=cvCreateImage(cvGetSize(dest->iplimg), IPL_DEPTH_8U, 1);
 
 	/** Grab a montage for the selected step **/
+	//printf("Params->ProtocolStep=%d\n",Params->ProtocolStep);
 	CvSeq* montage=GetMontageFromProtocolInterp(p,Params->ProtocolStep);
 	IllumWorm(SegWorm,montage,TempImage,p->GridSize,Params->IllumFlipLR);
 	LoadFrameWithImage(TempImage,dest);

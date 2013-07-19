@@ -37,6 +37,9 @@
 #ifndef ANDYSOPENCVLIB_H_
 #define ANDYSOPENCVLIB_H_
 
+#define A_OK 0
+#define A_ERROR -1
+
 
 /*
  *
@@ -370,16 +373,52 @@ void RemoveSequentialDuplicatePoints (CvSeq *seq);
 
 
 //Marc's functions for convolution
-void ConvolveInt1D (const int *src, int *dst, int length, int *kernel, int klength, int normfactor);
-
-void ConvolveCvPtSeq (const CvSeq *src, CvSeq *dst, int *kernel, int klength, int normfactor);
-
-void CreateGaussianKernel (double sigma, int **kernel, int *klength, int *normfactor);
-
 
 CvSeq *smoothPtSequence (const CvSeq *src, double sigma, CvMemStorage *mem);
 
 
+/*
+ * Do a gaussian smooth on a CvSeq of CvPoints (int) and return a CvSeq of floats
+ * So that we can use non-integer values.
+ */
+CvSeq *smoothPtSequenceIntToDouble(const CvSeq *src, double sigma, CvMemStorage *mem);
+
+
+
+/*
+ * extractCurvatureOfSeq
+ *
+ *
+ * Find curvature at each point.
+ *
+ * seq is sequence of points, CvPoint (int)
+ * k is an array of doubles. with two less element than CvPoint.
+ *
+ * Defined as difference in angle between adjacent tangent vectors.
+ * The curvature sequence has one less element than the original sequence.
+ *
+ * Sigma is the size of the gaussian kernal.
+ *
+ */
+int extractCurvatureOfSeq(const CvSeq* seq, double* curvature, double sigma,CvMemStorage* mem);
+
+
+/*
+ * extractCurvatureOfSeq
+ *
+ *
+ * Find curvature at each point.
+ *
+ * seq is sequence of double points, CvPoint2D64f (double)
+ * k is an array of doubles. with two less element than CvPoint.
+ *
+ * Defined as difference in angle between adjacent tangent vectors.
+ * The curvature sequence has one less element than the original sequence.
+ *
+ * Sigma is the size of the gaussian kernal.
+ *
+ */
+int extractCurvatureOfSeqDouble(const CvSeq* seq, double* curvature, double sigma,CvMemStorage* mem);
 
 /**** Testing Functions ****/
 
@@ -414,12 +453,45 @@ int CropNumber(int max, int min, int x);
 
 
 /*
+ * A cvSeq can be used as a buffer. This function allows one to push an element
+ * onto the front of a cvSeq buffer.
+ *
+ * If the buffer is full, it automatically tosses the oldest
+ * element in the buffer.
+ */
+int PushToSeqBuffer(CvSeq* seq, void* element, int MaxBuffSize);
+
+
+/*
  *  Adjust the pixel levels of an image
  *  Creates a lookup table and applies it
  */
 int simpleAdjustLevels(const IplImage* src, IplImage* dest, int min, int max);
 
 
+/*
+ * Print out a sequence of CvPoints to stdout
+ * expects int's
+ */
+
+void printSeq(CvSeq* Seq);
+
+/*
+ * Print sequences of double points (CvPoint2D64f)
+ */
+void printSeqDouble(CvSeq* Seq);
+
+/*
+ * Print out a sequence of Scalar Doubles to stdout
+ */
+
+void printSeqScalarDoubles(CvSeq* Seq);
+
+/*
+ * Converts a CvSeq of doubles into an array.
+ * Allocates memory for the array.
+ */
+int SeqDoublesToArr(const CvSeq* seq, double** arr);
 #endif /* ANDYSOPENCVLIB_H_ */
 
 

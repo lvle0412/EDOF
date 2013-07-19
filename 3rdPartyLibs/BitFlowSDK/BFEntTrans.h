@@ -114,11 +114,19 @@
 
 // R64
 
-// maximum number of CTAB entries
-// NOTE: Do not change this number. Changing this number
+// NOTE: Do not change these numbers. Changing them
 // will make all the camera configuration files already 
 // built no longer work.
+
+
+// maximum number of CTAB entries
 #define R64ENT_CTAB_MAXE		50
+// maximum  number of Stream-To-DMA-List entries
+#define CXP_ENTRIES_MAX_S2D	256
+// Maximum number of register to program in the camera
+#define CXP_ENTRIES_MAX_CAM_REGS	50
+// Maximum number of register to program in the CXP engine
+#define CXP_ENTRIES_MAX_CON_REGS	50
 
 // configuration tokens
 #define R64EntR64			1
@@ -167,11 +175,41 @@
 #define R64EntCon27			44
 #define R64EntCTab			45 // list
 #define R64EntQMod			(46 + R64ENT_CTAB_MAXE) // list
-#define R64EntComment		(47 + R64ENT_CTAB_MAXE + R64ENT_CTAB_MAXE)
+#define R64EntComment		(47 + R64ENT_CTAB_MAXE + R64ENT_CTAB_MAXE) // last entry can be any size
 
 // Maxentries plus max size of each list entry
 #define R64CNF_ENTRIES_TOTAL	48
 #define R64CNF_ENTRIES_MAX		(R64CNF_ENTRIES_TOTAL + R64ENT_CTAB_MAXE + R64ENT_CTAB_MAXE)
+
+#define IOStart				(R64EntComment)
+
+
+#define IOEntCon60			(IOStart + 0)
+#define IOEntCon61			(IOStart + 1)
+#define IOEntCon62			(IOStart + 2)
+#define IOEntCon63			(IOStart + 3)
+#define IOEntCon64			(IOStart + 4)
+#define IOEntCon65			(IOStart + 5)
+#define IOEntCon66			(IOStart + 6)
+#define IOEntCon67			(IOStart + 7)
+
+#define CXPStart			(IOEntCon67 + 1)
+
+// additional CXP entries
+#define CXPNumLinks			(CXPStart + 0)
+#define CXPLinkOrder		(CXPStart + 1)
+#define CXPCamPwrTimeout	(CXPStart + 2)
+#define CXPEntConList		(CXPStart + 3)	// list
+#define CXPEntStrmToDma		(CXPStart + 4 + CXP_ENTRIES_MAX_CON_REGS)	// list
+#define CXPEntCamRegBefore	(CXPStart + 5 + CXP_ENTRIES_MAX_CON_REGS + CXP_ENTRIES_MAX_S2D)  // list
+#define CXPEntCamRegAfter	(CXPStart + 6 + CXP_ENTRIES_MAX_CON_REGS + CXP_ENTRIES_MAX_S2D + CXP_ENTRIES_MAX_CAM_REGS)  // list
+#define CXPEntComment		(CXPStart + 7 + CXP_ENTRIES_MAX_CON_REGS + CXP_ENTRIES_MAX_S2D + CXP_ENTRIES_MAX_CAM_REGS + CXP_ENTRIES_MAX_CAM_REGS) // last entry can be any size
+
+
+// Max  CXP entries plus max size of each list entry
+#define KCXPCNF_ENTRIES_TOTAL		(CXPStart + 8)
+#define KCXPCNF_ENTRIES_MAX			(KCXPCNF_ENTRIES_TOTAL + CXP_ENTRIES_MAX_CON_REGS + CXP_ENTRIES_MAX_S2D + CXP_ENTRIES_MAX_CAM_REGS + CXP_ENTRIES_MAX_CAM_REGS)
+
 
 // Alta
 

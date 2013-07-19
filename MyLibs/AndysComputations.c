@@ -45,6 +45,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 
 #include "AndysComputations.h"
@@ -158,4 +159,126 @@ void Increment (int* x, int max){
 	return;
 }
 
+/*
+ * Returns the larger of either a or b.
+ * If a and b are equal, returns a.
+ */
+int LargerOf(int a, int b){
+	if (a==b) return a;
+	if (a>b){
+		return a;
+	} else {
+		return b;
+	}
+}
 
+
+/*
+ * Returns the smaller of either a or b.
+ * If a and b are equal, returns a.
+ */
+int SmallerOf(int a, int b){
+	if (a==b) return a;
+	if (a<b){
+		return a;
+	} else {
+		return b;
+	}
+
+}
+
+/* Sum over an array of N doubles */
+double SumDoubleArray(const double* arr,int N){
+	int k;
+	double s=0;
+	for (k = 0; k < N; ++k) {
+		s+=arr[k];
+	}
+	return s;
+}
+
+
+/*
+ * Returns the mean derivative of a series of n values in buffer x
+ * Written by Quan Wen
+ * It assumes that the zeroth index is at t=0.
+ */
+int mean_derivative(double *x, double *x_dot, int n)
+{
+	int PO=0; //print out?
+
+	/** If there are no elements in the buffer, then the derivative is zero **/
+	if (n<1){
+		printf("no elements in the buffer!\n");
+		*x_dot=0;
+		return A_OK;
+	}
+
+
+	if (x==NULL){
+		printf("Mean_derivative: Error!\n");
+		return A_ERROR;
+	}
+
+    int i;
+    double s_xx, s_xy, s_x, s_y, delta;
+
+    s_y=0;
+    s_xy=0;
+    s_xx=0;
+    s_x=  ((double) (n*(n-1)) ) /(double)2;
+
+    for (i=0;i<n;i++){
+        s_xx+=  (double) (i*i);
+        s_y+=*(x+ i);
+        s_xy+=(*(x+ i))* (double)i;
+        if (PO!=0)  printf("i=%d, s_xy=%f, s_x=%f, ,s_xx=%f, s_y=%f \n",i,s_xy,s_x,s_xx,s_y);
+
+    }
+
+    delta=n*s_xx-s_x*s_x;
+    *x_dot=(n*s_xy-s_x*s_y)/delta;  /*using linear fit to find the slope x_dot */
+    if (PO!=0) {
+    	printf("numerator=%f\n\n",(n*s_xy-s_x*s_y));
+    	printf("denom=%f\n",delta);
+    	printf("*x_dot=%f\n",*x_dot);
+    }
+
+}
+
+/*
+ * Simple comparer for finding median
+ */
+int compareDouble (const void * a, const void * b)
+{
+  return (int) ( *(double*)a - *(double*)b );
+}
+
+
+/*
+ *get the median of an array of doubles
+ *uses qsort under the hood
+ */
+double MedianOfDoubleArr(const double* arr, int N){
+
+	double* temp=(double*) malloc(N*sizeof(double));
+	memcpy(temp,arr,N*sizeof(double));
+	qsort(temp, N, sizeof(arr[0]), compareDouble);
+	double result= temp[N/2];
+	free(temp);
+	return result;
+}
+
+
+/*
+ * Print out the values of a double array
+ * with N elements
+ */
+void printDoubleArr(const double* arr, int N){
+	if (N<1) return;
+	if (arr==NULL) return;
+	int i;
+	for (i = 0; i < N; ++i) {
+		printf("%d: %f\n",i,arr[i]);
+	}
+}

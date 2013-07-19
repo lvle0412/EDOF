@@ -60,17 +60,19 @@ using namespace std;
 
 
 //OpenCV Headers
-#include <highgui.h>
-#include <cv.h>
-#include <cxcore.h>
+#include "opencv2/highgui/highgui_c.h"
+#include "opencv/cv.h"
+#include "opencv/cxcore.h"
+
+
 #include <assert.h>
 
 //Andy's Personal Headers
 #include "MyLibs/AndysOpenCVLib.h"
 #include "MyLibs/Talk2FrameGrabber.h"
 #include "MyLibs/Talk2DLP.h"
-#include "MyLibs/Talk2Matlab.h"
 #include "MyLibs/AndysComputations.h"
+#include "version.h"
 
 
 
@@ -370,8 +372,8 @@ void CalibrateAPoint(CvPoint pt, CalibrationSession* c){
 
 	/** Find the median point **/
 	PairOfPoints pair;
-	pair.alpha=pt;
-	pair.beta= GetMedianOfPoints(Pts);
+	pair.alpha=pt; // known DLP point
+	pair.beta= GetMedianOfPoints(Pts); // observed point on CCD
 
 	//If both points in the are greater than zero AND if the number of valid points is greater than half of the expected number of points
 	if ((pair.beta.x >0 && pair.beta.y > 0) && Pts->total > c->LoopsPerPt / 2) {
@@ -407,6 +409,97 @@ void WriteCalibrationToFile(int* CCD2DLPLookup, CvSize size, const char * filena
 
 	return;
 }
+
+
+
+/*
+/* Write out the raw calibrated points to disk as a YAML fil
+/* MATLAB will later read this file in and generated a lookup table that is to be provided
+/* to the main colbert soffware.
+/*
+/*  (This is is all to correctly register the DLP and CCD */
+int WriteOutCalibPointPairs(CvSeq *CalibSeq, int nsizex, int nsizey,int CCDsizex, int CCDsizey){
+
+
+	printf("In WriteOutCalibPointPairs()..\n");
+
+	/* Create writing data object and memory */
+	CvFileStorage* fs;
+	CvMemStorage* writerMem;
+	writerMem=cvCreateMemStorage(0);
+	
+	/** Open YAML Data File for writing**/
+	fs=cvOpenFileStorage("calibPoints.yaml",writerMem,CV_STORAGE_WRITE);
+	
+	if (fs==0) {
+		printf("DataWriter->fs is zero! Could you have specified the wrong directory?\n");
+		/** If there were errors, return immediately **/
+		return -1;
+	}
+
+
+
+	/** Write the header for the YAML data file **/
+	cvWriteComment(fs, "Raw Instrument Calibration Data\nMade by OpticalMindControl software\nleifer@princeton.edu\n",0);
+	cvWriteString(fs, "gitHash", build_git_sha,0);
+	cvWriteString(fs, "gitBuildTime",build_git_time,0);
+
+	/** Write Out Current Time**/
+	  struct tm *local;
+	  time_t t;
+
+	  t = time(NULL);
+	  local = localtime(&t);
+	cvWriteString(fs, "ExperimentTime",asctime(local),0);
+	
+	/** Write size info **/
+	cvWriteInt(fs,"DLPwidth", nsizex);
+	cvWriteInt(fs,"DLPheight", nsizey);
+	cvWriteInt(fs,"CCDwidth", CCDsizex);
+	cvWriteInt(fs,"CCDheight", CCDsizey);
+	cvWriteInt(fs,"SizeOfInt",sizeof(int));
+
+	/** Begin Writing out Pairs of Points **/
+	int PairCount; // Current pair 
+	PairOfPoints tuple;  //A pair consisting of a CCD (x,y) and a DLP (x,y) point
+
+	int NumberOfCalibPoints= CalibSeq->total; //How many pairs of points (CCD & DLP) do we have?
+	
+	cvStartWriteStruct(fs,"PairOfPoints",CV_NODE_SEQ,NULL);
+	
+	for (PairCount = 0; PairCount < NumberOfCalibPoints; ++PairCount) {
+		printf("Calibrated Pair %d of %d\n", PairCount, CalibSeq->total);
+		cvSeqPopFront(CalibSeq, &tuple);
+		printf("DLP ( %d , %d ) -> CCD ( %d , %d )\n", tuple.alpha.x, tuple.alpha.y, tuple.beta.x, tuple.beta.y);
+		
+		cvStartWriteStruct(fs,NULL,CV_NODE_MAP,NULL);
+
+			cvStartWriteStruct(fs,"DLP",CV_NODE_MAP,NULL);
+				cvWriteInt(fs,"x", tuple.alpha.x);
+				cvWriteInt(fs,"y",tuple.alpha.y);
+			cvEndWriteStruct(fs);
+		
+			cvStartWriteStruct(fs,"CCD",CV_NODE_MAP,NULL);
+				cvWriteInt(fs,"x", tuple.beta.x);
+				cvWriteInt(fs,"y",tuple.beta.y);
+			cvEndWriteStruct(fs);	
+
+		cvEndWriteStruct(fs);
+
+	}
+	cvEndWriteStruct(fs);
+	
+	/* Close up things */
+	cvReleaseFileStorage(&fs);
+	
+	printf("End WriteOutCalibPointPairs()\n");
+	return 0;
+
+
+}
+
+
+
 
 int main (int argc, char** argv){
 
@@ -486,21 +579,24 @@ int main (int argc, char** argv){
 
 	T2DLP_clear(c->myDLP);
 
-	/** Generate Look Up Table in Matlab **/
 	cvDestroyAllWindows();
-
-	printf("Talking to MATLAB....\n");
-	T2Matlab_GenLookUpTable(c->CalibSeq, c->CCD2DLPLookUp, c->DLPsize.width, c->DLPsize.height, c->Camsize.width, c->Camsize.height);
+	
+	/** Generate Look Up Table in Matlab **/
+	printf("Writing out Calibrated Pair of Points to YAML for later processing by MATLAB...\n");
+	WriteOutCalibPointPairs(c->CalibSeq,c->DLPsize.width, c->DLPsize.height, c->Camsize.width, c->Camsize.height);
+	printf("YAML file written.\n");
+	
+	
+	//T2Matlab_GenLookUpTable(c->CalibSeq, c->CCD2DLPLookUp, c->DLPsize.width, c->DLPsize.height, c->Camsize.width, c->Camsize.height);
 
 	/** Write calibration to file **/
-	WriteCalibrationToFile(c->CCD2DLPLookUp,c->Camsize,"calib.dat");
+	//WriteCalibrationToFile(c->CCD2DLPLookUp,c->Camsize,"calib.dat");
 
 	/** Turn everything Off **/
 	T2DLP_off(c->myDLP);
 	CloseFrameGrabber(c->fg);
 
 	DestroyCalibrationSession(c);
-
 
 	printf("\n Good bye.\n");
 	return 0;

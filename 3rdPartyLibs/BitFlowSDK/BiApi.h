@@ -29,6 +29,8 @@ extern "C" {
 BFDLL BFRC		BFCAPI BiBrdOpen(BFU32 BrdType, BFU32 BrdNumber, Bd *pBrdHandle);
 BFDLL BFRC		BFCAPI BiBrdOpenEx(BFU32 BrdType, BFU32 BrdNumber, Bd *pBrdHandle, BFU32 Options);
 BFDLL BFRC		BFCAPI BiBrdOpenCam(BFU32 BrdType, BFU32 BrdNumber, Bd *pBrdHandle, PBFCHAR ForceCamFile);
+BFDLL BFRC		BFCAPI BiBrdOpenCamEx(BFU32 BrdType, BFU32 BrdNumber, Bd *pBrdHandle, PBFCHAR ForceCamFile, BFU32 Options);
+BFDLL BFRC		BFCAPI BiBrdOpenSWConnector(BFU32 BrdType, BFU32 Switch, BFU32 Connector, Bd *pBrdHandle);
 BFDLL BFRC		BFCAPI BiBrdInquire(Bd Board, BFU32 InquireVar, PBFU32 Val);
 BFDLL BFRC		BFCAPI BiBrdClose(Bd Board);
 
@@ -100,8 +102,11 @@ BFDLL BFRC		BFCAPI BiCamClose(Bd Board, PBIBA pBufArray, PBFCNF pCam);
 BFDLL BFRC		BFCAPI BiCamSel(Bd Board, PBIBA pBufArray, BFU32 CamIndex, BFU32 Mode);
 BFDLL BFRC		BFCAPI BiCamGetCur(Bd Board, PBIBA pBufArray, PBFCNF *pCam);
 BFDLL BFRC		BFCAPI BiCamSetCur(Bd Board, PBIBA pBufArray, PBFCNF pCam, BFU32 Mode);
-BFDLL BFRC		BFCAPI BiCamGetFileName(Bd Board, PBIBA pBufArray, BFU32 Num, PBFCHAR CamName);
+BFDLL BFRC		BFCAPI BiCamGetFileName(Bd Board, PBIBA pBufArray, BFU32 Num, PBFCHAR CamName, BFSIZET CamNameStLen);
 
+/* Call back functions */
+BFDLL BFRC BFCAPI BiCallBackRemove(Bd Board, PBIBA pBufArray);
+BFDLL BFRC BFCAPI BiCallBackAdd(Bd Board, PBIBA pBufArray, BiCallBackFuncPtr CallBackFunc);
 
 /* DLL only functions. */
 BFDLL BFRC	BFCAPI BiInqParameterSet(Bd Board, PBFU32 InquireVar);

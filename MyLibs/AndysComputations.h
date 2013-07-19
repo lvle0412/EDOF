@@ -38,6 +38,9 @@
 #define ANDYSCOMPUTATIONS_H_
 
 
+#define A_OK 0
+#define A_ERROR -1
+
 #define _N_TIME_PTS 100
 
 typedef struct TimeProfileStruct{
@@ -118,4 +121,42 @@ void Decrement(int* x, int min);
 void Increment (int* x, int max);
 
 
+
+/*
+ * Returns the larger of either a or b.
+ * If a and b are equal, returns a.
+ */
+int LargerOf(int a, int b);
+
+
+/*
+ * Returns the smaller of either a or b.
+ * If a and b are equal, returns a.
+ */
+int SmallerOf(int a, int b);
+
+/* Sum over an array of N doubles */
+double SumDoubleArray(const double* arr,int N);
+
+/*
+ * Returns the mean derivative of a series of values in buffer x
+ * Written by Quan Wen
+ */
+/*
+ * Returns the mean derivative of a series of n values in buffer x
+ * Written by Quan Wen
+ */
+int mean_derivative(double *x, double *x_dot, int n);
+
+/*
+ * Print out the values of a double array
+ * with N elements
+ */
+void printDoubleArr(const double* arr, int N);
+
+/*
+ *get the median of an array of doubles
+ *uses qsort under the hood
+ */
+double MedianOfDoubleArr(const double* arr, int N);
 #endif /* ANDYSCOMPUTATIONS_H_ */

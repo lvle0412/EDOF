@@ -3,7 +3,7 @@
 // Created:     April 13, 2000
 // Creator:     Bob Sheff
 //
-// Copyright (C) 1993-2000 by BitFlow, Inc.  All Rights Reserved.
+// Copyright (C) 1993-2011 by BitFlow, Inc.  All Rights Reserved.
 //
 // Description:
 //
@@ -24,7 +24,7 @@
 // Version defines used for BitFlow style version management.
 
 #define BF_SDK_V1						0x05
-#define BF_SDK_V2						0x02
+#define BF_SDK_V2						0x06
 #define BF_SDK_V3						0x00
 #define BF_SDK_V4						0x00
 
@@ -46,24 +46,24 @@
 #ifdef LINX_BUILD_TARGET
 
 	#define BF_PRODUCT_NAME_STRING			"LinX SDK\0"
-	#define BF_LEGAL_COPYRIGHT_STRING		"Copyright © 2008-2009 LinX Corporation\0"
+	#define BF_LEGAL_COPYRIGHT_STRING		"Copyright © 2008-2011 LinX Corporation\0"
 	#define BF_COMPANY_STRING				"LinX Corporation\0"
 	#define BF_INTERNAL_NAME				"LinX.sys\0"
 
 #else
 
 	#define BF_PRODUCT_NAME_STRING			"BitFlow SDK\0"
-	#define BF_LEGAL_COPYRIGHT_STRING		"Copyright © 1996-2009 BitFlow Inc\0"
-	#define BF_COMPANY_STRING				"BitFlow Inc\0"
+	#define BF_LEGAL_COPYRIGHT_STRING		"Copyright © 1996-2011 BitFlow Inc\0"
+	#define BF_COMPANY_STRING				"BitFlow, Inc.\0"
 	#define BF_INTERNAL_NAME				"BitFlow.sys\0"
 
 #endif
 
-#define BF_PRODUCT_VERSION_NUMBERS		5, 2, 0, 0
-#define BF_PRODUCT_VERSION_STRING		"5.2.0.0\0"
+#define BF_PRODUCT_VERSION_NUMBERS		5, 6, 0, 0
+#define BF_PRODUCT_VERSION_STRING		"5.6.0.0\0"
 
-#define BF_FILE_VERSION_NUMBERS			5, 2, 0,0
-#define BF_FILE_VERSION_STRING			"5.2.0.0\0"
+#define BF_FILE_VERSION_NUMBERS			5, 6, 0, 0
+#define BF_FILE_VERSION_STRING			"5.6.0.0\0"
 
 #if defined(BuildWinXP)
 	#if defined(_DEBUG)

@@ -77,6 +77,8 @@ BFDLL BFRC			BFCAPI BFErVersion(PBFU32 pMajorVersion, PBFU32 pMinorVersion);
 BFDLL BFRC			BFCAPI BFQTabModeRequest(Bd Board, BFU32 ModeRequested, PBFU32 pModeImplemented);
 BFDLL BFRC			BFCAPI BFChainSIPEnable(Bd Board, PQNumPtr PhysQTabNum);
 BFDLL BFRC			BFCAPI BFChainSIPDisable(Bd Board, PQNumPtr PhysQTabNum);
+BFDLL BFRC			BFCAPI BFQSModeSet(Bd Board, BFU32 Mode);
+BFDLL BFRC			BFCAPI BFQSModeGet(Bd Board, PBFU32 pMode);
 
 // Structures
 
@@ -106,6 +108,9 @@ BFDLL BFRC			BFCAPI BFInterruptEnableStamps(Bd Board);
 BFDLL BFRC			BFCAPI BFInterruptDisableStamps(Bd Board);
 BFDLL BFRC			BFCAPI BFSerIntHandlerEnable(Bd Board);
 BFDLL BFRC			BFCAPI BFSerIntHandlerDisable(Bd Board);
+BFDLL BFRC			BFCAPI BFCallBackAdd(Bd Board, BFU32 SignalType, BFCallBackFuncPtr CallBackFunc);
+BFDLL BFRC			BFCAPI BFCallBackRemove(Bd Board, BFU32 SignalType);
+
 
 // Version Control Functions
 
@@ -135,9 +140,12 @@ BFDLL BFBOOL		BFCAPI BFIsKbnBase(Bd Board);
 BFDLL BFBOOL		BFCAPI BFIsKbnFull(Bd Board);
 BFDLL BFBOOL		BFCAPI BFIsNeon(Bd Board);
 BFDLL BFBOOL		BFCAPI BFIsNeonBase(Bd Board);
+BFDLL BFBOOL		BFCAPI BFIsNeonD(Bd Board);
+BFDLL BFBOOL		BFCAPI BFIsNeonQ(Bd Board);
 BFDLL BFBOOL		BFCAPI BFIsAlta(Bd Board);
 BFDLL BFBOOL		BFCAPI BFIsAltaAN(Bd Board);
 BFDLL BFBOOL		BFCAPI BFIsAltaCO(Bd Board);
+BFDLL BFBOOL		BFCAPI BFIsAltaYPC(Bd Board);
 BFDLL BFBOOL		BFCAPI BFIsAlta1(Bd Board);
 BFDLL BFBOOL		BFCAPI BFIsAlta2(Bd Board);
 BFDLL BFBOOL		BFCAPI BFIsAlta4(Bd Board);
@@ -145,6 +153,11 @@ BFDLL BFBOOL		BFCAPI BFIsMaster(Bd Board);
 BFDLL BFBOOL		BFCAPI BFIsSlave(Bd Board);
 BFDLL BFBOOL		BFCAPI BFIsEncDiv(Bd Board);
 BFDLL BFBOOL		BFCAPI BFIsNTG(Bd Board);
+BFDLL BFBOOL		BFCAPI BFIsKbnCXP(Bd Board);
+BFDLL BFBOOL		BFCAPI BFIsKbnCXP1(Bd Board);
+BFDLL BFBOOL		BFCAPI BFIsKbnCXP2(Bd Board);
+BFDLL BFBOOL		BFCAPI BFIsKbnCXP4(Bd Board);
+BFDLL BFBOOL		BFCAPI BFIsCallerWOW64(PBFVOID Irp);
 
 // Serial communication funcctions
 
@@ -161,6 +174,17 @@ BFDLL BFU32			BFCAPI BFClockRate(void);
 BFDLL BFU32			BFCAPI BFClockDelta(BFU64 t0, BFU64 t1);
 BFDLL void			BFCAPI BFClockWait(BFU32 Milliseconds);						
 
+// CXP functions
+BFDLL BFRC			BFCAPI BFCXPReadData(Bd Board, BFU32 Link, BFU32 Address, BFU32 ReadSizeRequested, PBFU32 pReadSizeActual, PBFVOID pBuffer, BFSIZET BufferSize);
+BFDLL BFRC			BFCAPI BFCXPWriteData(Bd Board, BFU32 Link, BFU32 Address, PBFVOID pBuffer, BFSIZET NumBytesToWrite);
+BFDLL BFRC			BFCAPI BFCXPReadReg(Bd Board, BFU32 Link, BFU32 Address, PBFU32 pValue);
+BFDLL BFRC			BFCAPI BFCXPWriteReg(Bd Board, BFU32 Link, BFU32 Address, BFU32 Value);
+BFDLL BFRC			BFCAPI BFCXPForceReg(Bd Board, BFU32 Link, BFU32 Address, BFU32 Value);
+BFDLL BFRC			BFCAPI BFCXPConfigureLinkSpeed(Bd Board, BFU32 Link, BFU32 NumCamLinks, BFBOOL ProgCam);
+BFDLL BFRC			BFCAPI BFCXPPowerLinkUp(Bd Board, BFU32 Link);
+BFDLL BFRC			BFCAPI BFCXPPowerLinkDown(Bd Board, BFU32 Link);
+BFDLL BFRC			BFCAPI BFCXPClearFIFOs(Bd Board, BFU32 Link);
+
 
 // misc
 
@@ -171,6 +195,9 @@ BFDLL void			BFCAPI BFOutputDebugString(PBFCHAR OutputString);
 BFDLL BFRC			BFCAPI BFGetCurrentFimwareName(Bd Board, PBFCHAR FWRoot, PBFCHAR FWFileName, BFU32 FWFileNameSize);
 BFDLL BFRC			BFCAPI BFGetBuildTarget(PBFU32 pTarget);
 BFDLL void			BFCAPI BFReadSerialNumber(Bd Board, PBFU32 pSerialNumber);
+BFDLL void			BFCAPI BFReadHWRevision(Bd Board, PBFCHAR HWRevision, BFU32 HWRevsionSize);
+BFDLL BFU32			BFCAPI BFGetVFGNum(Bd Board);
+
 
 
 // Alternate spellings.

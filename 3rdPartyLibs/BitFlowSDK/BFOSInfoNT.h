@@ -56,6 +56,8 @@
 		PFILE_OBJECT		pFileObjectActive;			// File object that is active.
 		PFILE_OBJECT		pFileObjectEngage;			// File object that was active during last engage.
 		PFILE_OBJECT		pFileObjectUARTMutex;		// File object that was set the UART mutex.
+
+		BFU32				TestLevel;
 		
 		// DMA Adapter
 		PDEVICE_OBJECT		PhysicalDeviceObject;		// The physical device object for the device requesting the DMA adapter structure.

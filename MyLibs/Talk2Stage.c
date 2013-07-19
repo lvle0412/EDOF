@@ -2,7 +2,9 @@
 // usb_rcfg.cpp : A simple USB DOS console application. Sample code.
 // Author: Doug Lovett
 // Birth: 02/07/2000
-// Written by Andrew Leifer
+// 
+// 
+// Heavily modified  by Andrew Leifer
 
 /*
  * Compile by running:
@@ -124,8 +126,9 @@ HANDLE InitializeUsbStage(){
 
 		//CBR_9600 works
 		//dcbSerialParams.BaudRate=CBR_9600;
-		//CBR_115200 also works.
-		dcbSerialParams.BaudRate=CBR_256000;
+		//CBR_115200 also works. //This matches what LUDL Says
+		//CBR_256000 also works
+		dcbSerialParams.BaudRate=CBR_115200; 
 		dcbSerialParams.ByteSize=8;
 		dcbSerialParams.StopBits=TWOSTOPBITS;
 		dcbSerialParams.Parity=NOPARITY;
@@ -154,22 +157,70 @@ HANDLE InitializeUsbStage(){
 }
 
 /*
+ If you don't clear some buffer and you are using the virtual com port driver, then 
+ the stage stops responding to commands after around the 3300th command. By running this function
+ you clear that mysterious buffer and everything works. See the email from rzingel@ludl.com
+ */
+void clearStageBuffer(HANDLE s){
+	/* From an email from rzingel@ludl.com:
+	 It looks like the characters that the MAC6000 is sending in response to the spin commands :A<LF> is causing a buffer overflow and that is causing the unit to stop responding.  It's possible that the proprietary driver handled this better then the virtual com.  There is a simple work around that seems to fix it.  I ran the test with out this code I added and it always failed around 3500 commands.  Once I made the change that I show below then I've had it running for over 15000 commands without the lockup issue.  Basically I just clear the comm errors and read any characters that are in the buffer.  */
+
+	//Begin Buffer Clearing Fix from rzingel
+		DWORD dwErrors; 
+		DWORD Length;
+
+
+        COMSTAT Status; 
+        
+        ClearCommError( s, &dwErrors, &Status); 
+        Length = Status.cbInQue;        // get the rx data length in buffer 
+        // Get data and put it in to iBuffer 
+        DWORD nRead; 
+        char * pText; 
+        pText = (char *)malloc(sizeof(char)*(Length + 2)); 
+        ReadFile(s,pText, Length, &nRead,NULL); 
+        free(pText); 
+ 		return;
+
+}
+
+
+
+/*
  * Set the velocity of the stage
  *
  */
 int spinStage(HANDLE s, int xspeed,int yspeed){
-	DWORD Length;
+	
+
+	 DWORD Length;
+	 
+	
+	//Error handling modeled off of http://msdn.microsoft.com/en-us/library/windows/hardware/bb540534(v=vs.85).aspx
+	BOOL bErrorFlag = FALSE;
+
+
 	char* buff=(char*) malloc(sizeof(char)*1024);
 	sprintf(buff,"SPIN X=%d Y=%d\r",xspeed,yspeed);
-	WriteFile(s, buff, strlen(buff), &Length, NULL);
+	bErrorFlag=WriteFile(s, buff, strlen(buff), &Length, NULL);
 	free(buff);
+
+	if (FALSE == bErrorFlag)
+    {
+        printf("Failure: Unable to write to serial port.\n");
+    }
+
+	clearStageBuffer(s);
 	return 0;
 
 }
 
+
+
 int haltStage(HANDLE s){
 		DWORD Length;
 		WriteFile(s, "HALT\r", strlen("HALT\r"), &Length, NULL);
+		clearStageBuffer(s);
 		return 0;
 
 }
@@ -180,6 +231,7 @@ int moveStageRel(HANDLE s, int xpos, int ypos){
 	sprintf(buff,"MOVEI X=%d Y=%d\r",xpos,ypos);
 	WriteFile(s, buff, strlen(buff), &Length, NULL);
 	free(buff);
+	clearStageBuffer(s);
 	return 0;
 }
 
@@ -187,6 +239,7 @@ int moveStageRel(HANDLE s, int xpos, int ypos){
 int zeroStage(HANDLE s){
 	DWORD Length;
 	WriteFile(s, "HERE X=0 Y=0\r", strlen("HERE X=0 Y=0\r"), &Length, NULL);
+	clearStageBuffer(s);
 	return 0;
 
 }
@@ -198,6 +251,7 @@ int centerStage(HANDLE s){
 	printf("Hit enter when done. This will zero the stage.\n");
 	scanf("");
 	zeroStage(s);
+	clearStageBuffer(s);
 	return 0;
 
 }
@@ -256,8 +310,8 @@ void steerStageFromNumberPad(HANDLE s, int speed, int input){
 
 
 
-
-
+// OLD WINXP PROPRIETORY DRIVER  INTERFACE:
+//
 // ------------------------------------------------------------------------ //
 // UsbScan() - Scan for first USB device with a GUID that matches the one
 // passed. Return 1 if device found, else 0.

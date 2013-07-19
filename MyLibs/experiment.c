@@ -48,11 +48,11 @@
 #include <sys/time.h>
 
 //OpenCV Headers
-#include <highgui.h>
-#include <cv.h>
-#include <cxcore.h>
+#include "opencv2/highgui/highgui_c.h"
+#include "opencv/cv.h"
+#include "opencv/cxcore.h"
 
-//Timer Lib
+//Timer Libray
 #include "../3rdPartyLibs/tictoc.h"
 
 //Andy's Personal Headers
@@ -68,7 +68,7 @@
 #include "TransformLib.h"
 #include "WriteOutWorm.h"
 #include "version.h"
-
+#include "../API/mc_api_dll.h"
 
 #include "experiment.h"
 
@@ -164,6 +164,7 @@ Experiment* CreateExperimentStruct() {
 
 	/** Illumination Timing Info **/
 	exp->illumStart = 0;
+	exp->illumFinished = 0;
 
 	/** Illumination Head Tail Timing Info **/
 	exp->illumSweepHTtimer=0;
@@ -184,6 +185,11 @@ Experiment* CreateExperimentStruct() {
 	/** Macros **/
 	exp->RECORDVID = 0;
 	exp->RECORDDATA = 0;
+
+	/** MindControl API **/
+	exp->sm=NULL;
+
+	exp->scratchMem =cvCreateMemStorage(0);
 
 	/** Error Handling **/
 	exp->e = 0;
@@ -444,13 +450,196 @@ int HandleIlluminationSweep(Experiment* exp){
 
 }
 
-/** Handle Transient Illumination Timing **/
+/*
+ * Calculate the Mean Curvature of the Head and Analyze the Phase of the
+ * worm's sinusoidal body motions.
+ *
+ * Put this  in a buffer that includes prior curvatures over the last 20 frames or so.
+ *
+ * If we are trigging based on the phase of the worm's motion, turn the DLP on if we are
+ * in the triggering region.
+ *
+ */
+int HandleCurvaturePhaseAnalysis(Experiment* exp){
+
+	int DEBUG_FLAG=0; // print out ?
+
+
+	_TICTOC_TIC_FUNC
+	TICTOC::timer().tic("_CurvaturePhaseAnalysis",exp->e);
+
+	/** If Curvature Analysis is turned off, just return **/
+	if (exp->Params->CurvatureAnalyzeOn == 0){
+		return EXP_SUCCESS;
+	}  /** Otherwise Let's Calculate the Mean Curvature of the Head**/
+
+
+
+
+	/** Smoothing parameter**/
+	double sigma=5; /** made bigger **/
+	int factor=exp->Params->CurvaturePhaseVisualaziationFactor; //visualization parameter
+
+	/** Define the head in worm coordinates **/
+	int HEAD_BEGIN=10;
+	int HEAD_END=30;
+
+	/** Splice the head **/
+	CvSeq* headcent=cvSeqSlice(exp->Worm->Segmented->Centerline,cvSlice(HEAD_BEGIN,HEAD_END));
+	int N=headcent->total - 2;
+	if (DEBUG_FLAG!=0){
+		printf("Whole Centerline :\n");
+		printSeq(exp->Worm->Segmented->Centerline);
+		printf("Just the Head:\n");
+		printSeq(headcent);
+	}
+
+
+	/** Extract the curvature of the head **/
+	double* curvature= (double*) malloc(N* (sizeof(double)));
+	RefreshWormMemStorage(exp->Worm);
+
+	/** Smooth and Extract Curvature **/
+	if (extractCurvatureOfSeq( headcent,curvature,sigma,exp->Worm->MemScratchStorage)< 0) return EXP_ERROR;
+	RefreshWormMemStorage(exp->Worm);
+	if (DEBUG_FLAG!=0) printDoubleArr(curvature,N);
+
+	/** Calculate Median Curvature **/
+	double median_curvature=MedianOfDoubleArr(curvature,N);
+	if (DEBUG_FLAG!=0) {
+		printf("median_curvature*100=%f\n",median_curvature* (double) 100);
+		printf("About to add the mean head curvature to the buffer.\n");
+	}
+
+	/** Store Mean head curvature in buffer that includes mean head curvatures from previous 20 frames**/
+	if (AddMeanHeadCurvature(exp->Worm->TimeEvolution,median_curvature,exp->Params)!=A_OK) printf("Error adding mean curvature!!\n");
+	if (DEBUG_FLAG!=0) {
+		printf("exp->Worm->TimeEvolution->MeanHeadCurvatureBuffer->total=%d\n",exp->Worm->TimeEvolution->MeanHeadCurvatureBuffer->total);
+		printSeqScalarDoubles(exp->Worm->TimeEvolution->MeanHeadCurvatureBuffer);
+	}
+
+	/** Calculate the derivative of the mean head curvature with respect to time **/
+	double* headPhaseBuff=NULL;
+	SeqDoublesToArr((const CvSeq*) exp->Worm->TimeEvolution->MeanHeadCurvatureBuffer,&headPhaseBuff);
+	int N_curr=exp->Worm->TimeEvolution->MeanHeadCurvatureBuffer->total;
+
+	if (DEBUG_FLAG!=0){
+		printf("headPhaseBuff\n");
+		printDoubleArr(headPhaseBuff,N_curr);
+	}
+
+	double negative_k_dot;//our buffer is backwards. 0th index is most recent.
+
+	mean_derivative(headPhaseBuff,&negative_k_dot,N_curr);
+	exp->Worm->TimeEvolution->derivativeOfHeadCurvature=-negative_k_dot;
+
+
+	/** Deallocate memory for head phase buffer **/
+	free(headPhaseBuff);
+	if (DEBUG_FLAG!=0) {
+		printf("k*%d=%f\t, kdot* %d: %f\n",factor, (double)factor *median_curvature, factor, (double)factor* (exp->Worm->TimeEvolution->derivativeOfHeadCurvature));
+		printf("NumFrames: %d, kdot+/-: %d, k+/-: %d, Thresh: %d\n",exp->Params->CurvaturePhaseNumFrames, exp->Params->CurvaturePhaseDerivThresholdPositive,exp->Params->CurvaturePhaseThresholdPositive,exp->Params->CurvaturePhaseThreshold);
+		cvWaitKey(1000);
+	}
+
+
+	/** If triggering based on phase, decide weather to turn the DLP on or off**/
+	double k, kdot, trig, desiredSignk, desiredSignkdot, signOfk, signOfkdot;
+
+	if (exp->Params->CurvaturePhaseTriggerOn != 0){
+		struct timeval curr_tv;
+
+		/*
+		 * This is subtle. There is k and kdot. k is the median curvature. kdot is the derivative of the median curvature.
+		 * We want to trigger based upon when |k| > trig and when sign(kdot) == desiredSign .
+		 */
+		kdot=exp->Worm->TimeEvolution->derivativeOfHeadCurvature;
+		k=median_curvature*factor;
+
+		/** find signOfkdot**/
+		signOfkdot=-1;
+		if (kdot>0) signOfkdot=1;
+
+		/** find sign(k) **/
+		signOfk=-1;
+		if (k>0) signOfk=1;
+
+		/** get desiredSign  for k and kdot**/
+		desiredSignkdot= 1;
+		desiredSignk =1;
+		if (exp->Params->CurvaturePhaseDerivThresholdPositive ==0) desiredSignkdot=  -1;
+		if (exp->Params->CurvaturePhaseThresholdPositive ==0) desiredSignk=  -1;
+
+
+		trig= (double) exp->Params->CurvaturePhaseThreshold  / 10; //Divide by 10 because the slider bar is multiplied by 10
+
+		/** trigger if the abs(k)>trig AND signOfk==desiredSign **/
+		if (  (signOfk * k) > trig   && (signOfkdot==desiredSignkdot)   && (signOfk==desiredSignk))  {
+
+
+			/*
+			 * We want to implement a minimum DLP on-time, and a refactory
+			 * period. E.g. once the DLP goes on it should stay on a minimimum of n seconds
+			 * and once it goes off it should stay off a minimum of m seconds.
+			 *
+			 */
+
+			/** If we are in Illumination-Stay-On-and-Refractory-Period-Mode **/
+			if (exp->Params->StayOnAndRefract==1){
+
+				/** Get timing info to Find out if Refractory Period is Over **/
+				gettimeofday(&curr_tv, NULL);
+				double diff = curr_tv.tv_sec + (curr_tv.tv_usec / 1000000.0) - exp->illumFinished;
+				if ( diff  >  (double) exp->Params->IllumRefractoryPeriod / 10.0){
+
+					/** Turn on the DLP for a preset amount of time **/
+					exp->Params->DLPOnFlash=1;
+
+					/** TRICKY!!  **/
+					exp->Params->DLPOn=1; // let's also turn the DLP on right now! this shoudln't mess with HAndle Illumination Timing
+
+
+				} else {
+					// Don't actually turn on the DLP, because the refractory period isn't met.
+				}
+
+			}else{
+
+			/** Turn on the DLP **/
+			exp->Params->DLPOn = 1;
+
+			}
+
+		} else {
+			/** The curvature is such that we are no longer triggering **/
+
+			 if (exp->Params->StayOnAndRefract==1){
+				//don't do anything because the Handle IllumiantionTiming DLP function will take care of turning things off
+			 } else {
+				/** Turn the DLP Off **/
+				exp->Params->DLPOn = 0;
+			 }
+		}
+
+
+	}
+	TICTOC::timer().toc("_CurvaturePhaseAnalysis",exp->e);
+	return A_OK;
+}
+
+
+/*
+ * Feature to turn on DLP illumination for a specified period of time
+ * and then auto shut off.
+ *
+ */
 int HandleIlluminationTiming(Experiment* exp) {
 
 	struct timeval curr_tv;
 	double diff;
 
 	int tenthsOfSecondsElapsed;
+
 
 	/** Case 1: Nothing to do **/
 	if (!exp->Params->DLPOnFlash) {
@@ -463,7 +652,13 @@ int HandleIlluminationTiming(Experiment* exp) {
 	if ((exp->Params->DLPOnFlash) && (exp->illumStart == 0)) {
 		/**Set the start time to now. **/
 		gettimeofday(&curr_tv, NULL);
+
+		/** Set illumStart Time **/
 		exp->illumStart = curr_tv.tv_sec + (curr_tv.tv_usec / 1000000.0);
+
+		/** Set illumFinished Time as now (even though we are not yet finished) **/
+		exp->illumFinished =exp->illumStart;
+
 
 		/** Turn the DLP On **/
 		exp->Params->DLPOn = 1;
@@ -476,6 +671,11 @@ int HandleIlluminationTiming(Experiment* exp) {
 		gettimeofday(&curr_tv, NULL);
 		diff = curr_tv.tv_sec + (curr_tv.tv_usec / 1000000.0) - exp->illumStart;
 
+		/** Set IllumFinished **/
+		exp->illumFinished = curr_tv.tv_sec + (curr_tv.tv_usec / 1000000.0);
+
+
+		/** Determine if we should continue illuminating or stop **/
 		tenthsOfSecondsElapsed = (int) (diff * 10.0);
 		if (tenthsOfSecondsElapsed > exp->Params->IllumDuration) {
 			/** The illumination is now finished **/
@@ -642,7 +842,7 @@ void SetupGUI(Experiment* exp) {
 
 	/****** Setup Debug Control Panel ******/
 	cvNamedWindow(exp->WinCon2);
-	cvResizeWindow(exp->WinCon2, 450, 200);
+	cvResizeWindow(exp->WinCon2, 450, 800);
 	cvCreateTrackbar("FloodLight", exp->WinCon2,
 			&(exp->Params->IllumFloodEverything), 1, (int) NULL);
 
@@ -650,14 +850,52 @@ void SetupGUI(Experiment* exp) {
 	cvCreateTrackbar("Min",exp->WinCon2,&(exp->Params->LevelsMin),255, (int) NULL );
 	cvCreateTrackbar("Max",exp->WinCon2,&(exp->Params->LevelsMax),255, (int) NULL );
 
+	/** Setup Information about Curvature Analysis on the extra control panel **/
+	//Curvature analysis? Yes / No
+	cvCreateTrackbar("KAnalyzeOn", exp->WinCon2,
+			&(exp->Params->CurvatureAnalyzeOn), 1, (int) NULL);
+
+	//Trigger based on the derivative of the mean curvature of the head? Yes/No
+	cvCreateTrackbar("KTriggerOn", exp->WinCon2,
+			&(exp->Params->CurvaturePhaseTriggerOn), 1, (int) NULL);
+
+	//How many number of frames do we go back in time to calculate the derivative?
+	cvCreateTrackbar("KNumFrames", exp->WinCon2,
+				&(exp->Params->CurvaturePhaseNumFrames), 50, (int) NULL);
+
+	//Abs value threshold for mean curvature, greater than which we illuminate
+	cvCreateTrackbar("KThresh*10", exp->WinCon2,
+				&(exp->Params->CurvaturePhaseThreshold), 100, (int) NULL);
+
+	//Illuminate during sign of k positive or negative
+	cvCreateTrackbar("KThresh+/-", exp->WinCon2,
+				&(exp->Params->CurvaturePhaseThresholdPositive), 1, (int) NULL);
+
+
+	//Illuminate for positive or negative derivative of curvature (kdot >? 0)?
+	cvCreateTrackbar("KdotThresh+/-", exp->WinCon2,
+					&(exp->Params->CurvaturePhaseDerivThresholdPositive), 1, (int) NULL);
+
+	cvCreateTrackbar("IllumRefractPeriod", exp->WinCon2,
+			&(exp->Params->IllumRefractoryPeriod), 70, (int) NULL);
+
+	//Use the minimum DLP On and Refractory Period?
+	cvCreateTrackbar("StayOn&Refract", exp->WinCon2,
+					&(exp->Params->StayOnAndRefract), 1, (int) NULL);
+
+
+
 
 	/** If we have loaded a protocol, set up protocol specific sliders **/
 	if (exp->pflag) {
 		cvCreateTrackbar("Protocol", exp->WinCon2, &(exp->Params->ProtocolUse),
 				1, (int) NULL);
-		cvCreateTrackbar("ProtoStep", exp->WinCon2,
-				&(exp->Params->ProtocolStep), exp->p->Steps->total - 1,
-				(int) NULL);
+
+		if (exp->p->Steps->total > 1){
+			cvCreateTrackbar("ProtoStep", exp->WinCon2,
+					&(exp->Params->ProtocolStep), exp->p->Steps->total - 1,
+					(int) NULL);
+		}
 	}
 
 	/** Stage Related GUI elements **/
@@ -718,8 +956,11 @@ void UpdateGUI(Experiment* exp) {
 		/** If we have loaded a protocol, update protocol specific sliders **/
 		if (exp->pflag) {
 			cvSetTrackbarPos("Protocol", exp->WinCon2, exp->Params->ProtocolUse);
-			cvSetTrackbarPos("ProtoStep", exp->WinCon2,
-					(exp->Params->ProtocolStep));
+
+			if (exp->p->Steps->total > 1){
+				cvSetTrackbarPos("ProtoStep", exp->WinCon2,
+						(exp->Params->ProtocolStep));
+			}
 		}
 
 		/** Floodlight **/
@@ -858,6 +1099,9 @@ void InitializeExperiment(Experiment* exp) {
 	WormGeom* PrevWorm = CreateWormGeom();
 	exp->PrevWorm = PrevWorm;
 
+	/** Create MindControl API Shared Memory **/
+	exp->sm=MC_API_StartServer();
+
 }
 
 /*
@@ -873,6 +1117,13 @@ void ReleaseExperiment(Experiment* exp) {
 		DestroyFrame(&(exp->forDLP));
 	if (exp->IlluminationFrame != NULL)
 		DestroyFrame(&(exp->IlluminationFrame));
+
+	/** Stop MindControl API Shared Memory Server **/
+	if (exp->sm!=NULL){
+		MC_API_StopServer(exp->sm);
+		exp->sm=NULL;
+	}
+
 
 	/** Free up Strings **/
 	exp->dirname = NULL;
@@ -917,6 +1168,7 @@ void ReleaseExperiment(Experiment* exp) {
  * To be run after ReleaseExperiment()
  */
 void DestroyExperiment(Experiment** exp) {
+	cvReleaseMemStorage( &((*exp)->scratchMem));
 	free(*exp);
 	*exp = NULL;
 }
@@ -983,7 +1235,7 @@ int GrabFrame(Experiment* exp) {
 		LoadFrameWithImage(tempImgGray, exp->fromCCD);
 		cvReleaseImage(&tempImgGray);
 		/*
-		 * Note: for some reason thinks crash when you go cvReleaseImage(&tempImg)
+		 * Note: for some reason thingt crash when you go cvReleaseImage(&tempImg)
 		 * And there don't seem to be memory leaks if you leave it. So I'm going to leave it in place.
 		 *
 		 */
@@ -1048,8 +1300,7 @@ int SetupRecording(Experiment* exp) {
 		BeginToWriteOutFrames(exp->DataWriter);
 
 		printf("Initialized data recording\n");
-		//DestroyFilename(&DataFileName); //Somehow this seems to be throwing a bug.
-		printf("Destroyed filename\n");
+		DestroyFilename(&DataFileName);
 	}
 
 	/** Set Up Video Recording **/
@@ -1069,8 +1320,8 @@ int SetupRecording(Experiment* exp) {
 		exp->VidHUDS = cvCreateVideoWriter(HUDSFileName,
 				CV_FOURCC('M','J','P','G'), 30, cvSize(NSIZEX / 2, NSIZEY / 2),
 				0);
-		if (exp->Vid ==NULL ) printf("\tERROR in SetupRecording! exp->Vid is NULL\n");
-		if (exp->VidHUDS ==NULL ) printf("\tERROR in SetupRecording! exp->VidHUDS is NULL\n");
+		if (exp->Vid ==NULL ) printf("\tERROR in SetupRecording! exp->Vid is NULL\nYou probably are missing the default codec.\n");
+		if (exp->VidHUDS ==NULL ) printf("\tERROR in SetupRecording! exp->VidHUDS is NULL\n You probably are missing the default codec.\n");
 		DestroyFilename(&MovieFileName);
 		DestroyFilename(&HUDSFileName);
 		printf("Initialized video recording\n");
@@ -1117,10 +1368,25 @@ void StartFrameRateTimer(Experiment* exp) {
  * Calculate the frame rate and print i tout
  *
  */
-void CalculateAndPrintFrameRate(Experiment* exp) {
+void CalculateAndPrintFrameRateAndInfo(Experiment* exp) {
 	/*** Print out Frame Rate ***/
+	int fps,factor;
 	if ((exp->Worm->timestamp - exp->prevTime) > CLOCKS_PER_SEC) {
-		printf("%d fps\n", exp->Worm->frameNum - exp->prevFrames);
+
+		/** Simply count the frames given in the last second **/
+		fps=exp->Worm->frameNum - exp->prevFrames;
+
+		/** If we are doing real time analysis of head curvature **/
+		if (exp->Params->CurvatureAnalyzeOn) {
+			factor=exp->Params->CurvaturePhaseVisualaziationFactor;
+			/** display the head curvature and derivative along with the frame rate **/
+			printf("%d fps \tk*%d=%Lf \tkdot*%d=%Lf \n", fps, factor, (double)factor*exp->Worm->TimeEvolution->currMeanHeadCurvature,factor, (double)factor* exp->Worm->TimeEvolution->derivativeOfHeadCurvature);
+		}else{
+			/** Print only frames **/
+			printf("%d fps\n", fps);
+		}
+
+		/** In all cases, reset the timer **/
 		exp->prevFrames = exp->Worm->frameNum;
 		exp->prevTime = exp->Worm->timestamp;
 	}
@@ -1427,11 +1693,39 @@ int HandleKeyStroke(int c, Experiment* exp) {
 	return 0;
 }
 
+
+/*
+ * Write out current values to MindControl API and read in
+ * values set by external processes.
+ *
+ * At the moment, MindControl writes out the current frame and the
+ * status of the DLP. It reads in the laser power values.
+ */
+void SyncAPI(Experiment* exp){
+
+	/** Write out to the MindControl API **/
+	MC_API_SetCurrentFrame(exp->sm, exp->Worm->frameNum);
+	MC_API_SetDLPOnOff(exp->sm,exp->Params->DLPOn);
+
+	/** Load in Info From Laser Controller **/
+	if (MC_API_isLaserControllerPresent(exp->sm)) {
+		exp->Params->GreenLaser=MC_API_GetGreenLaserPower(exp->sm);
+		exp->Params->BlueLaser=MC_API_GetBlueLaserPower(exp->sm);
+	} else {
+		exp->Params->GreenLaser=-1;
+		exp->Params->BlueLaser=-1;
+	}
+
+	return;
+
+}
+
 /*
  * Write video and data to Disk
  *
  */
 void DoWriteToDisk(Experiment* exp) {
+
 
 	/** Throw error if the user has asked to record, but the system is not in record mode **/
 	if (exp->Params->Record && (exp->RECORDVID!=1)  ){
@@ -1464,8 +1758,9 @@ void DoWriteToDisk(Experiment* exp) {
 	if (exp->RECORDDATA && exp->Params->Record) {
 		TICTOC::timer().tic("AppendWormFrameToDisk");
 		AppendWormFrameToDisk(exp->Worm, exp->Params, exp->DataWriter);
-TICTOC	::timer().toc("AppendWormFrameToDisk");
-}
+		TICTOC	::timer().toc("AppendWormFrameToDisk");
+	}
+
 }
 
 /*
@@ -1473,26 +1768,24 @@ TICTOC	::timer().toc("AppendWormFrameToDisk");
  *
  */
 int DoOnTheFlyIllumination(Experiment* exp) {
-
 	CvSeq* montage = CreateIlluminationMontage(exp->Worm->MemScratchStorage);
-
 	/** Note, out of laziness I am hardcoding the grid dimensions to be Numsegments by number of segments **/
-	;
-
+	
 	CvPoint origin = ConvertSlidlerToWormSpace(exp->Params->IllumSquareOrig,exp->Params->DefaultGridSize);
-	GenerateSimpleIllumMontage(montage, origin, exp->Params->IllumSquareRad, exp->Params->DefaultGridSize);
-
+	int tmp;
+	tmp=GenerateSimpleIllumMontage(montage, origin, exp->Params->IllumSquareRad, exp->Params->DefaultGridSize);
 	/** Illuminate the worm **/
 	/** ...in camera space **/
 	IllumWorm(exp->Worm->Segmented, montage, exp->IlluminationFrame->iplimg,
 			exp->Params->DefaultGridSize,exp->Params->IllumFlipLR);
+			
 	LoadFrameWithImage(exp->IlluminationFrame->iplimg, exp->IlluminationFrame);
 	/** ... in DLP space **/
 	IllumWorm(exp->segWormDLP, montage, exp->forDLP->iplimg,
 			exp->Params->DefaultGridSize,exp->Params->IllumFlipLR);
 	LoadFrameWithImage(exp->forDLP->iplimg, exp->forDLP);
-
 	cvClearSeq(montage);
+	return 0;
 
 }
 
@@ -1610,8 +1903,8 @@ CvPoint AdjustStageToKeepObjectAtTarget(HANDLE stage, CvPoint* obj,CvPoint targe
 	/** (stage-obj)*speed **/
 //	printf("obj= (%d, %d), target =(%d, %d)\n",obj->x, obj->y, target->x, target->y);
 
-	diff.y=target.x-obj->x;
-	diff.x=target.y-obj->y;
+	diff.x=target.x-obj->x;
+	diff.y=target.y-obj->y;
 
 	//printf("About to Multiply!\n");
 	vel.x= CropNumber(-activeZoneRadius,activeZoneRadius, diff.x)*speed;
@@ -1664,6 +1957,7 @@ int HandleStageTracker(Experiment* exp){
 				/** Turn the stage off **/
 				exp->stageIsTurningOff=1;
 				exp->Params->stageTrackingOn=0;
+				printf("Setting flags to turn stage off in HandleStageTracker()\n");
 			} else {
 			/** Move the stage to keep the worm centered in the field of view **/
 			printf(".");
@@ -1676,6 +1970,7 @@ int HandleStageTracker(Experiment* exp){
 			}
 		}
 		if (exp->Params->stageTrackingOn==0){/** Tracking Should be off **/
+		//	printf("Tracking is off in HandleStageTracker()\n");
 			/** If we are in the process of turning tacking off **/
 			if (exp->stageIsTurningOff==1){
 				/** Tell the stage to Halt **/
@@ -1685,6 +1980,7 @@ int HandleStageTracker(Experiment* exp){
 				exp->stageIsTurningOff=0;
 			}
 			/** The stage is already halted, so there is nothing to do. **/
+			//printf("The stage is already halted in HandleStageTracker()\n.");
 		}
 
 	}

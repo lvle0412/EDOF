@@ -637,6 +637,7 @@ int GivenBoundaryFindWormHeadTail(WormAnalysisData* Worm, WormAnalysisParam* Par
 	int BehindPtr=0;
 	int Ptr=0;
 	int* DotProdPtr;
+	int* CrossProdPtr;
 	int DotProdVal;
 	int CrossProdVal;
 
@@ -675,7 +676,6 @@ int GivenBoundaryFindWormHeadTail(WormAnalysisData* Worm, WormAnalysisParam* Par
 		/** Store the Cross Product in our Mat **/
 		CrossProdVal=PointCross(&AheadVec,&BehindVec);
 		cvSeqPush(CrossProds,&CrossProdVal);
-		
 
 	//	printf("i= %d, DotProdVal=%d\n", i, DotProdVal);
 	//	cvWaitKey(0);
@@ -700,6 +700,7 @@ int GivenBoundaryFindWormHeadTail(WormAnalysisData* Worm, WormAnalysisParam* Par
 
 	for (i = 0; i < TotalBPts; i++) {
 		DotProdPtr = (int*) cvGetSeqElem(DotProds,i);
+		CrossProdPtr = (int*) cvGetSeqElem(CrossProds,i);
 		if (*DotProdPtr < MostCurvy && *CrossProdPtr > 0) { //If this locaiton is curvier than the previous MostCurvy location
 			MostCurvy = *DotProdPtr; //replace the MostCurvy point
 			MostCurvyIndex = i;
@@ -729,12 +730,12 @@ int GivenBoundaryFindWormHeadTail(WormAnalysisData* Worm, WormAnalysisParam* Par
 
 	for (i = 0; i < TotalBPts; i++) {
 		DotProdPtr =(int*) cvGetSeqElem(DotProds,i);
-
+		CrossProdPtr=(int*) cvGetSeqElem(CrossProds,i);
 		DistBetPtsOnBound = DistBetPtsOnCircBound(TotalBPts, i, MostCurvyIndex);
 		//If we are at least a 1/4 of the total boundary away from the most curvy point.
 		if (DistBetPtsOnBound > (TotalBPts / 4)) {
-			//If this location is curvier than the previous SecondMostCurvy location
-			if (*DotProdPtr< SecondMostCurvy) {
+			//If this location is curvier than the previous SecondMostCurvy location & is not an invagination
+			if (*DotProdPtr< SecondMostCurvy && *CrossProdPtr > 0) {
 				SecondMostCurvy = *DotProdPtr; //replace the MostCurvy point
 				SecondMostCurvyIndex = i;
 			}

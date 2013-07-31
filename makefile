@@ -224,6 +224,7 @@ hw_ind= version.o AndysComputations.o AndysOpenCVLib.o TransformLib.o IllumWormP
 #CoLBeRT is the whole megillah: BitFlow FrameGrabber, DLP, OpenCV, Stage Control
 makecolbert: $(targetDir)/colbert.exe $(targetDir)/calibrate_colbert_first.exe
 
+makevirtual: $(targetDir)/VirtualColbert.exe
 
 all_tests: test_DLP test_CV test_FG test_Stage
 
@@ -243,6 +244,16 @@ test_Stage : $(targetDir)/testStage.exe
 # Top-level Linker Targets
 #=========================
 
+$(targetDir)/VirtualColbert.exe : VirtualColbert.o \
+		Talk2FrameGrabber.o \
+		DontTalk2DLP.o \
+		Talk2Stage.o \
+		DontTalk2Camera.o \
+		$(openCVobjs) \
+		$(targetDir)/mc_api.dll \
+		$(hw_ind)	
+	$(CXX) $(LINKFLAGS) -o $(targetDir)/VirtualColbert.exe $(targetDir)/mc_api.dll DontTalk2FrameGrabber.o Talk2Stage.o DontTalk2Camera.o DontTalk2DLP.o $(hw_ind) $(LinkerWinAPILibObj) 
+
 
 $(targetDir)/colbert.exe : colbert.o \
 		Talk2FrameGrabber.o \
@@ -255,7 +266,8 @@ $(targetDir)/colbert.exe : colbert.o \
 		$(targetDir)/mc_api.dll \
 		$(hw_ind)	
 	$(CXX) $(LINKFLAGS) -o $(targetDir)/colbert.exe  colbert.o $(targetDir)/mc_api.dll Talk2FrameGrabber.o Talk2Stage.o DontTalk2Camera.o $(BFObj) Talk2DLP.o   $(ALP_STATIC) $(hw_ind) $(LinkerWinAPILibObj) 
-
+	
+	
 $(targetDir)/calibrate_colbert_first.exe : calibrate_colbert_first.o \
 		Talk2FrameGrabber.o \
 		$(BFobj) \
@@ -299,6 +311,20 @@ $(targetDir)/testStage.exe : testStage.o Talk2Stage.o
 #=========================
 # Top-level Compile Source
 #=========================
+
+VirtualColbert.o : main.cpp  \
+		$(MyLibs)/Talk2DLP.h \
+		$(MyLibs)/Talk2Camera.h \
+		$(MyLibs)/TransformLib.h \
+		$(MyLibs)/AndysOpenCVLib.h \
+		$(MyLibs)/Talk2FrameGrabber.h \
+		$(MyLibs)/AndysComputations.h \
+		$(MyLibs)/WormAnalysis.h \
+		$(MyLibs)/WriteOutWorm.h \
+		$(MyLibs)/IllumWormProtocol.h \
+		$(MyLibs)/TransformLib.h \
+		$(MyLibs)/experiment.h
+	$(CXX) $(COMPFLAGS) -o VirtualColbert.o main.cpp -I$(MyLibs) $(openCVinc)  -I$(bfIncDir)
 
 colbert.o : main.cpp  \
 		$(MyLibs)/Talk2DLP.h \
@@ -407,13 +433,17 @@ timer.o: $(3rdPartyLibs)/Timer.cpp $(3rdPartyLibs)/Timer.h
 	
 
 #
-# Hardware independent hack
+# Hardware independent hacks
 #
 
 DontTalk2Camera.o : $(MyLibs)/DontTalk2Camera.c $(MyLibs)/Talk2Camera.h
 	$(CCC) $(COMPFLAGS) $(MyLibs)/DontTalk2Camera.c -I$(MyLibs)  $(TailOpts)
+
+DontTalk2FrameGrabber.o: $(MyLibs)/DontTalk2FrameGrabber.cpp $(MyLibs)/Talk2FrameGrabber.h
+	$(CCC) $(COMPFLAGS) $(MyLibs)/DontTalk2FrameGrabber.cpp  -I$(bfIncDir)
 	
-	
+DontTalk2DLP.o: $(MyLibs)/DontTalk2DLP.c $(MyLibs)/Talk2DLP.h
+	$(CCC) $(COMPFLAGS) $(MyLibs)/DontTalk2DLP.c -I$(MyLibs)
 	
 #=============================
 # Dependency Applications

@@ -34,6 +34,14 @@
 # Andrew Leifer is happy to help explain the code, but cannot be responsible for 
 # teaching others about these core concepts.
 
+# A note about redistributing binaries:
+# Despite adding static flags to the linker, the code seems to require the following two
+# dll's for redistribution (note this is for 64bit OS):
+# libgcc_s_seh-1.dll
+# libstdc++-6.dll
+#
+# Both dll's can be found in C:\mingw64\bin
+
 
 #=================================
 # Location of external directories
@@ -81,7 +89,7 @@ LINKFLAGS=  -v -W  -O2 -DNDEBUG
 # WinAPI Linker objects
 #======================
 #This WIN API linker objects must go at the END of the linker command
-LinkerWinAPILibObj= -lcomctl32 -lgdi32 -lole32 -lavifil32 -lavicap32 -lwinmm -lmsvfw32 -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32 -lsetupapi -lmingw32 -lsetupapi
+LinkerWinAPILibObj= -lcomctl32 -lgdi32 -lole32 -lavifil32 -lavicap32 -lwinmm -lmsvfw32 -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32 -lsetupapi -lmingw32 -lsetupapi -static-libgcc -static-libstdc++
 
 
 #========
@@ -245,14 +253,14 @@ test_Stage : $(targetDir)/testStage.exe
 #=========================
 
 $(targetDir)/VirtualColbert.exe : VirtualColbert.o \
-		Talk2FrameGrabber.o \
+		DontTalk2FrameGrabber.o \
 		DontTalk2DLP.o \
 		Talk2Stage.o \
 		DontTalk2Camera.o \
 		$(openCVobjs) \
 		$(targetDir)/mc_api.dll \
 		$(hw_ind)	
-	$(CXX) $(LINKFLAGS) -o $(targetDir)/VirtualColbert.exe $(targetDir)/mc_api.dll DontTalk2FrameGrabber.o Talk2Stage.o DontTalk2Camera.o DontTalk2DLP.o $(hw_ind) $(LinkerWinAPILibObj) 
+	$(CXX) $(LINKFLAGS) -o $(targetDir)/VirtualColbert.exe VirtualColbert.o $(targetDir)/mc_api.dll DontTalk2FrameGrabber.o Talk2Stage.o DontTalk2Camera.o DontTalk2DLP.o $(hw_ind) $(LinkerWinAPILibObj) 
 
 
 $(targetDir)/colbert.exe : colbert.o \

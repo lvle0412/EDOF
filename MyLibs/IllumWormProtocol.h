@@ -250,6 +250,19 @@ void IllumWorm(SegmentedWorm* segworm, CvSeq* IllumMontage, IplImage* img,CvSize
  */
 int IlluminateFromProtocol(SegmentedWorm* SegWorm,Frame* dest, Protocol* p,WormAnalysisParam* Params);
 
+/*
+ * Switch to a different protocol step for a specified amount of time and then switch back
+ *
+ * This is useful for combined calcium imaging and optogenetic stimulation. 
+ * Let some protocol step, A, be to illuminate a cell with a calcium indicator
+ * and protocol step B, be to illuminate that cell plus also some cell expressing ChR2. 
+ * 
+ * Often when calcium imaging we want to transiently stimulate some other cell for a given time,
+ * say 2 seconds. The machinery here allows the user to set a secondary protocol step and will transiently
+ * switch to that protocol for a specified amount of time.
+ */
+int HandleTimedSecondaryProtocolStep(Protocol* p,WormAnalysisParam* Params);
+
 
 /*****************
  * File INput Output

@@ -44,3 +44,5 @@ shortcutkeys.txt
 
 - u: start/stop a head-to-tail illumination sweep
 - U: toggle direction of head-to-tail illumination sweep
+
+- q: toggle timed secondary protocol step

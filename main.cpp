@@ -255,6 +255,8 @@ int main (int argc, char** argv){
 
 			/** Handle the Choise of Illumination Protocol Here**/
 			/** ANDY: write this here **/
+			 HandleTimedSecondaryProtocolStep(exp->p,exp->Params);
+
 
 			/*** Do Some Illumination ***/
 			if (exp->e == 0) {

@@ -895,7 +895,24 @@ void SetupGUI(Experiment* exp) {
 			cvCreateTrackbar("ProtoStep", exp->WinCon2,
 					&(exp->Params->ProtocolStep), exp->p->Steps->total - 1,
 					(int) NULL);
-		}
+
+			/** Secondary Protocol Stop for Timed Switching Applications **/
+			cvCreateTrackbar("Proto2", exp->WinCon2,
+					&(exp->Params->ProtocolSecondaryStep), exp->p->Steps->total - 1,
+					(int) NULL);
+			
+			/** Duration for Timed secondary protocol step illumintion **/
+			cvCreateTrackbar("Proto2Dur", exp->WinCon2,
+					&(exp->Params->ProtocolSecondaryDuration), 70,
+					(int) NULL);
+			
+			cvCreateTrackbar("Proto2On", exp->WinCon2,
+					&(exp->Params->ProtocolSecondaryIsOn), 1,
+					(int) NULL);
+					
+				
+		}	
+		
 	}
 
 	/** Stage Related GUI elements **/
@@ -960,6 +977,17 @@ void UpdateGUI(Experiment* exp) {
 			if (exp->p->Steps->total > 1){
 				cvSetTrackbarPos("ProtoStep", exp->WinCon2,
 						(exp->Params->ProtocolStep));
+						
+			/** Secondary Protocol Stop for Timed Switching Applications **/
+			cvSetTrackbarPos("Proto2", exp->WinCon2,
+					(exp->Params->ProtocolSecondaryStep));
+			
+			/** Duration for Timed secondary protocol step illumintion **/
+			cvSetTrackbarPos("Proto2Dur", exp->WinCon2,
+					(exp->Params->ProtocolSecondaryDuration));
+			
+			cvSetTrackbarPos("Proto2On", exp->WinCon2,
+					(exp->Params->ProtocolSecondaryIsOn));						
 			}
 		}
 
@@ -1638,6 +1666,11 @@ int HandleKeyStroke(int c, Experiment* exp) {
 		Increment(&(exp->Params->IllumDuration),100);
 		break;
 
+	/** Timed Secondary Protocol Illumination **/
+    case 'q':
+		Toggle(&(exp->Params->ProtocolSecondaryIsOn));
+		break;
+		
 	/** Temporal **/
 	case 't':
 		Toggle(&(exp->Params->TemporalOn));

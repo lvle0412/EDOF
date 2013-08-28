@@ -785,7 +785,7 @@ void IllumWorm(SegmentedWorm* segworm, CvSeq* IllumMontage, IplImage* img,CvSize
 				printf(" (%d, %d)\n",polyArr[i].x,polyArr[i].y);
 				cvCircle(img, polyArr[i], 1, cvScalar(255, 255, 255), 1);
 				cvShowImage("Debug",img);
-				cvWaitKey(10);
+				cvWaitKey(5);
 			}
 
 		}
@@ -844,14 +844,26 @@ int IlluminateFromProtocol(SegmentedWorm* SegWorm,Frame* dest, Protocol* p,WormA
 
 	/** Create a Temp Image **/
 	IplImage* TempImage=cvCreateImage(cvGetSize(dest->iplimg), IPL_DEPTH_8U, 1);
+	cvSetZero(TempImage); // It turns out that this is critically imporant. 
+						  // Ommitting this command causes image to be initialized with extra crap
+						  // Worse, its not even random crap. On the contrary, it seems to randomly copy
+						  // over the contents of another image
+						  // So for who-knows how long, the DMD was sending the illumination pattern 
+						  // superimposed on top of the illumination pattern that was being shown to the user 
+						  // In other words. It was illuminating extra rectangles and crap.
+						  // Seriously lame. Now it is fixed.j
+						 
 
+	
 	/** Grab a montage for the selected step **/
 	//printf("Params->ProtocolStep=%d\n",Params->ProtocolStep);
 	CvSeq* montage=GetMontageFromProtocolInterp(p,Params->ProtocolStep);
+
 	IllumWorm(SegWorm,montage,TempImage,p->GridSize,Params->IllumFlipLR);
 	LoadFrameWithImage(TempImage,dest);
 
-//	cvClearSeq(montage);
+	cvClearSeq(montage);
+	
 	cvReleaseImage(&TempImage);
 	return 0;
 }

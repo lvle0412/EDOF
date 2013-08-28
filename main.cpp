@@ -275,14 +275,14 @@ int main (int argc, char** argv){
 
 						/** Repeat but for the DLP space for sending to DLP **/
 					} else{
-						
-						/** Illuminate The worm in Camera Space **/
 						TICTOC::timer().tic("IlluminateFromProtocol()");
 						
-						IlluminateFromProtocol(exp->Worm->Segmented,exp->IlluminationFrame,exp->p,exp->Params);
-
 						/** Illuminate the worm in DLP space **/
 						IlluminateFromProtocol(exp->segWormDLP,exp->forDLP,exp->p,exp->Params);
+						
+						/** Illuminate The worm in Camera Space **/						
+						IlluminateFromProtocol(exp->Worm->Segmented,exp->IlluminationFrame,exp->p,exp->Params);
+
 						TICTOC::timer().toc("IlluminateFromProtocol()");
 
 					}

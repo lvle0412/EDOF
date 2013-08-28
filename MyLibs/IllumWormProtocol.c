@@ -44,6 +44,7 @@
 #include <time.h>
 #include <string.h>
 #include <stdlib.h>
+#include <sys/time.h>
 
 //OpenCV Headers
 //#include <cxcore.h>

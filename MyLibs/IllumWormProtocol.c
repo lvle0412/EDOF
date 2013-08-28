@@ -899,9 +899,6 @@ int HandleTimedSecondaryProtocolStep(Protocol* p,WormAnalysisParam* Params) {
 		/** Set the Start Time of the Timed Secondary Protocol Step **/
 		Params->ProtocolSecondaryStartTime = curr_tv.tv_sec + (curr_tv.tv_usec / 1000000.0);
 
-		/** Set illumFinished Time as now (even though we are not yet finished) **/
-		Params->ProtocolSecondaryFinishedTimeTime = Params->ProtocolSecondaryStartTime;
-
 
 		/** Set the Current Protocol Step to be the Secondary Protocol Step **/
 		Params->ProtocolStep = Params->ProtocolSecondaryStep;

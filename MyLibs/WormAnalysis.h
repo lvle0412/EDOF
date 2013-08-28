@@ -90,8 +90,6 @@ typedef struct WormAnalysisParamStruct{
 	int SegStart; // Deprecated
 	int SegStop; // Deprecated
 
-
-
 	int IllumInvert;
 	int IllumFlipLR;
 	CvPoint IllumSquareOrig; // rectangular cursor location
@@ -111,6 +109,20 @@ typedef struct WormAnalysisParamStruct{
 	int ProtocolUse;
 	int ProtocolStep;
 	int ProtocolTotalSteps;
+	
+	/** Protocol: Timed Step **/ 
+	// Feature to transiently invoke a secondary protocol stop for a specified amount of time
+	// Then revert back to the primary protocol stop
+	// This is useful for simultaneous calcium imaging with occasional optogoenetic stimuli
+	int ProtocolPrimaryStep;
+	int ProtocolSecondaryStep;
+	int ProtocolSecondaryDuration;
+	int ProtocolSecondaryIsOn;
+	
+	/** Timed Protocol Internal Timer Variables **/
+	double ProtocolSecondaryStartTime; //Time that the secondary protocol step began
+	
+	
 
 	/** Laser Power **/
 	int GreenLaser;

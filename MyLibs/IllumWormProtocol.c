@@ -695,7 +695,7 @@ void IllumRectWorm(IplImage* rectWorm,Protocol* p,int step,int FlipLR){
  * This function is used by IlilumWorm to illuminate a worm.
  *
  * Also takes an int FlipLR. When FlipLR is 1, the left/right coordinates are flipped.
- * This is useful for inverting an image in teh dorsal-ventral plane.
+ * This is useful for inverting an image in the dorsal-ventral plane.
  */
 CvPoint CvtPtWormSpaceToImageSpace(CvPoint WormPt, SegmentedWorm* worm, CvSize gridSize, int FlipLR){
 
@@ -829,7 +829,7 @@ int IlluminateFromProtocol(SegmentedWorm* SegWorm,Frame* dest, Protocol* p,WormA
 
 	/** Check to See if the Worm->Segmented has any NULL values**/
 	if (SegWorm->Centerline==NULL || SegWorm->LeftBound==NULL || SegWorm->RightBound ==NULL ){
-		printf("Error! The Worm->Segmented had NULL children. in SimpleIlluminateWorm()\n");
+		printf("Error! The Worm->Segmented had NULL children. in IlluminateFromProtocol()\n");
 		return -1;
 	}
 
@@ -854,6 +854,95 @@ int IlluminateFromProtocol(SegmentedWorm* SegWorm,Frame* dest, Protocol* p,WormA
 	cvReleaseImage(&TempImage);
 	return 0;
 }
+
+
+
+/*
+ * Switch to a different protocol step for a specified amount of time and then switch back
+ *
+ * This is useful for combined calcium imaging and optogenetic stimulation. 
+ * Let some protocol step, A, be to illuminate a cell with a calcium indicator
+ * and protocol step B, be to illuminate that cell plus also some cell expressing ChR2. 
+ * 
+ * Often when calcium imaging we want to transiently stimulate some other cell for a given time,
+ * say 2 seconds. The machinery here allows the user to set a secondary protocol step and will transiently
+ * switch to that protocol for a specified amount of time.
+ */
+int HandleTimedSecondaryProtocolStep(Protocol* p,WormAnalysisParam* Params) {
+
+	struct timeval curr_tv;
+	double diff;
+
+	int tenthsOfSecondsElapsed;
+
+
+	/** Case 1: Nothing to do **/
+	if (!Params->ProtocolSecondaryIsOn) { 
+		/** Timed Secondary Protocl Step is off **/
+		Params->ProtocolSecondaryStartTime = 0;
+		
+		/** Just for neatness the primary step should be set to zero **/
+		Params->ProtocolPrimaryStep=0;
+		return 0;
+	}
+
+	/** Case 2: First time the Secondary Protocol Step  is turned on**/
+	if ((Params->ProtocolSecondaryIsOn) && (Params->ProtocolSecondaryStartTime == 0)) {
+		
+		/** Set the Primary Protocol Step to the currently selected Protocol **/
+		Params->ProtocolPrimaryStep=Params->ProtocolStep;
+		
+		/**Set the start time to now. **/
+		gettimeofday(&curr_tv, NULL);
+
+		/** Set the Start Time of the Timed Secondary Protocol Step **/
+		Params->ProtocolSecondaryStartTime = curr_tv.tv_sec + (curr_tv.tv_usec / 1000000.0);
+
+		/** Set illumFinished Time as now (even though we are not yet finished) **/
+		Params->ProtocolSecondaryFinishedTimeTime = Params->ProtocolSecondaryStartTime;
+
+
+		/** Set the Current Protocol Step to be the Secondary Protocol Step **/
+		Params->ProtocolStep = Params->ProtocolSecondaryStep;
+		printf("Turning on the Secondary Protocol Step transiently for %d tenths of seconds ...\n",Params->ProtocolSecondaryDuration);
+		return 1;
+	}
+
+	/** Case 3: Secondary Protocol Step has already been on **/
+	if ((Params->ProtocolSecondaryIsOn) && (Params->ProtocolSecondaryStartTime > (double) 0)) {
+		gettimeofday(&curr_tv, NULL);
+		diff = curr_tv.tv_sec + (curr_tv.tv_usec / 1000000.0) - Params->ProtocolSecondaryStartTime;
+
+
+		/** Determine if we should continue illuminating or stop **/
+		tenthsOfSecondsElapsed = (int) (diff * 10.0);
+		if (tenthsOfSecondsElapsed > Params->ProtocolSecondaryDuration) {
+			/** The transient secondary protocol step is now finished **/
+			/** Switch back to the primary protocol step **/
+			Params->ProtocolStep = Params->ProtocolPrimaryStep;
+			Params->ProtocolSecondaryIsOn = 0;
+
+			/** Set the start time to zero.**/
+			Params->ProtocolSecondaryStartTime = 0;
+			printf("Timed Secondary Protocol Step is finished.\n");
+			return 0;
+
+		} else {
+			/** We should continue to leave the secondary protocol as the current protocol **/
+			
+			return 1;
+		}
+
+	}
+
+}
+
+
+
+
+
+
+
 
 
 /**********************
@@ -908,7 +997,7 @@ Protocol* LoadProtocolFromFile(const char* filename){
 		/** Let's loop through all of the steps **/
 		for (int i= 0; i< numsteps; ++i) {
 
-			/**Create Illumination Montage Object **/
+			/**Create illumination Montage Object **/
 			CvSeq* montage=CreateIlluminationMontage(myP->memory);
 
 			/** Find the node of the current image montage (step) **/

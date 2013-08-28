@@ -256,7 +256,7 @@ WormAnalysisParam* CreateWormAnalysisParam(){
 	/** Single Frame Analysis Parameters **/
 	ParamPtr->BinThresh=48;
 	ParamPtr->GaussSize=1;
-	ParamPtr->LengthScale=9;
+	ParamPtr->LengthScale=30;
 	ParamPtr->LengthOffset=ParamPtr->LengthScale/2;
 	ParamPtr->NumSegments=100;
 	ParamPtr->BoundSmoothSize=0;
@@ -323,9 +323,19 @@ WormAnalysisParam* CreateWormAnalysisParam(){
 	ParamPtr->IllumSweepHT = 1;
 	ParamPtr->IllumSweepOn=0;
 
+	/** Protocol Paramaters **/
 	ParamPtr->ProtocolUse=0;
 	ParamPtr->ProtocolStep=0;
 	ParamPtr->ProtocolTotalSteps=0;
+
+	/** Timed Protocol Parameters **/
+	ParamPtr->ProtocolPrimaryStep=0;
+	ParamPtr->ProtocolSecondaryStep=0;
+	ParamPtr->ProtocolSecondaryDuration=15;
+	ParamPtr->ProtocolSecondaryIsOn=0;
+	
+	/** Timed Protocol Internal Timer Variables **/
+	ParamPtr->ProtocolSecondaryStartTime=0; //Time that the secondary protocol step began	
 
 	/** Stage Control Parameters **/
 	ParamPtr->stageTrackingOn=0;

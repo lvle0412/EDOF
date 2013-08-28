@@ -243,14 +243,18 @@ int main (int argc, char** argv){
 			ClearDLPifNotDisplayingNow(exp);
 
 
-
+			/* Transform the segmented worm coordinates into DLP space */
+			/* Note that this is much more computationally efficient than to transform the original image 
+			or to transform the resulting illumination pattern                                           */ 
+			
 			TICTOC::timer().tic("TransformSegWormCam2DLP");
 			if (exp->e == 0){
 				TransformSegWormCam2DLP(exp->Worm->Segmented, exp->segWormDLP,exp->Calib);
 			}
 			TICTOC::timer().toc("TransformSegWormCam2DLP");
 
-
+			/** Handle the Choise of Illumination Protocol Here**/
+			/** ANDY: write this here **/
 
 			/*** Do Some Illumination ***/
 			if (exp->e == 0) {
@@ -266,16 +270,12 @@ int main (int argc, char** argv){
 
 					if (!(exp->Params->ProtocolUse)) /** if not running the protocol **/{
 						/** Otherwise Actually illuminate the  region of the worm your interested in **/
-						/** Do the Illumination in Camera space for Display **/
 
 						DoOnTheFlyIllumination(exp);
-					//	SimpleIlluminateWormLR(exp->Worm->Segmented, exp->IlluminationFrame, exp->Params->IllumSegCenter, exp->Params->IllumSegRadius, exp->Params->IllumLRC);
 
 						/** Repeat but for the DLP space for sending to DLP **/
-					//	SimpleIlluminateWormLR(exp->segWormDLP, exp->forDLP, exp->Params->IllumSegCenter, exp->Params->IllumSegRadius, exp->Params->IllumLRC);
 					} else{
-
-
+						
 						/** Illuminate The worm in Camera Space **/
 						TICTOC::timer().tic("IlluminateFromProtocol()");
 						

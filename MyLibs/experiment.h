@@ -155,11 +155,9 @@ typedef struct ExperimentStruct{
 	double illumStart; //Time that the illumination began
 	double illumFinished;  //Time that the illumination finished
 
-
 	/** Illum Head-To-Tail Sweep Internal Variables **/
 	double illumSweepHTtimer;
-
-
+	
 	/** Frame Rate Information **/
 	int nframes;
 	int prevFrames;

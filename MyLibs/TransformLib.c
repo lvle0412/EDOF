@@ -267,10 +267,21 @@ int cvtPtCam2DLP(CvPoint camPt, CvPoint* DLPpt,CalibData* Calib) {
 
 
 
-	if (DLPpt->x < 0 || DLPpt->y < 0 || DLPpt->x >= nsizex || DLPpt->y >= nsizey) {
-		printf ("ERROR: Illumination pattern is out of the field of the DLP.\n");
-		return 0;
-	}
+	/* I am commenting this out, because this is a low level enough function, 
+	that it is often useful to convert into DLP space even if we are out of range
+	of the mirrors on the DLP. For examople, the head of the worm might be out of 
+	range of the DLP, but it can still be important to know where the head is so 
+	that one can draw an illumination pattern accurately, because there will ceraintly 
+	be cases where the head of hte worm is out of bounds but the illumination pattern 
+	itself is well within bounds. 
+	
+	Instead I should add in an error to let the user know when the illumination pattern
+	is out of range of the DLP. */
+	
+//	if (DLPpt->x < 0 || DLPpt->y < 0 || DLPpt->x >= nsizex || DLPpt->y >= nsizey) {
+//		printf ("ERROR: Illumination pattern is out of the field of the DLP.\n");
+//		return 0;
+//	}
 
 
 	return 1;

@@ -41,37 +41,56 @@ end
 t = cp2tform(DLPPoints,CCDPoints,'lwm',NUM_PARIED_PTS);
 
 
-x=1:D.DLPwidth;
-y=[1:D.DLPheight]';
 
-source(:,:,1)= repmat(x,[D.DLPheight 1]);
-source(:,:,2)=repmat(y,[1 D.DLPwidth]);
-source(:,:,3)=zeros(size(source(:,:,1)));
+%Generate a mesh with one element for each pixel on the CCD
+[xCCD,yCCD]=meshgrid(1:D.DLPwidth,1:D.DLPheight);
 
+
+
+%For each element on the CCD, find the corresponding element on the DLP
+% NOte that this assigns DLP elements that don't actually exist (e.g.
+% negative lemetns, or elements that go beyond where the current mirrors
+% are)
+disp('Generated lookup table');
+[xDLP,yDLP]=tforminv(t,xCCD,yCCD);
+
+%identiy the position of the DLP 
+pDLP=ones(size(xDLP));
+pDLP(xDLP>D.DLPwidth)=0;
+pDLP(xDLP<0)=0;
+pDLP(yDLP>D.DLPheight)=0;
+pDLP(yDLP<0)=0;
+
+hFig = figure(1);
+set(hFig, 'Position', [200 200 1000 600])
 
 subplot(2,2,1);
-imagesc(source./(max(D.DLPwidth,D.DLPheight)));
-title('Graphical representation of x&y coordinates. X is Red. Y is green');
+imagesc(pDLP);
+title('Position of DLP as seen from camera');
 
 
 
-%Transform an image where the elements are also the indices and therefore
-%build up an a Look up Table
-LookUp = imtransform(source,t,'XData',[1 D.CCDwidth],'YData',[1 D.CCDheight]);
-LookUp=round(LookUp); %Round it because we are doing integers
-disp('Generated lookup table');
+LookUp(:,:,1)=xDLP;
+LookUp(:,:,2)=yDLP;
+LookUp(:,:,3)=zeros(size(yDLP));
+
+
+
+LookUp=ceil(LookUp); %Round it because we are doing integers
 
 %Display destination and results
 subplot(2,2,2);
-imagesc(LookUp./(max(max(max(LookUp)))));
+imshow(LookUp./max(max(max(LookUp))));
 title('Destination of x&y coordinates. X is red. Y is grene')
 
 subplot(2,2,3);
 imagesc(LookUp(:,:,1)); 
+colorbar
 title('Dimension 1');
 
 subplot(2,2,4);
 imagesc(LookUp(:,:,2));
+colorbar
 title('Dimension 2'); 
 
 %Cut out the extra third channel matrix that we've been carrying around

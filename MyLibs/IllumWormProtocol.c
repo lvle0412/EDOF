@@ -793,6 +793,27 @@ void IllumWorm(SegmentedWorm* segworm, CvSeq* IllumMontage, IplImage* img,CvSize
 
 		/** Actually draw the polygon **/
 		cvFillPoly(img,&polyArr,&numpts,1,cvScalar(255,255,255),8);
+		
+		/** I believe we want to check here to see if any of the polygons 
+		fall out of range of the image. That would indicate an attempt to draw a polygon
+		that extends beyond the image. **/
+
+		int warnflag=0;
+		int i;
+		for (i = 0; i < numpts; i++) {
+			if  (polyArr[i].x > img->width || polyArr[i].x < 0) {
+				warnflag=1;
+				}
+			if   (polyArr[i].y > img->height || polyArr[i].y < 0) {
+				warnflag=1;
+				}
+		}
+		if (warnflag) {
+			printf("Trying to draw a polygon that falls out of bounds.\n");
+			printf("This could mean your illumination pattern is out of bounds of the DMD\n.");
+		}	
+
+		
 
 		free(polyArr);
 		polyArr=NULL;

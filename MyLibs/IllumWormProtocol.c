@@ -876,6 +876,7 @@ int IlluminateFromProtocol(SegmentedWorm* SegWorm,Frame* dest, Protocol* p,WormA
 						 
 
 	
+
 	/** Grab a montage for the selected step **/
 	//printf("Params->ProtocolStep=%d\n",Params->ProtocolStep);
 	CvSeq* montage=GetMontageFromProtocolInterp(p,Params->ProtocolStep);

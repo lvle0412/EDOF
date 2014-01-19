@@ -72,3 +72,25 @@ Contact
 =======
 Please contact Andrew Leifer, leifer (at) princeton.edu with questions or feedback.
 
+
+An Important Note About Using This Code
+=======================================
+This code is primarily provided for the scientific record. Andrew Leifer does not have time to troubleshoot the installation of this software or to help with the modification of this software for your particular use.
+
+If you want to compile this source code, please note that you will need to be proficient in the following core technologies and concepts:
+
+
+* C and C++
+* make and makefiles
+* The GNU compiler, gcc and how to compile and link libraries
+* the difference betwen statically linked and dynamically linked libraries
+* using git and git submodules
+* how to use the GNU toolchain on windows
+* specifically how to use msys and mingw and how to use mingw-w64
+* a thorough understanding of how to work with 32 bit and 64 bit binaries and libraries and how they cannot play together
+* a thorough understanding of the differences between C and C++ and when and how they can be mixed and matched
+* a working knowledge of standard windows libraries
+
+
+Good luck!
+

@@ -22,10 +22,8 @@
 # proficient with the following core technologies and concepts
 #
 # - make and makefiles
-# - cmake
 # - The GNU compiler, gcc and how to compile and link libraries
-# - environment variables
-# - the difference between statically linked and dynamically linked libraries
+# - the difference betwen statically linked and dynamically linked libraries
 # - using git and git submodules
 # - how to use the GNU toolchain on windows
 # - specifically how to use msys and mingw and how to use mingw-w64
@@ -53,8 +51,8 @@
 ALP_INC_DIR=3rdPartyLibs/ALPx64
 
 # OpenCV
-OPENCV2_BUILD_DIR=C:/opencv/build_mingw64
-OPENCV2_SOURCE_DIR=C:/opencv/sources
+OPENCV2_BUILD_DIR=C:/OpenCV2x/build_mingw64
+OPENCV2_SOURCE_DIR=C:/OpenCV2x/source
 
 #BitFlow (frame grabber SDK)
 BitFlow_DIR = C:/BitFlow\ SDK\ 5.60/
@@ -99,165 +97,60 @@ LinkerWinAPILibObj= -lcomctl32 -lgdi32 -lole32 -lavifil32 -lavicap32 -lwinmm -lm
 #========
 
 #OpenCV objects
-openCVobjs=$(OPENCV2_BUILD_DIR)/lib/libopencv_calib3d248.dll.a  \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_calib3d248d.dll.a\
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_calib3d_pch_dephelp.a\
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_calib3d_pch_dephelpd.a\
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_contrib248.dll.a\
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_contrib_pch_dephelp.a\
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_core248.dll.a\
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_core248d.dll.a\
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_core_pch_dephelp.a\
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_core_pch_dephelpd.a\
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_features2d248.dll.a\
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_features2d248d.dll.a\
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_features2d_pch_dephelp.a\
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_features2d_pch_dephelpd.a\
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_flann248.dll.a                                     \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_flann248d.dll.a                                    \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_flann_pch_dephelp.a                                \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_flann_pch_dephelpd.a                               \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_gpu248.dll.a                                       \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_gpu248d.dll.a                                      \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_gpu_pch_dephelp.a                                  \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_gpu_pch_dephelpd.a                                 \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_haartraining_engine.a                              \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_highgui248.dll.a                                   \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_highgui248d.dll.a                                  \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_highgui_pch_dephelp.a                              \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_highgui_pch_dephelpd.a                             \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_imgproc248.dll.a                                   \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_imgproc248d.dll.a                                  \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_imgproc_pch_dephelp.a                              \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_imgproc_pch_dephelpd.a                             \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_legacy248.dll.a                                    \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_legacy248d.dll.a                                   \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_legacy_pch_dephelp.a                               \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_legacy_pch_dephelpd.a                              \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_ml248.dll.a                                        \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_ml248d.dll.a                                       \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_ml_pch_dephelp.a                                   \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_ml_pch_dephelpd.a                                  \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_nonfree248.dll.a                                   \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_nonfree_pch_dephelp.a                              \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_objdetect248.dll.a                                 \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_objdetect248d.dll.a                                \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_objdetect_pch_dephelp.a                            \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_objdetect_pch_dephelpd.a                           \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_ocl248.dll.a                                       \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_ocl_pch_dephelp.a                                  \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_perf_calib3d_pch_dephelp.a                         \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_perf_calib3d_pch_dephelpd.a                        \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_perf_core_pch_dephelp.a                            \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_perf_core_pch_dephelpd.a                           \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_perf_features2d_pch_dephelp.a                      \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_perf_features2d_pch_dephelpd.a                     \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_perf_gpu_pch_dephelp.a                             \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_perf_gpu_pch_dephelpd.a                            \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_perf_highgui_pch_dephelp.a                         \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_perf_highgui_pch_dephelpd.a                        \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_perf_imgproc_pch_dephelp.a                         \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_perf_imgproc_pch_dephelpd.a                        \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_perf_nonfree_pch_dephelp.a                         \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_perf_objdetect_pch_dephelp.a                       \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_perf_objdetect_pch_dephelpd.a                      \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_perf_ocl_pch_dephelp.a                             \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_perf_photo_pch_dephelp.a                           \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_perf_photo_pch_dephelpd.a                          \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_perf_stitching_pch_dephelp.a                       \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_perf_superres_pch_dephelp.a                        \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_perf_video_pch_dephelp.a                           \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_perf_video_pch_dephelpd.a                          \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_photo248.dll.a                                     \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_photo248d.dll.a                                    \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_photo_pch_dephelp.a                                \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_photo_pch_dephelpd.a                               \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_stitching248.dll.a                                 \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_stitching_pch_dephelp.a                            \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_superres248.dll.a                                  \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_superres_pch_dephelp.a                             \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_test_calib3d_pch_dephelp.a                         \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_test_calib3d_pch_dephelpd.a                        \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_test_contrib_pch_dephelp.a                         \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_test_core_pch_dephelp.a                            \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_test_core_pch_dephelpd.a                           \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_test_features2d_pch_dephelp.a                      \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_test_features2d_pch_dephelpd.a                     \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_test_flann_pch_dephelp.a                           \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_test_flann_pch_dephelpd.a                          \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_test_gpu_pch_dephelp.a                             \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_test_highgui_pch_dephelp.a                         \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_test_highgui_pch_dephelpd.a                        \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_test_imgproc_pch_dephelp.a                         \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_test_imgproc_pch_dephelpd.a                        \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_test_legacy_pch_dephelp.a                          \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_test_legacy_pch_dephelpd.a                         \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_test_ml_pch_dephelp.a                              \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_test_ml_pch_dephelpd.a                             \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_test_nonfree_pch_dephelp.a                         \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_test_objdetect_pch_dephelp.a                       \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_test_objdetect_pch_dephelpd.a                      \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_test_ocl_pch_dephelp.a                             \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_test_photo_pch_dephelp.a                           \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_test_photo_pch_dephelpd.a                          \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_test_stitching_pch_dephelp.a                       \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_test_superres_pch_dephelp.a                        \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_test_video_pch_dephelp.a                           \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_test_video_pch_dephelpd.a                          \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_ts248.a                                            \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_ts248d.a                                           \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_ts_pch_dephelp.a                                   \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_ts_pch_dephelpd.a                                  \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_video248.dll.a                                     \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_video248d.dll.a                                    \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_video_pch_dephelp.a                                \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_video_pch_dephelpd.a                               \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_videostab248.dll.a                                 \
-	$(OPENCV2_BUILD_DIR)/lib/libopencv_videostab_pch_dephelp.a                            \
-	$(OPENCV2_BUILD_DIR)/3rdparty/lib/libIlmImf.a     \
-	$(OPENCV2_BUILD_DIR)/3rdparty/lib/libIlmImfd.a    \
-	$(OPENCV2_BUILD_DIR)/3rdparty/lib/liblibjasper.a  \
-	$(OPENCV2_BUILD_DIR)/3rdparty/lib/liblibjasperd.a \
-	$(OPENCV2_BUILD_DIR)/3rdparty/lib/liblibjpeg.a    \
-	$(OPENCV2_BUILD_DIR)/3rdparty/lib/liblibjpegd.a   \
-	$(OPENCV2_BUILD_DIR)/3rdparty/lib/liblibpng.a     \
-	$(OPENCV2_BUILD_DIR)/3rdparty/lib/liblibpngd.a    \
-	$(OPENCV2_BUILD_DIR)/3rdparty/lib/liblibtiff.a    \
-	$(OPENCV2_BUILD_DIR)/3rdparty/lib/liblibtiffd.a   \
-	$(OPENCV2_BUILD_DIR)/3rdparty/lib/libzlib.a       \
-	$(OPENCV2_BUILD_DIR)/3rdparty/lib/libzlibd.a      
-
+openCVobjs=$(OPENCV2_BUILD_DIR)/lib/libopencv_core243.a \
+	$(OPENCV2_BUILD_DIR)/lib/libopencv_flann243.a \
+	$(OPENCV2_BUILD_DIR)/lib/libopencv_imgproc243.a \
+	$(OPENCV2_BUILD_DIR)/lib/libopencv_highgui243.a \
+	$(OPENCV2_BUILD_DIR)/lib/libopencv_ml243.a \
+	$(OPENCV2_BUILD_DIR)/lib/libopencv_video243.a \
+	$(OPENCV2_BUILD_DIR)/lib/libopencv_objdetect243.a \
+	$(OPENCV2_BUILD_DIR)/lib/libopencv_photo243.a \
+	$(OPENCV2_BUILD_DIR)/lib/libopencv_nonfree243.a \
+	$(OPENCV2_BUILD_DIR)/lib/libopencv_features2d243.a \
+	$(OPENCV2_BUILD_DIR)/lib/libopencv_calib3d243.a \
+	$(OPENCV2_BUILD_DIR)/lib/libopencv_legacy243.a \
+	$(OPENCV2_BUILD_DIR)/lib/libopencv_contrib243.a \
+	$(OPENCV2_BUILD_DIR)/lib/libopencv_ml243.a \
+	$(OPENCV2_BUILD_DIR)/lib/libopencv_video243.a \
+	$(OPENCV2_BUILD_DIR)/lib/libopencv_objdetect243.a \
+	$(OPENCV2_BUILD_DIR)/lib/libopencv_calib3d243.a \
+	$(OPENCV2_BUILD_DIR)/lib/libopencv_features2d243.a \
+	$(OPENCV2_BUILD_DIR)/lib/libopencv_flann243.a \
+	$(OPENCV2_BUILD_DIR)/lib/libopencv_highgui243.a \
+	$(OPENCV2_BUILD_DIR)/lib/libopencv_imgproc243.a \
+	$(OPENCV2_BUILD_DIR)/lib/libopencv_core243.a \
+	$(OPENCV2_BUILD_DIR)/3rdparty/lib/liblibjpeg.a \
+	$(OPENCV2_BUILD_DIR)/3rdparty/lib/liblibpng.a \
+	$(OPENCV2_BUILD_DIR)/3rdparty/lib/liblibtiff.a \
+	$(OPENCV2_BUILD_DIR)/3rdparty/lib/liblibjasper.a \
+	$(OPENCV2_BUILD_DIR)/3rdparty/lib/libIlmImf.a \
+	$(OPENCV2_BUILD_DIR)/3rdparty/lib/libzlib.a
 
 #OpenCV library commands
 openCVlibs= -Wl,--major-image-version,0,--minor-image-version,0  -lstdc++ $(openCVobjs)
+	
+	
 
 #OpenCV include files (.h)
-openCVinc=$(OPENCV2_SOURCE_DIR)/include \
-	-I$(OPENCV2_SOURCE_DIR)/include/opencv2 \
-	-I$(OPENCV2_SOURCE_DIR)/include/opencv \
-	-I$(OPENCV2_SOURCE_DIR)/modules/androidcamera/include \
-	-I$(OPENCV2_SOURCE_DIR)/modules/calib3d/include \
-	-I$(OPENCV2_SOURCE_DIR)/modules/contrib/include \
-	-I$(OPENCV2_SOURCE_DIR)/modules/core/include \
-	-I$(OPENCV2_SOURCE_DIR)/modules/dynamicuda/include \
-	-I$(OPENCV2_SOURCE_DIR)/modules/features2d/include \
-	-I$(OPENCV2_SOURCE_DIR)/modules/flann/include \
-	-I$(OPENCV2_SOURCE_DIR)/modules/gpu/include \
-	-I$(OPENCV2_SOURCE_DIR)/modules/highgui/include \
-	-I$(OPENCV2_SOURCE_DIR)/modules/imgproc/include \
-	-I$(OPENCV2_SOURCE_DIR)/modules/java/include \
-	-I$(OPENCV2_SOURCE_DIR)/modules/legacy/include \
-	-I$(OPENCV2_SOURCE_DIR)/modules/ml/include \
-	-I$(OPENCV2_SOURCE_DIR)/modules/nonfree/include \
-	-I$(OPENCV2_SOURCE_DIR)/modules/objdetect/include \
-	-I$(OPENCV2_SOURCE_DIR)/modules/ocl/include \
-	-I$(OPENCV2_SOURCE_DIR)/modules/photo/include \
-	-I$(OPENCV2_SOURCE_DIR)/modules/python/include \
-	-I$(OPENCV2_SOURCE_DIR)/modules/stitching/include \
-	-I$(OPENCV2_SOURCE_DIR)/modules/superres/include \
-	-I$(OPENCV2_SOURCE_DIR)/modules/ts/include \
-	-I$(OPENCV2_SOURCE_DIR)/modules/video/include \
-	-I$(OPENCV2_SOURCE_DIR)/modules/videostab/include
+openCVinc=-I$(OPENCV2_BUILD_DIR) \
+	-I$(OPENCV2_SOURCE_DIR)/opencv/include \
+	-I$(OPENCV2_SOURCE_DIR)/opencv/modules/core/include \
+	-I$(OPENCV2_SOURCE_DIR)/opencv/modules/imgproc/include \
+	-I$(OPENCV2_SOURCE_DIR)/opencv/modules/flann/include \
+	-I$(OPENCV2_SOURCE_DIR)/opencv/modules/highgui/include \
+	-I$(OPENCV2_SOURCE_DIR)/opencv/modules/features2d/include \
+	-I$(OPENCV2_SOURCE_DIR)/opencv/modules/calib3d/include \
+	-I$(OPENCV2_SOURCE_DIR)/opencv/modules/ml/include \
+	-I$(OPENCV2_SOURCE_DIR)/opencv/modules/video/include \
+	-I$(OPENCV2_SOURCE_DIR)/opencv/modules/objdetect/include \
+	-I$(OPENCV2_SOURCE_DIR)/opencv/modules/contrib/include \
+	-I$(OPENCV2_SOURCE_DIR)/opencv/modules/nonfree/include \
+	-I$(OPENCV2_SOURCE_DIR)/opencv/modules/photo/include \
+	-I$(OPENCV2_SOURCE_DIR)/opencv/modules/legacy/include \
+	-I$(OPENCV2_SOURCE_DIR)/opencv/modules/gpu/include \
+	-I$(OPENCV2_SOURCE_DIR)/opencv/modules/stitching/include \
+	-I$(OPENCV2_SOURCE_DIR)/opencv/modules/ts/include \
+	-I$(OPENCV2_SOURCE_DIR)/opencv/modules/videostab/include
 
 #==============================================
 # Intel Integrated Performance Primitives (IPP)
@@ -345,7 +238,7 @@ all_tests: test_DLP test_CV test_FG test_Stage
 
 # Executables for testing different dependencies
 test_DLP: $(targetDir)/testDLP.exe  
-
+	
 test_CV: $(targetDir)/testCV.exe 
  
 # This tests the frame grabber, openCV and DLP
@@ -381,8 +274,8 @@ $(targetDir)/colbert.exe : colbert.o \
 		$(targetDir)/mc_api.dll \
 		$(hw_ind)	
 	$(CXX) $(LINKFLAGS) -o $(targetDir)/colbert.exe  colbert.o $(targetDir)/mc_api.dll Talk2FrameGrabber.o Talk2Stage.o DontTalk2Camera.o $(BFObj) Talk2DLP.o   $(ALP_STATIC) $(hw_ind) $(LinkerWinAPILibObj) 
-
-
+	
+	
 $(targetDir)/calibrate_colbert_first.exe : calibrate_colbert_first.o \
 		Talk2FrameGrabber.o \
 		$(BFobj) \
@@ -405,8 +298,8 @@ $(targetDir)/calibrate_colbert_first.exe : calibrate_colbert_first.o \
 		$(hw_ind) \
 		$(LinkerWinAPILibObj) 
 
-
-
+	
+	
 
 $(targetDir)/testDLP.exe : testDLP.o Talk2DLP.o 
 		$(CXX) $(LINKFLAGS) -o $(targetDir)/testDLP.exe testDLP.o  Talk2DLP.o  $(ALP_STATIC) $(LinkerWinAPILibObj) 
@@ -556,10 +449,10 @@ DontTalk2Camera.o : $(MyLibs)/DontTalk2Camera.c $(MyLibs)/Talk2Camera.h
 
 DontTalk2FrameGrabber.o: $(MyLibs)/DontTalk2FrameGrabber.cpp $(MyLibs)/Talk2FrameGrabber.h
 	$(CCC) $(COMPFLAGS) $(MyLibs)/DontTalk2FrameGrabber.cpp  -I$(bfIncDir)
-
+	
 DontTalk2DLP.o: $(MyLibs)/DontTalk2DLP.c $(MyLibs)/Talk2DLP.h
 	$(CCC) $(COMPFLAGS) $(MyLibs)/DontTalk2DLP.c -I$(MyLibs)
-
+	
 #=============================
 # Dependency Applications
 #=============================
@@ -585,10 +478,10 @@ version.o : $(MyLibs)/version.c $(MyLibs)/version.h
 $(MyLibs)/version.c: FORCE 
 	$(GIT) rev-parse HEAD | awk ' BEGIN {print "#include \"version.h\""} {print "extern const char * build_git_sha = \"" $$0"\";"} END {}' > $(MyLibs)/version.c
 	date | awk 'BEGIN {} {print "extern const char * build_git_time = \""$$0"\";"} END {} ' >> $(MyLibs)/version.c	
-
+		
 FORCE:
-
-
+	
+	
 #==============
 # Dummy targets
 #==============

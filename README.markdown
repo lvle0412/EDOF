@@ -1,6 +1,3 @@
-For a description of different branches see:
-https://gist.github.com/aleifer/c060861504d462031600
-
 Welcome to MindControl
 ======================
 
@@ -21,17 +18,15 @@ MindControl is the software component of [CoLBeRT] [4] (**Co**ntrolling **L**oco
 Authors
 -------
 
-MindControl is written by Andrew Leifer with help from Marc Gershow. It is a product of the [Samuel Lab][5] in the [Department of Physics][6] and the [Center for Brain Science][7] at [Harvard University][8]. 
+MindControl is written by Andrew Leifer with help from Marc Gershow. It is originally a  product of the [Samuel Lab][5] in the [Department of Physics][6] and the [Center for Brain Science][7] at [Harvard University][8]. Now it continues to be expanded and updated by Andrew Leifer at [his own lab][9] at the [Lewis-Sigler Institute][10] at [Princeton University] [11].
 
   [6]: http://physics.harvard.edu/
   [7]: http://cbs.fas.harvard.edu/
   [8]: http://harvard.edu
+  [9]: http://leiferlab.princeton.edu
+  [10]: http://genomics.princeton.edu
+  [11]: http://princeton.edu
 
-Most Up To Date Version
------------------------
-The most up to date version of the MindControl software will always be available at [http://github.com/samuellab/mindcontrol] [9]
-
-  [9]: http://github.com/samuellab/mindcontrol  
 
 License
 -------
@@ -43,34 +38,28 @@ How to Cite
 
 If you use any portion of this code or software in your research, please cite:
 
-> Leifer, A.M., Fang-Yen, C., Gershow, M., Alkema, M., Samuel, A.D.T., "Optogenetic manipulation of neural activity in freely moving Caenorhabditis elegans," Nature Methods, in press (2010).
-
-Requirements
-============
-The software was developed on Intel hardware running Windows XP. It was compiled with the MinGW gcc compiler.  The software has different requirements depending on whether you plan to compile the code, or run an existing pre-compiled binary. Moreover, there are different compile targets and executables for different hardware environments. For example, to control a micromirror device requires compiling an executable that links to commercial software libraries included with the micromirror device.
-
-
-Quick Start
-------------------
-The quickest way to get a feel for the software is to run the VritualMC.exe pre-built executable which is packaged in a zip file and availabe for download at [http://github.com/downloads/samuellab/mindcontrol/MindControlDEMO.zip][mc] VirtualMC.exe will run on any Windows XP system and requires only the included OpenCV 1.1 run-time libraries. No special hardware is required. Follow the README in the zip.
-
-[mc]: http://github.com/downloads/samuellab/mindcontrol/MindControlDEMO.zip
+> Leifer, A.M., Fang-Yen, C., Gershow, M., Alkema, M., Samuel, A.D.T., "Optogenetic manipulation of neural activity in freely moving Caenorhabditis elegans," Nature Methods, 8, 147-142 (2011).
 
 Compiling Your Own Binaries
 ---------------------------
 To utilize camera or micromirror hardware functionality, you will need to compile the software from source. 
 
-The code compiles under Windows XP. At a minimum it requires:
+The code compiles under Windows 7 64 bit. At a minimum it requires:
 
-*	`mingw`
-*	OpenCV 1.1
-*	`msysgit`
+*	`mingw-w64`
+*	OpenCV 2
+*	msys 1.0
 *	`make`
 *	`awk`
 
-To compile any of the calibration routines additionally requires:
+The calibration routines additionally requires:
 
 *	`MATLAB`
+
+Additionaly helper scripts require:
+
+* Python 3x
+
 
 To compile an executable that uses a camera and DLP requires
 
@@ -79,11 +68,29 @@ To compile an executable that uses a camera and DLP requires
 
 See the `makefile` for more details about the different compile targets. 
 
-
-Development Environment
-=======================
-On Windows, see this gist: https://gist.github.com/1107504
-
 Contact
 =======
-Please contact Andrew Leifer, leifer (at) fas (dot) harvard.edu with questions or feedback.
+Please contact Andrew Leifer, leifer (at) princeton.edu with questions or feedback.
+
+
+An Important Note About Using This Code
+=======================================
+This code is primarily provided for the scientific record. Andrew Leifer does not have time to troubleshoot the installation of this software or to help with the modification of this software for your particular use.
+
+If you want to compile this source code, please note that you will need to be proficient in the following core technologies and concepts:
+
+
+* C and C++
+* make and makefiles
+* The GNU compiler, gcc and how to compile and link libraries
+* the difference betwen statically linked and dynamically linked libraries
+* using git and git submodules
+* how to use the GNU toolchain on windows
+* specifically how to use msys and mingw and how to use mingw-w64
+* a thorough understanding of how to work with 32 bit and 64 bit binaries and libraries and how they cannot play together
+* a thorough understanding of the differences between C and C++ and when and how they can be mixed and matched
+* a working knowledge of standard windows libraries
+
+
+Good luck!
+

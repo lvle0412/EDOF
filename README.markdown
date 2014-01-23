@@ -75,22 +75,68 @@ Please contact Andrew Leifer, leifer (at) princeton.edu with questions or feedba
 
 An Important Note About Using This Code
 =======================================
-This code is primarily provided for the scientific record. Andrew Leifer does not have time to troubleshoot the installation of this software or to help with the modification of this software for your particular use.
 
 If you want to compile this source code, please note that you will need to be proficient in the following core technologies and concepts:
 
 
 * C and C++
-* make and makefiles
+* make,  and makefiles
 * The GNU compiler, gcc and how to compile and link libraries
-* the difference betwen statically linked and dynamically linked libraries
+* the difference between statically linked and dynamically linked libraries
 * using git and git submodules
 * how to use the GNU toolchain on windows
 * specifically how to use msys and mingw and how to use mingw-w64
 * a thorough understanding of how to work with 32 bit and 64 bit binaries and libraries and how they cannot play together
 * a thorough understanding of the differences between C and C++ and when and how they can be mixed and matched
 * a working knowledge of standard windows libraries
+* an ability to compile OpenCV from source
+
+Andrew Leifer is unable to help with questions regarding these core technologies. 
+Andrew Leifer is happy, however, to answer any questions about the code itself or the algorithms used. 
 
 
-Good luck!
+Step by step install for Windows 7 64 Bit
+=========================================
 
+* Install Bitflow SDK (Camera API)
+* Install Karbon Bitflow Frame Grabber Board
+* Hook up Camera via Cameralink
+* Install Vialux & ALP Basic (DMD API)
+* Hook up DMD via USB
+* Install git http://git-scm.com/downloads  (note 1.8.5 has a bug w/ https, so use 1.8.4 for now)
+* Install this git repo and the submodules it depends upon
+* Install `mingw-w64` to `C:\mingw64\`, installed from Reuben's build http://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/rubenvb/gcc-4.8-release/x86_64-w64-mingw32-gcc-4.8.0-win64_rubenvb.7z/download
+* Add the bin directory for mingw64, `C:\mingw64\bin` to windows path environment
+* Install msys via the "mingw get install" setup program http://sourceforge.net/projects/mingw/files/Installer/mingw-get-setup.exe/download  with the following packages:
+    * mingw-developer-toolkit
+    * msys-base
+* Install openCV2 (here we use 2.4.8) https://sourceforge.net/projects/opencvlibrary/files/opencv-win/2.4.8/opencv-2.4.8.exe/download
+* Download `cmake`, http://www.cmake.org/files/v2.8/cmake-2.8.12.1-win32-x86.exe
+* Prepare to Compile openCV by running `cmake`
+    * Point cmake to opencv's source directory: `C:/opencv/sources`
+    * Create a folder for the compiled opencv libraries: `C:/opencv/build_mingw64`
+    * Configure cmake as "unix makefile" and point it to the toolchain file template included in this repo: `mingw-w64-toolchain.cmake`  note you may have to adjust the file paths
+    * I had to manually add in some parameters for `cmake` to work, even if they were also included in the tool chain, specifically: 
+        * `CMAKE_LINKER C:/mingw64/x86_64-w64-mingw32/bin/ld.exe`
+        * `CMAKE_MAKE_PROGRAM C:/mingw64/bin/mingw32-make.exe` 
+        * `CMAKE_EXE_LINKER_FLAGS  -static-libgcc` 
+    * And I had to manually add in the location of the linker `ld.exe` and `ar.exe` by editing this file after the configuration failed: `C:\opencv\build_mingw64\CMakeFiles\2.8.12.1\CMakeCXXCompiler.cmake`  
+    * Once Configure works, also run generate. 
+    * Note I  ran into trouble compiling one of OpenCV's GPU modules with the "Fatal error" "File to big" and so on. So now I set `CMAKE_BUILD_TYPE` to `RELEASE` and not ``.
+    * You should now be done with CMake
+*Use `make` to compile Opencv
+    * Open the `msys` shell
+    * `cd` into `/c/opencv/build_mingw64`
+    * run `/c/mingw64/bin/mingw32-make.exe install`   (if you are rerunning, be sure to `make clean` first)
+    * At the end of a successful compilation, `C:\opencv\build_mingw64\lib\` should be full of `*.a` files. and `C:\opencv\build_mingw64\bin\` should be full of sample programs that actually run  when invoked from a `cmd` Windows command line environment. 
+* Adjust the mindcontrol software `makefile` in preparation of compiling the mindcontrol software. Sometimes, for example opencv changes the location of different header folders or modules and this needs to be updated. Also check that the locations of `git` is the same as this gets called during compilation.
+
+* Compile the mindcontrol software
+    * Open an `MSYS` shell and `cd` into the root of this repository
+    * run `echo $PATH` and confirm that `/c/mingw64/bin` is on the path. If not add this folder to the system wide environment variable in windows and start a new `MSYS` shell
+    * run `make all_tests`
+    * and ensure everything compiles without error. Then compile everything: `make makecolbert`
+
+    * (interestingly it seems that the mindcontrol software require plain old `make` and not mingw64's `mingw32-make.exe` here because mingw64's make messes up my `awk` script by adding in lots of extra slashes. (the awk script gets run during making))
+*Add the folder full of opencv DLL's to windows PATH, `C:\opencv\build_mingw64\bin`
+*When you are ready to run the software, remember to run it under microsoft's terminal, `cmd`

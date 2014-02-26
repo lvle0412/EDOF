@@ -98,10 +98,10 @@ Andrew Leifer is happy, however, to answer any questions about the code itself o
 Step by step install for Windows 7 64 Bit
 =========================================
 
-* Install Bitflow SDK (Camera API)
+* Install Bitflow SDK (Camera API) v. 5.60
 * Install Karbon Bitflow Frame Grabber Board
 * Hook up Camera via Cameralink
-* Install Vialux & ALP Basic (DMD API)
+* Install Vialux & ALP Basic (DMD API) ALP Basic 4.1
 * Hook up DMD via USB
 * Install git http://git-scm.com/downloads  (note 1.8.5 has a bug w/ https, so use 1.8.4 for now)
 * Install this git repo and the submodules it depends upon

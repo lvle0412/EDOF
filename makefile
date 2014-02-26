@@ -61,7 +61,7 @@ BitFlow_DIR = C:/BitFlow\ SDK\ 5.60/
 
 #Git Version control
 GIT=C:/Progra~2/Git/bin/git
-
+#C:\Users\nji\AppData\Local\Programs\Git\bin\git.exe
 
 
 #=========================
@@ -179,7 +179,7 @@ openCVobjs=$(OPENCV2_BUILD_DIR)/lib/libopencv_calib3d248.dll.a  \
 openCVlibs= -Wl,--major-image-version,0,--minor-image-version,0  -lstdc++ $(openCVobjs)
 
 #OpenCV include files (.h)
-openCVinc=-I$(OPENCV2_SOURCE_DIR)/include \
+openCVinc=$(OPENCV2_SOURCE_DIR)/include \
 	-I$(OPENCV2_SOURCE_DIR)/include/opencv2 \
 	-I$(OPENCV2_SOURCE_DIR)/include/opencv \
 	-I$(OPENCV2_SOURCE_DIR)/modules/androidcamera/include \

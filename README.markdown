@@ -115,7 +115,7 @@ Step by step install for Windows 7 64 Bit
 * Prepare to Compile openCV by running `cmake`
     * Point cmake to opencv's source directory: `C:/opencv/sources`
     * Create a folder for the compiled opencv libraries: `C:/opencv/build_mingw64`
-    * Configure cmake as "unix makefile" and point it to the toolchain file template included in this repo: `mingw-w64-toolchain.cmake`  note you may have to adjust the file paths
+    * Configure cmake as "unix makefile" or "MinGW Makefile" whichever works and point it to the toolchain file template included in this repo: `mingw-w64-toolchain.cmake`  note you may have to adjust the file paths
     * I had to manually add in some parameters for `cmake` to work, even if they were also included in the tool chain, specifically: 
         * `CMAKE_LINKER C:/mingw64/x86_64-w64-mingw32/bin/ld.exe`
         * `CMAKE_MAKE_PROGRAM C:/mingw64/bin/mingw32-make.exe` 

@@ -110,7 +110,7 @@ Step by step install for Windows 7 64 Bit
 * Install msys via the "mingw get install" setup program http://sourceforge.net/projects/mingw/files/Installer/mingw-get-setup.exe/download  with the following packages:
     * mingw-developer-toolkit
     * msys-base
-* Install openCV2 (here we use 2.4.8) https://sourceforge.net/projects/opencvlibrary/files/opencv-win/2.4.8/opencv-2.4.8.exe/download
+* Install openCV2 (here we use 2.4.8) https://sourceforge.net/projects/opencvlibrary/files/opencv-win/2.4.8/opencv-2.4.8.exe/download  it should extract a folder called `opencv` move this folder to `C:\opencv\`
 * Download `cmake`, http://www.cmake.org/files/v2.8/cmake-2.8.12.1-win32-x86.exe
 * Prepare to Compile openCV by running `cmake`
     * Point cmake to opencv's source directory: `C:/opencv/sources`

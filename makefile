@@ -53,11 +53,11 @@
 ALP_INC_DIR=3rdPartyLibs/ALPx64
 
 # OpenCV
-OPENCV2_BUILD_DIR=C:/opencv/build_mingw64
+OPENCV2_BUILD_DIR=C:/opencv/build64
 OPENCV2_SOURCE_DIR=C:/opencv/sources
 
 #BitFlow (frame grabber SDK)
-BitFlow_DIR = C:/BitFlow\ SDK\ 5.60/
+BitFlow_DIR = C:/BitFlow\ SDK\ 5.70/
 
 #Git Version control
 GIT=C:/Progra~2/Git/bin/git
@@ -220,22 +220,23 @@ openCVinc=$(OPENCV2_SOURCE_DIR)/include \
 # BitFlow Frame Graber SDK
 #=========================
 #BFobjects
-BFObj = $(BitFlow_DIR)/Lib/BFD.lib \
-	$(BitFlow_DIR)/Lib/BFDiskIO.lib \
-	$(BitFlow_DIR)/Lib/BFDrv.lib \
-	$(BitFlow_DIR)/Lib/BFEr.lib \
-	$(BitFlow_DIR)/Lib/BFOS.lib \
-	$(BitFlow_DIR)/Lib/BFS.lib \
-	$(BitFlow_DIR)/Lib/Bid.lib \
-	$(BitFlow_DIR)/Lib/BufferInterface.lib \
-	$(BitFlow_DIR)/Lib/Cid.lib  \
-	$(BitFlow_DIR)/Lib/R2Cam.lib \
-	$(BitFlow_DIR)/Lib/R2D.lib \
-	$(BitFlow_DIR)/Lib/R64D.lib \
-	$(BitFlow_DIR)/Lib/clallserial.lib \
-	$(BitFlow_DIR)/Lib/clserbit.lib \
-	$(BitFlow_DIR)/Lib/DispSurf.lib
+BFObj = $(BitFlow_DIR)/Lib64/BFD.lib \
+	$(BitFlow_DIR)/Lib64/BFDiskIO.lib \
+	$(BitFlow_DIR)/Lib64/BFEr.lib \
+	$(BitFlow_DIR)/Lib64/BFOS.lib \
+	$(BitFlow_DIR)/Lib64/BFS.lib \
+	$(BitFlow_DIR)/Lib64/Bid.lib \
+	$(BitFlow_DIR)/Lib64/BufferInterface.lib \
+	$(BitFlow_DIR)/Lib64/Cid.lib  \
+	$(BitFlow_DIR)/Lib64/R2Cam.lib \
+	$(BitFlow_DIR)/Lib64/R2D.lib \
+	$(BitFlow_DIR)/Lib64/R64D.lib \
+	$(BitFlow_DIR)/Lib64/clallserial.lib \
+	$(BitFlow_DIR)/Lib64/clserbit.lib \
+	$(BitFlow_DIR)/Lib64/DispSurf.lib
 
+	#	$(BitFlow_DIR)/Lib/BFDrv.lib  (From version 5.6)
+	
 #BF include directory (.h files)
 bfIncDir=$(3rdPartyLibs)/BitFlowSDK
 	

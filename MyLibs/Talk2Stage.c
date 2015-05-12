@@ -215,6 +215,67 @@ int spinStage(HANDLE s, int xspeed,int yspeed){
 
 }
 
+/*
+ * ask the position of the stage
+ *
+ */
+
+
+int findStagePosition(HANDLE s){
+
+	
+	DWORD      dwRead;
+    DWORD      Length;	
+	char* buff=(char*) malloc(sizeof(char)*1024);
+	char* read_buff=buff;
+	BOOL bErrorFlag = FALSE;
+	
+	clearStageBuffer(s);
+
+	bErrorFlag=WriteFile(s, "WHERE X Y\r", strlen("WHERE X Y\r"), &Length, NULL);
+	
+
+	if (FALSE == bErrorFlag)
+    {
+        printf("Failure: Unable to write to serial port and cannot findStagePosition.\n");
+		return 0;
+    }
+	
+/* Start reading from the series port */	
+	
+   	
+	for ( ; ; ) {
+
+            do {
+			    if (ReadFile(s, read_buff, 1, &dwRead, NULL)){
+			       if (*read_buff != '\n') 
+				       read_buff++;
+			       else
+				       break;   
+			    }
+                else
+			       break;
+               } while (dwRead); 
+			   
+			if (*read_buff == '\n'){
+			
+			   if ((*(read_buff-2)=='A')&&(*(read_buff-3)==':')){
+			      free(buff);
+				  char* buff=(char*) malloc(sizeof(char)*1024);
+			    }
+			   else{
+     		      printf(buff);
+			      free(buff);
+			      break;
+			    }
+			}
+			
+			Sleep(15);
+					
+    }
+	
+	return 0;
+}
 
 
 int haltStage(HANDLE s){

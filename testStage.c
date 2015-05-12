@@ -39,6 +39,7 @@ int main(){
 		if (k%100==0){
 			printf("\n%d commands sent",k);	
 			printf(" current velocity: %d, %d\n",vx, vy);
+			findStagePosition(stage);
 		}
 		printf(".");
 		k=k+1;

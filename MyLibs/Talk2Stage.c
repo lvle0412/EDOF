@@ -230,7 +230,6 @@ int findStagePosition(HANDLE s){
 	char* read_buff=buff;
 	BOOL bErrorFlag = FALSE;
 	
-	clearStageBuffer(s);
 
 	bErrorFlag=WriteFile(s, "WHERE X Y\r", strlen("WHERE X Y\r"), &Length, NULL);
 	
@@ -260,11 +259,11 @@ int findStagePosition(HANDLE s){
 			if (*read_buff == '\n'){
 			
 			   if ((*(read_buff-2)=='A')&&(*(read_buff-3)==':')){
-			      free(buff);
-				  char* buff=(char*) malloc(sizeof(char)*1024);
+                  read_buff=buff;
+				  continue;
 			    }
 			   else{
-     		      printf(buff);
+			      printf("The position of the stage is %s",buff+3);
 			      free(buff);
 			      break;
 			    }
@@ -273,6 +272,7 @@ int findStagePosition(HANDLE s){
 			Sleep(15);
 					
     }
+	
 	
 	return 0;
 }

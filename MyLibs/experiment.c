@@ -780,7 +780,7 @@ void SetupGUI(Experiment* exp) {
 
 
 	cvNamedWindow(exp->WinCon1);
-	cvResizeWindow(exp->WinCon1, 500, 1000);
+	cvResizeWindow(exp->WinCon1, 500, 1100);
 
 	cvNamedWindow("ProtoIllum");
 

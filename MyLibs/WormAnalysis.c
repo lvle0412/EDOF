@@ -118,6 +118,7 @@ WormAnalysisData* CreateWormAnalysisDataStruct(){
 
 	/** Position on plate information **/
 	WormPtr->stageVelocity=cvPoint(0,0);
+	WormPtr->stagePosition=cvPoint(0,0);
 
 	return WormPtr;
 }

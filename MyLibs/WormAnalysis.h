@@ -221,6 +221,7 @@ typedef struct WormImageAnalysisStruct{
 
 	/** Information about location on plate **/
 	CvPoint stageVelocity; //compensating velocity of stage.
+	CvPoint stagePosition; //Position of the motorized stage.
 
 
 	//WormIlluminationData* Illum;

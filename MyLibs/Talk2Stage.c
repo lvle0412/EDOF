@@ -19,6 +19,8 @@
 #include <initguid.h>
 #include <conio.h>
 #include <stdio.h>
+#include <ctype.h>
+#include <stdlib.h>
 
 // Defines
 DEFINE_GUID(LEP_GUID, // LEP's global, unique identifier
@@ -221,13 +223,12 @@ int spinStage(HANDLE s, int xspeed,int yspeed){
  */
 
 
-int findStagePosition(HANDLE s){
+int findStagePosition(HANDLE s, int* x, int* y){
 
 	
 	DWORD      dwRead;
     DWORD      Length;	
-	char* buff=(char*) malloc(sizeof(char)*1024);
-	char* read_buff=buff;
+	char* read_buff=(char*) malloc(sizeof(char)*1024);
 	BOOL bErrorFlag = FALSE;
 	
 
@@ -237,44 +238,68 @@ int findStagePosition(HANDLE s){
 	if (FALSE == bErrorFlag)
     {
         printf("Failure: Unable to write to serial port and cannot findStagePosition.\n");
+		*x=0;
+		*y=0;
 		return 0;
     }
 	
 /* Start reading from the series port */	
+
+    int n=0;
 	
    	
 	for ( ; ; ) {
 
             do {
-			    if (ReadFile(s, read_buff, 1, &dwRead, NULL)){
-			       if (*read_buff != '\n') 
-				       read_buff++;
+			    if (bErrorFlag=ReadFile(s, &read_buff[n], 1, &dwRead, NULL)){
+			       if (read_buff[n]!='\n') 
+				       n++;
 			       else
 				       break;   
 			    }
                 else
-			       break;
+					break;
                } while (dwRead); 
 			   
-			if (*read_buff == '\n'){
-			
-			   if ((*(read_buff-2)=='A')&&(*(read_buff-3)==':')){
-                  read_buff=buff;
-				  continue;
-			    }
-			   else{
-			      printf("The position of the stage is %s",buff+3);
-			      free(buff);
-			      break;
-			    }
+			if ((n>4)&&(read_buff[n] == '\n')&&(isspace(read_buff[n-1]))&&(isdigit(read_buff[n-2]))){ 
+			    printf("%s",read_buff);
+			    break;
+			}
+
+			if (FALSE==bErrorFlag){
+				Sleep(15);
+			}
+			else{
+				n=0;
+				
 			}
 			
-			Sleep(15);
-					
+				
     }
 	
+	int i=0;
+	int j=0;
+	char* Stage_x=(char*) malloc(sizeof(char)*1024);
+    char* Stage_y=(char*) malloc(sizeof(char)*1024);
+	
+	for (i=0;!isspace(read_buff[i+3]);i++) Stage_x[i]=read_buff[i+3];
+	
+	Stage_x[i]='\0';
+	
+	while ((Stage_y[j]=read_buff[i+3])!='\n'){
+			i++;
+			j++;
+	}
+	
+	*x=atoi(Stage_x);
+	*y=atoi(Stage_y);
+	
+	free(Stage_x);
+	free(Stage_y);
+	free(read_buff);
 	
 	return 0;
+	
 }
 
 

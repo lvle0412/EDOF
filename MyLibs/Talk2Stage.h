@@ -51,7 +51,7 @@ HANDLE InitializeUsbStage();
  */
 int spinStage(HANDLE s, int xspeed,int yspeed);
 
-int findStagePosition(HANDLE s);
+int findStagePosition(HANDLE s, int* x, int* y);
 
 
 int haltStage(HANDLE s);

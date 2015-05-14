@@ -11,6 +11,9 @@ int main(){
 	
 	int k=1;
 	int key=0;
+	int vx, vy;
+	int px=0;
+	int py=0;
 	
 	float x;
 	float y;
@@ -28,7 +31,7 @@ int main(){
 		y=1000*cos(t/300);
 		
 		// Convert floats to int
-		int vx, vy;
+
 		vx=(int) x;
 		vy= (int) y;
 		
@@ -39,7 +42,8 @@ int main(){
 		if (k%100==0){
 			printf("\n%d commands sent",k);	
 			printf(" current velocity: %d, %d\n",vx, vy);
-			findStagePosition(stage);
+			findStagePosition(stage,&px,&py);
+			printf("current stage position: %d, %d\n",px,py);
 		}
 		printf(".");
 		k=k+1;

@@ -84,6 +84,7 @@ using namespace std;
 #include "MyLibs/TransformLib.h"
 #include "API/mc_api_dll.h"
 #include "MyLibs/experiment.h"
+#include "Talk2Stage.h"
 
 
 //3rd Party Libraries
@@ -507,6 +508,11 @@ UINT Thread(LPVOID lpdwParam) {
 					/** Do the Stage Tracking **/
 					TICTOC::timer().tic("HandleStageTracker()");
 					HandleStageTracker(exp);
+					if ((EverySoOften(k,20))&&(exp->Params->stageTrackingOn==1)){
+					findStagePosition(exp->stage, &(exp->Worm->stagePosition.x),&(exp->Worm->stagePosition.y));
+					}
+					
+					
 					TICTOC::timer().toc("HandleStageTracker()");
 				
 				}
@@ -515,8 +521,8 @@ UINT Thread(LPVOID lpdwParam) {
 				TICTOC::timer().tic("WriteRecentFrameNumberToFile()");
 				WriteRecentFrameNumberToFile(exp);
 
-				TICTOC::timer().toc("WriteRecentFrameNumberToFile()");
 			}
+				TICTOC::timer().toc("WriteRecentFrameNumberToFile()");
 
 			k++;
 

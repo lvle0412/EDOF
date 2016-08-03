@@ -262,7 +262,9 @@ int findStagePosition(HANDLE s, int* x, int* y){
                } while (dwRead); 
 			   
 			if ((n>4)&&(read_buff[n] == '\n')&&(isspace(read_buff[n-1]))&&(isdigit(read_buff[n-2]))){ 
-			    printf("%s",read_buff);
+				read_buff[n+1]='\0';
+				//printf("complete reading stage buffer!, number of chars equal to %d \n",n);
+			    //printf("%s",read_buff);
 			    break;
 			}
 
@@ -290,6 +292,8 @@ int findStagePosition(HANDLE s, int* x, int* y){
 			i++;
 			j++;
 	}
+
+	Stage_y[j]='\0';
 	
 	*x=atoi(Stage_x);
 	*y=atoi(Stage_y);
@@ -297,6 +301,7 @@ int findStagePosition(HANDLE s, int* x, int* y){
 	free(Stage_x);
 	free(Stage_y);
 	free(read_buff);
+
 	
 	return 0;
 	

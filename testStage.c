@@ -39,7 +39,7 @@ int main(){
 		spinStage(stage,vx,vy);
 		
 		
-		if (k%100==0){
+		if (k%20==0){
 			printf("\n%d commands sent",k);	
 			printf(" current velocity: %d, %d\n",vx, vy);
 			findStagePosition(stage,&px,&py);

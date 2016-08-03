@@ -508,7 +508,7 @@ UINT Thread(LPVOID lpdwParam) {
 					/** Do the Stage Tracking **/
 					TICTOC::timer().tic("HandleStageTracker()");
 					HandleStageTracker(exp);
-					if ((EverySoOften(k,20))&&(exp->Params->stageTrackingOn==1)){
+					if ((EverySoOften(k,5))&&(exp->Params->stageTrackingOn==1)){
 					findStagePosition(exp->stage, &(exp->Worm->stagePosition.x),&(exp->Worm->stagePosition.y));
 					}
 					
@@ -520,9 +520,11 @@ UINT Thread(LPVOID lpdwParam) {
 				/** Write the Recent Frame Number to File to be accessed by the Annotation System **/
 				TICTOC::timer().tic("WriteRecentFrameNumberToFile()");
 				WriteRecentFrameNumberToFile(exp);
+				TICTOC::timer().toc("WriteRecentFrameNumberToFile()");
+
 
 			}
-				TICTOC::timer().toc("WriteRecentFrameNumberToFile()");
+				
 
 			k++;
 

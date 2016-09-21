@@ -89,6 +89,7 @@ Experiment* CreateExperimentStruct() {
 
 	/** Simulation? True/False **/
 	exp->SimDLP = 0;
+	exp->aftertrigger = 0;
 	exp->VidFromFile = 0;
 
 	/** GuiWindowNames **/
@@ -245,7 +246,7 @@ int HandleCommandLineArguments(Experiment* exp) {
 	opterr = 0;
 
 	int c;
-	while ((c = getopt(exp->argc, exp->argv, "si:d:o:p:gtx:y:?")) != -1) {
+	while ((c = getopt(exp->argc, exp->argv, "sai:d:o:p:gtx:y:?")) != -1) {
 		switch (c) {
 		case 'i': /** specify input video file **/
 			exp->VidFromFile = 1;
@@ -274,6 +275,10 @@ int HandleCommandLineArguments(Experiment* exp) {
 			}
 			exp->RECORDVID = 1;
 			exp->RECORDDATA = 1;
+			break;
+
+		case 'a':
+			exp->aftertrigger = 1;
 			break;
 
 		case 's': /** Run in DLP simulation Mode **/
@@ -1745,19 +1750,31 @@ int HandleKeyStroke(int c, Experiment* exp) {
  */
 void SyncAPI(Experiment* exp){
 
+
 	/** Write out to the MindControl API **/
 	MC_API_SetCurrentFrame(exp->sm, exp->Worm->frameNum);
-	MC_API_SetDLPOnOff(exp->sm,exp->Params->DLPOn);
+
+	if (!exp->aftertrigger) MC_API_SetDLPOnOff(exp->sm,exp->Params->DLPOn);
+
+	
 
 	/** Load in Info From Laser Controller **/
 	if (MC_API_isLaserControllerPresent(exp->sm)) {
+		//printf("successfully register laser controller! \n");
 		exp->Params->GreenLaser=MC_API_GetGreenLaserPower(exp->sm);
 		exp->Params->BlueLaser=MC_API_GetBlueLaserPower(exp->sm);
-		exp->Params->DLPOn=MC_API_GetDLPOnOff(exp->sm);
+		if (exp->aftertrigger) exp->Params->DLPOn=MC_API_GetDLPOnOff(exp->sm);
+		//printf("DLP is %d \n", exp->Params->DLPOn);
+		//printf("GreenLaser is %d \n", exp->Params->GreenLaser);
+		
+
 	} else {
 		exp->Params->GreenLaser=-1;
 		exp->Params->BlueLaser=-1;
 	}
+
+
+
 
 	return;
 

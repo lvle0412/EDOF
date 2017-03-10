@@ -92,10 +92,14 @@ using namespace std;
 
 /** Global Variables (for multithreading) **/
 UINT Thread(LPVOID lpdwParam);
-IplImage* CurrentImg;
+UINT Thread2(LPVOID lpdwParam);
+
+
 bool DispThreadHasStarted;
+bool TrackThreadHasStarted;
 bool MainThreadHasStopped;
 bool DispThreadHasStopped;
+bool TrackThreadHasStopped;
 bool UserWantsToStop;
 
 int main (int argc, char** argv){
@@ -152,12 +156,29 @@ int main (int argc, char** argv){
 	}
 
 
+	/** Start New Thread2 **/
+	if (exp->stageIsPresent) {
+		DWORD dwThreadId2;
+		HANDLE hThread2 = CreateThread(NULL, 0,
+				(LPTHREAD_START_ROUTINE) Thread2, (void*) exp, 0, &dwThreadId2);
+		if (hThread2 == NULL) {
+			printf("Cannot create tracking thread.\n");
+			return -1;
+		}
+	}
+
+
+
 
 	// wait for thread
-	DispThreadHasStarted=FALSE;
-	DispThreadHasStopped=FALSE;
-	MainThreadHasStopped=FALSE;
-	while (!DispThreadHasStarted)
+	DispThreadHasStarted = FALSE;
+	DispThreadHasStopped = FALSE;
+	TrackThreadHasStarted = FALSE;
+	TrackThreadHasStopped = FALSE;
+	MainThreadHasStopped = FALSE;
+
+
+	while ((!DispThreadHasStarted)||((exp->stageIsPresent) && (!TrackThreadHasStarted)))
 		Sleep(10);
 
 	/** SetUp Data Recording **/
@@ -361,9 +382,8 @@ int main (int argc, char** argv){
 	}
 
 	if (!(exp->VidFromFile) && !(exp->UseFrameGrabber)){
-		/***** Turn off Camera & DLP ****/
-		T2Cam_TurnOff(&(exp->MyCamera));
-		T2Cam_CloseLib();
+		/***** Turn off Camera ****/
+		T2Cam_Close(exp->MyCamera);
 	}
 
 	if (!(exp->VidFromFile) && (exp->UseFrameGrabber)){
@@ -426,9 +446,7 @@ UINT Thread(LPVOID lpdwParam) {
 		cvShowImage("ProtoIllum",rectWorm);
 	}
 
-	printf("DispThread: invoking stage...\n ");
-	InvokeStage(exp);
-
+	
 	printf("DispThread: Starting loop\n");
 
 	printf("Waiting a few ms to start the loop.\n");
@@ -497,47 +515,77 @@ UINT Thread(LPVOID lpdwParam) {
 
 			UpdateGUI(exp);
 
-			if(EverySoOften(k,1)){ //This determines how often the stage is updated
-				
-				
-				if (exp->e != 0 && exp->stageIsPresent) {
-					printf("\tAuto-safety STAGE SHUTOFF from dispThread!\n");
-					ShutOffStage(exp);
-				} else {
-				
-					/** Do the Stage Tracking **/
-					TICTOC::timer().tic("HandleStageTracker()");
-					HandleStageTracker(exp);
-					if ((EverySoOften(k,1))&&(exp->Params->stageTrackingOn==1)){
-					findStagePosition(exp->stage, &(exp->Worm->stagePosition.x),&(exp->Worm->stagePosition.y));
-					}
-					
-					
-					TICTOC::timer().toc("HandleStageTracker()");
-				
-				}
-
-				/** Write the Recent Frame Number to File to be accessed by the Annotation System **/
+						/** Write the Recent Frame Number to File to be accessed by the Annotation System **/
 				TICTOC::timer().tic("WriteRecentFrameNumberToFile()");
 				WriteRecentFrameNumberToFile(exp);
 				TICTOC::timer().toc("WriteRecentFrameNumberToFile()");
 
 
-			}
-				
+			
+		}	
 
-			k++;
+		if (exp->stageIsPresent) ShutOffStage(exp);
 
+		//if (exp->pflag) cvReleaseImage(&rectWorm);
+
+		//	printf("%s",TICTOC::timer().generateReportCstr());
+		printf("\nDisplayThread: Goodbye!\n");
+		DispThreadHasStopped=TRUE;
+		return 0;
+}
+
+
+
+UINT Thread2(LPVOID lpdwParam) {
+
+	Experiment* exp = (Experiment*) lpdwParam;
+	printf("TrackingThread: Hello!\n");
+
+	printf("TrackingThread: invoking stage...\n ");
+	InvokeStage(exp);
+	
+	TrackThreadHasStarted=TRUE;
+
+	printf("TrackingThread: Starting loop\n");
+
+	int k = 0;
+	
+	
+
+	while (!MainThreadHasStopped) {
+
+		if (EverySoOften(k, 1)) { //This determines how often the stage is updated
+
+			/** Do the Stage Tracking **/
+			TICTOC::timer().tic("HandleStageTracker()");
+			
+
+			HandleStageTracker(exp);
+			
+						
+			TICTOC::timer().toc("HandleStageTracker()");
+		}
+
+		//if (EverySoOften(k,100)){
+
+		//	printf("the x position of the stage is: %d \n",exp->Worm->stagePosition.x);
+		//	printf("the y position of the stage is: %d \n",exp->Worm->stagePosition.y);
+		//}
+
+		k++;
+		cvWaitKey(30);
 
 	}
 
-	if (exp->stageIsPresent) ShutOffStage(exp);
+	if (exp->stageIsPresent)
+		ShutOffStage(exp);
 
-	//if (exp->pflag) cvReleaseImage(&rectWorm);
-
-	//	printf("%s",TICTOC::timer().generateReportCstr());
-		printf("\nDisplayThread: Goodbye!\n");
-		DispThreadHasStopped=TRUE;
+	printf("\nTrackingThread: Goodbye!\n");
+	TrackThreadHasStopped = TRUE;
 	return 0;
+
 }
+
+
+
 

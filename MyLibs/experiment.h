@@ -79,7 +79,7 @@ typedef struct ExperimentStruct{
 	/** Simulation? True/false **/
 	int SimDLP; //1= simulate the DLP, 0= real DLP
 	int VidFromFile; // 1 =Video from File, 0=Video From Camera
-	int aftertrigger; //use labjack to control DLP
+
 
 	/** GuiWindowNames **/
 	char* WinDisp ;

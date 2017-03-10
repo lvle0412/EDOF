@@ -89,7 +89,6 @@ Experiment* CreateExperimentStruct() {
 
 	/** Simulation? True/False **/
 	exp->SimDLP = 0;
-	exp->aftertrigger = 0;
 	exp->VidFromFile = 0;
 
 	/** GuiWindowNames **/
@@ -246,7 +245,7 @@ int HandleCommandLineArguments(Experiment* exp) {
 	opterr = 0;
 
 	int c;
-	while ((c = getopt(exp->argc, exp->argv, "sai:d:o:p:gtx:y:?")) != -1) {
+	while ((c = getopt(exp->argc, exp->argv, "si:d:o:p:gtx:y:?")) != -1) {
 		switch (c) {
 		case 'i': /** specify input video file **/
 			exp->VidFromFile = 1;
@@ -275,10 +274,6 @@ int HandleCommandLineArguments(Experiment* exp) {
 			}
 			exp->RECORDVID = 1;
 			exp->RECORDDATA = 1;
-			break;
-
-		case 'a':
-			exp->aftertrigger = 1;
 			break;
 
 		case 's': /** Run in DLP simulation Mode **/
@@ -1055,14 +1050,10 @@ void RollVideoInput(Experiment* exp) {
 
 			/**Use Frame Grabber **/
 		} else {
-			/** Use ImagingSource USB Camera **/
+			/** Use Basler USB3 Camera **/
 
 			/** Turn on Camera **/
-			T2Cam_InitializeLib();
-			T2Cam_AllocateCamData(&(exp->MyCamera));
-			T2Cam_ShowDeviceSelectionDialog(&(exp->MyCamera));
-			/** Start Grabbing Frames and Update the Internal Frame Number iFrameNumber **/
-			T2Cam_GrabFramesAsFastAsYouCan(&(exp->MyCamera));
+			if (T2Cam_Initialize(exp->MyCamera)!=EXP_SUCCESS) exp->e=EXP_ERROR;
 		}
 
 	}
@@ -1113,6 +1104,11 @@ void InitializeExperiment(Experiment* exp) {
 	Frame* fromCCD = CreateFrame(cvSize(NSIZEX, NSIZEY));
 	Frame* forDLP = CreateFrame(cvSize(NSIZEX, NSIZEY));
 	Frame* IlluminationFrame = CreateFrame(cvSize(NSIZEX, NSIZEY));
+
+
+	CamData* MyCamera = T2Cam_CreateCamData();
+
+	exp->MyCamera = MyCamera;
 
 	exp->fromCCD = fromCCD;
 	exp->forDLP = forDLP;
@@ -1233,12 +1229,21 @@ int GrabFrame(Experiment* exp) {
 
 		} else {
 
-			/** Acqure from ImagingSource USB Cam **/
+			/** Acqure from Basler USB3 Cam **/
 
-			exp->lastFrameSeenOutside = exp->MyCamera->iFrameNumber;
-			/*** Create a local copy of the image***/
-			LoadFrameWithBin(exp->MyCamera->iImageData, exp->fromCCD);
+			if (T2Cam_GrabFrame(exp->MyCamera)==EXP_SUCCESS){
 
+				if ((int) exp->MyCamera->grabResult.SizeX != exp->fromCCD->size.width || (int) exp->MyCamera->grabResult.SizeY != exp->fromCCD->size.height) {
+				
+
+					printf("Size from Camera does not match size in IplImage fromCCD!\n");
+
+					return EXP_ERROR;
+				}
+
+				LoadFrameWithBin(exp->MyCamera->ImageRawData, exp->fromCCD);
+
+			}
 		}
 
 	} else {
@@ -1288,7 +1293,7 @@ int isFrameReady(Experiment* exp) {
 	if (!(exp->VidFromFile) && !(exp->UseFrameGrabber)) {
 		/** If This isn't a simulation.. **/
 		/** And if we arent using the frame grabber **/
-		return (exp->MyCamera->iFrameNumber > exp->lastFrameSeenOutside);
+		return 1;
 	} else {
 		/** Otherwise just keep chugging... **/
 
@@ -1754,7 +1759,7 @@ void SyncAPI(Experiment* exp){
 	/** Write out to the MindControl API **/
 	MC_API_SetCurrentFrame(exp->sm, exp->Worm->frameNum);
 
-	if (!exp->aftertrigger) MC_API_SetDLPOnOff(exp->sm,exp->Params->DLPOn);
+	exp->Params->DLPOn=MC_API_GetDLPOnOff(exp->sm);
 
 	
 
@@ -1763,7 +1768,7 @@ void SyncAPI(Experiment* exp){
 		//printf("successfully register laser controller! \n");
 		exp->Params->GreenLaser=MC_API_GetGreenLaserPower(exp->sm);
 		exp->Params->BlueLaser=MC_API_GetBlueLaserPower(exp->sm);
-		if (exp->aftertrigger) exp->Params->DLPOn=MC_API_GetDLPOnOff(exp->sm);
+		
 		//printf("DLP is %d \n", exp->Params->DLPOn);
 		//printf("GreenLaser is %d \n", exp->Params->GreenLaser);
 		
@@ -2027,7 +2032,7 @@ int HandleStageTracker(Experiment* exp){
 			
 			/** Adjust the stage velocity to keep that point centered in the field of view **/
 			exp->Worm->stageVelocity=AdjustStageToKeepObjectAtTarget(exp->stage,PtOnWorm,exp->stageFeedbackTarget,exp->Params->stageSpeedFactor, exp->Params->stageROIRadius);
-			/**findStagePosition(exp->stage, &(exp->Worm->stagePosition.x),&(exp->Worm->stagePosition.y)); **/
+			findStagePosition(exp->stage, &(exp->Worm->stagePosition.x),&(exp->Worm->stagePosition.y));
 			}
 		}
 		if (exp->Params->stageTrackingOn==0){/** Tracking Should be off **/

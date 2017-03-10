@@ -1115,6 +1115,8 @@ int CreateWormHUDS(IplImage* TempImage, WormAnalysisData* Worm, WormAnalysisPara
 		if (Params->DLPOn) cvPutText(TempImage,"Did you forget to record?",cvPoint(20,100),&font,cvScalar(255,255,255));
 	}
 
+	
+
 
 	/*** Let the user know if the illumination flood light is on ***/
 	if (Params->IllumFloodEverything){
@@ -1128,6 +1130,15 @@ int CreateWormHUDS(IplImage* TempImage, WormAnalysisData* Worm, WormAnalysisPara
 		cvPutText(TempImage,protoNum,cvPoint(20,160),&font,cvScalar(255,255,255));
 
 	}
+
+	if (Params->GreenLaser>0){
+		cvPutText(TempImage,"GreenLaser ON",cvPoint(20,160),&font,cvScalar(255,255,255));
+	}
+
+	if (Params->BlueLaser>0){
+		cvPutText(TempImage,"BlueLaser ON",cvPoint(20,190),&font,cvScalar(255,255,255));
+	}
+
 
 	char frame[30]; // these are freed automatically 
 					// SEE http://stackoverflow.com/questions/1335230/is-the-memory-of-a-character-array-freed-by-going-out-of-scope

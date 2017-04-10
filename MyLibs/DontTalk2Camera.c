@@ -33,13 +33,8 @@
  *  Created on: Dec 17, 2009
  *      Author: Andy
  */
-
 #include <assert.h>
 #include <Talk2Camera.h>
-#include "pylonc/PylonC.h"
-#include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
 
 #define UNUSED(x) (void)(x)
 
@@ -66,25 +61,12 @@ void T2Cam_errormsg(){
 	printf("Try running the software using a video file as input by invoking the -i switch.\n\n");
 }
 
-
-
-CamData* T2Cam_CreateCamData(){
-
-	T2Cam_errormsg();
-	assert(0);
-	return NULL;
-}
-
-
-
-
-
 /*
  * Initalizes the library and provides the  license key for
  * the Imaging control software. The function returns a
  * non-zero value if successful.
  */
-int T2Cam_Initialize(CamData* MyCamera){
+int T2Cam_InitializeLib(){
 	T2Cam_errormsg();
 	assert(0);
 	return 0;
@@ -94,34 +76,68 @@ int T2Cam_Initialize(CamData* MyCamera){
  * Closes the library.
  *
  */
-void T2Cam_Close(CamData* MyCamera){
+void T2Cam_CloseLib(){
 	T2Cam_errormsg();
 	assert(0);
 }
 
 
-
-int T2Cam_GrabFrame(CamData* MyCamera){
-
+/*
+ * In continuousmode, callback is called every time the camera acquires
+ * a new frame. The callback populates the data structure "Data" using the
+ * CamData data type.
+ *
+ */
+void _cdecl callback(HGRABBER hGrabber, unsigned char* pData, unsigned long frameNumber, void* blah){
 	T2Cam_errormsg();
+	UNUSED(hGrabber);
+	UNUSED(pData);
+	UNUSED(frameNumber);
 	assert(0);
-	return 0;
-
 }
 
-
-void printErrorAndExit( GENAPIC_RESULT errc ){
-
+/*
+ * Given a pointer to a CamData type, this function will allocate
+ * memory.
+ */
+void T2Cam_AllocateCamData(CamData** CameraDataStruct){
 	T2Cam_errormsg();
 	assert(0);
-	return;
 }
 
+/*
+ * Show the Device Selection Dialog, initilize the camera and store the resulting
+ * framegrabber handle in CamData->hgrabber.
+ *
+ * CameraInfo must already have memory allocated
+ */
+void T2Cam_ShowDeviceSelectionDialog(CamData** CameraInfo){
+	T2Cam_errormsg();
+	assert(0);
+}
 
-/* This function can be used to wait for user input at the end of the sample program. */
-void pressEnterToExit(void)
-{
-    fprintf( stderr, "\nPress enter to exit.\n");
-    while( getchar() != '\n');
+/*
+ * Sets up the camera in continuous mode and tells the camera to begin
+ * continuously grabbing frames and calling the callback function.
+ *  This requires a pointer to a CamData type
+ * that has memory already allocated.
+ *
+ * This begins thread that calls a Callback function
+ *  that immediately begins dumping data into CameraDataStruct
+ */
+void T2Cam_GrabFramesAsFastAsYouCan(CamData** CameraDataStruct){
+	T2Cam_errormsg();
+	assert(0);
+}
+
+/*
+ *
+ * Takes a CameraDataStruct with an initialized frame grabber
+ * and turns it off.
+ *
+ */
+void T2Cam_TurnOff(CamData** CameraDataStruct){
+	T2Cam_errormsg();
+	assert(0);
 }
 

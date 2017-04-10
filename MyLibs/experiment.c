@@ -90,6 +90,7 @@ Experiment* CreateExperimentStruct() {
 	/** Simulation? True/False **/
 	exp->SimDLP = 0;
 	exp->VidFromFile = 0;
+	//exp->Labview = 0;
 
 	/** GuiWindowNames **/
 	exp->WinDisp = NULL;
@@ -247,6 +248,7 @@ int HandleCommandLineArguments(Experiment* exp) {
 	int c;
 	while ((c = getopt(exp->argc, exp->argv, "si:d:o:p:gtx:y:?")) != -1) {
 		switch (c) {
+
 		case 'i': /** specify input video file **/
 			exp->VidFromFile = 1;
 			exp->infname = optarg;
@@ -824,7 +826,7 @@ void SetupGUI(Experiment* exp) {
 			(int) NULL);
 
 	cvCreateTrackbar("IllumDuration", exp->WinCon1,
-			&(exp->Params->IllumDuration), 70, (int) NULL);
+			&(exp->Params->IllumDuration), 150, (int) NULL);
 	cvCreateTrackbar("DLPFlashOn", exp->WinCon1,
 			&(exp->Params->DLPOnFlash), 1, (int) NULL);
 
@@ -882,11 +884,8 @@ void SetupGUI(Experiment* exp) {
 			&(exp->Params->IllumRefractoryPeriod), 70, (int) NULL);
 
 	//Use the minimum DLP On and Refractory Period?
-	cvCreateTrackbar("StayOn&Refract", exp->WinCon2,
-					&(exp->Params->StayOnAndRefract), 1, (int) NULL);
-
-
-
+	cvCreateTrackbar("StayOn&Refract", exp->WinCon2,&(exp->Params->StayOnAndRefract), 1, (int) NULL);
+		
 
 	/** If we have loaded a protocol, set up protocol specific sliders **/
 	if (exp->pflag) {
@@ -1050,10 +1049,14 @@ void RollVideoInput(Experiment* exp) {
 
 			/**Use Frame Grabber **/
 		} else {
-			/** Use Basler USB3 Camera **/
+			/** Use ImagingSource USB Camera **/
 
 			/** Turn on Camera **/
-			if (T2Cam_Initialize(exp->MyCamera)!=EXP_SUCCESS) exp->e=EXP_ERROR;
+			T2Cam_InitializeLib();
+			T2Cam_AllocateCamData(&(exp->MyCamera));
+			T2Cam_ShowDeviceSelectionDialog(&(exp->MyCamera));
+			/** Start Grabbing Frames and Update the Internal Frame Number iFrameNumber **/
+			T2Cam_GrabFramesAsFastAsYouCan(&(exp->MyCamera));
 		}
 
 	}
@@ -1104,11 +1107,6 @@ void InitializeExperiment(Experiment* exp) {
 	Frame* fromCCD = CreateFrame(cvSize(NSIZEX, NSIZEY));
 	Frame* forDLP = CreateFrame(cvSize(NSIZEX, NSIZEY));
 	Frame* IlluminationFrame = CreateFrame(cvSize(NSIZEX, NSIZEY));
-
-
-	CamData* MyCamera = T2Cam_CreateCamData();
-
-	exp->MyCamera = MyCamera;
 
 	exp->fromCCD = fromCCD;
 	exp->forDLP = forDLP;
@@ -1229,21 +1227,12 @@ int GrabFrame(Experiment* exp) {
 
 		} else {
 
-			/** Acqure from Basler USB3 Cam **/
+			/** Acqure from ImagingSource USB Cam **/
 
-			if (T2Cam_GrabFrame(exp->MyCamera)==EXP_SUCCESS){
+			exp->lastFrameSeenOutside = exp->MyCamera->iFrameNumber;
+			/*** Create a local copy of the image***/
+			LoadFrameWithBin(exp->MyCamera->iImageData, exp->fromCCD);
 
-				if ((int) exp->MyCamera->grabResult.SizeX != exp->fromCCD->size.width || (int) exp->MyCamera->grabResult.SizeY != exp->fromCCD->size.height) {
-				
-
-					printf("Size from Camera does not match size in IplImage fromCCD!\n");
-
-					return EXP_ERROR;
-				}
-
-				LoadFrameWithBin(exp->MyCamera->ImageRawData, exp->fromCCD);
-
-			}
 		}
 
 	} else {
@@ -1293,7 +1282,7 @@ int isFrameReady(Experiment* exp) {
 	if (!(exp->VidFromFile) && !(exp->UseFrameGrabber)) {
 		/** If This isn't a simulation.. **/
 		/** And if we arent using the frame grabber **/
-		return 1;
+		return (exp->MyCamera->iFrameNumber > exp->lastFrameSeenOutside);
 	} else {
 		/** Otherwise just keep chugging... **/
 
@@ -1480,7 +1469,7 @@ void DoSegmentation(Experiment* exp) {
 	 */
 	TICTOC::timer().tic("_FindWormBoundary",exp->e);
 	if (!(exp->e))
-		FindWormBoundary(exp->Worm, exp->Params);
+		exp->e = FindWormBoundary(exp->Worm, exp->Params);
 	TICTOC::timer().toc("_FindWormBoundary",exp->e);
 
 	/*** Find Worm Head and Tail ***/
@@ -1759,9 +1748,10 @@ void SyncAPI(Experiment* exp){
 	/** Write out to the MindControl API **/
 	MC_API_SetCurrentFrame(exp->sm, exp->Worm->frameNum);
 
-	exp->Params->DLPOn=MC_API_GetDLPOnOff(exp->sm);
-
-	
+	if(exp->Params->Labview!=MC_API_GetDLPOnOff(exp->sm)){
+		exp->Params->DLPOn=MC_API_GetDLPOnOff(exp->sm);
+		exp->Params->Labview=MC_API_GetDLPOnOff(exp->sm);
+	}
 
 	/** Load in Info From Laser Controller **/
 	if (MC_API_isLaserControllerPresent(exp->sm)) {
@@ -2032,7 +2022,7 @@ int HandleStageTracker(Experiment* exp){
 			
 			/** Adjust the stage velocity to keep that point centered in the field of view **/
 			exp->Worm->stageVelocity=AdjustStageToKeepObjectAtTarget(exp->stage,PtOnWorm,exp->stageFeedbackTarget,exp->Params->stageSpeedFactor, exp->Params->stageROIRadius);
-			findStagePosition(exp->stage, &(exp->Worm->stagePosition.x),&(exp->Worm->stagePosition.y));
+			/**findStagePosition(exp->stage, &(exp->Worm->stagePosition.x),&(exp->Worm->stagePosition.y)); **/
 			}
 		}
 		if (exp->Params->stageTrackingOn==0){/** Tracking Should be off **/

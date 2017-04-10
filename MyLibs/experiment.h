@@ -79,8 +79,7 @@ typedef struct ExperimentStruct{
 	/** Simulation? True/false **/
 	int SimDLP; //1= simulate the DLP, 0= real DLP
 	int VidFromFile; // 1 =Video from File, 0=Video From Camera
-
-
+	//int Labview //begin to use labview code to control DLP and Shutter
 	/** GuiWindowNames **/
 	char* WinDisp ;
 	char* WinCon1;

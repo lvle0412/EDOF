@@ -152,6 +152,8 @@ typedef struct WormAnalysisParamStruct{
 	/** Record Data Parameters **/
 	int Record;
 
+	/** Labview **/
+	int Labview;
 
 } WormAnalysisParam;
 
@@ -418,7 +420,7 @@ int AddMeanHeadCurvature(WormTimeEvolution* TimeEvolution, double CurrHeadCurvat
  * The Boundary is placed in Worm.Boundary
  *
  */
-void FindWormBoundary(WormAnalysisData* Worm, WormAnalysisParam* WormParams);
+int FindWormBoundary(WormAnalysisData* Worm, WormAnalysisParam* WormParams);
 
 
 

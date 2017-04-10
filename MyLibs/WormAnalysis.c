@@ -255,12 +255,12 @@ WormAnalysisParam* CreateWormAnalysisParam(){
 	ParamPtr->OnOff=0;
 
 	/** Single Frame Analysis Parameters **/
-	ParamPtr->BinThresh=48;
-	ParamPtr->GaussSize=1;
+	ParamPtr->BinThresh=100;
+	ParamPtr->GaussSize=4;
 	ParamPtr->LengthScale=30;
 	ParamPtr->LengthOffset=ParamPtr->LengthScale/2;
 	ParamPtr->NumSegments=100;
-	ParamPtr->BoundSmoothSize=0;
+	ParamPtr->BoundSmoothSize=3;
 	ParamPtr->DilateErode=0;
 
 	/** Levels Brightness **/
@@ -289,7 +289,7 @@ WormAnalysisParam* CreateWormAnalysisParam(){
 	ParamPtr->IllumInvert=0;
 	ParamPtr->IllumFlipLR=0;
 	ParamPtr->IllumSquareOrig=cvPoint(ParamPtr->DefaultGridSize.width/2,ParamPtr->DefaultGridSize.height/2);
-	ParamPtr->IllumSquareRad=cvSize(ParamPtr->DefaultGridSize.width/4,ParamPtr->DefaultGridSize.height/4);
+	ParamPtr->IllumSquareRad=cvSize(ParamPtr->DefaultGridSize.width,ParamPtr->DefaultGridSize.height/10);
 	ParamPtr->IllumDuration=15;
 	ParamPtr->DLPOnFlash=0;
 
@@ -342,11 +342,13 @@ WormAnalysisParam* CreateWormAnalysisParam(){
 	ParamPtr->stageTrackingOn=0;
 	ParamPtr->stageSpeedFactor=25;
 	ParamPtr->stageROIRadius=250;
-	ParamPtr->stageTargetSegment=10;
+	ParamPtr->stageTargetSegment=40;
 
 	/**Record Parameters **/
 	ParamPtr->Record=0;
 
+	/** Labview **/
+	ParamPtr->Labview=0;
 	return ParamPtr;
 }
 
@@ -535,7 +537,7 @@ int AddMeanHeadCurvature(WormTimeEvolution* TimeEvolution, double CurrHeadCurvat
  * The Boundary is placed in Worm.Boundary
  *
  */
-void FindWormBoundary(WormAnalysisData* Worm, WormAnalysisParam* Params){
+int FindWormBoundary(WormAnalysisData* Worm, WormAnalysisParam* Params){
 	/** This function currently takes around 5-7 ms **/
 	/**
 	 * Before I forget.. plan to make this faster by:
@@ -560,7 +562,14 @@ void FindWormBoundary(WormAnalysisData* Worm, WormAnalysisParam* Params){
 	cvThreshold(Worm->ImgSmooth,Worm->ImgThresh,Params->BinThresh,255,CV_THRESH_BINARY );
 	TICTOC::timer().toc("cvThreshold");
 
+	CvScalar pixelsum;
+	pixelsum=cvSum(Worm->ImgThresh);
 
+	if (pixelsum.val[0]<1000){
+		printf("Cannot find the worm! \n");
+		return -1;
+	}
+	
 	/** Dilate and Erode **/
 	if (Params->DilateErode==1){
 		TICTOC::timer().tic("DilateAndErode");
@@ -596,7 +605,7 @@ void FindWormBoundary(WormAnalysisData* Worm, WormAnalysisParam* Params){
 		Worm->Boundary=cvCloneSeq(rough);
 	}
 
-
+ 	return 0;
 
 }
 
@@ -1115,8 +1124,6 @@ int CreateWormHUDS(IplImage* TempImage, WormAnalysisData* Worm, WormAnalysisPara
 		if (Params->DLPOn) cvPutText(TempImage,"Did you forget to record?",cvPoint(20,100),&font,cvScalar(255,255,255));
 	}
 
-	
-
 
 	/*** Let the user know if the illumination flood light is on ***/
 	if (Params->IllumFloodEverything){
@@ -1131,19 +1138,19 @@ int CreateWormHUDS(IplImage* TempImage, WormAnalysisData* Worm, WormAnalysisPara
 
 	}
 
-	if (Params->GreenLaser>0){
-		cvPutText(TempImage,"GreenLaser ON",cvPoint(20,160),&font,cvScalar(255,255,255));
-	}
-
-	if (Params->BlueLaser>0){
-		cvPutText(TempImage,"BlueLaser ON",cvPoint(20,190),&font,cvScalar(255,255,255));
-	}
-
-
 	char frame[30]; // these are freed automatically 
 					// SEE http://stackoverflow.com/questions/1335230/is-the-memory-of-a-character-array-freed-by-going-out-of-scope
 	sprintf(frame,"%d",Worm->frameNum);
 	cvPutText(TempImage,frame,cvPoint(Worm->SizeOfImage.width- 200,Worm->SizeOfImage.height - 10),&font,cvScalar(255,255,255) );
+
+	/** Print laser shutter status **/
+	if (Params->GreenLaser>0){
+		cvPutText(TempImage,"GreenLaserOn",cvPoint(Worm->SizeOfImage.width- 250,70),&font,cvScalar(255,255,255));
+	}
+	if (Params->BlueLaser>0){
+		cvPutText(TempImage,"BlueLaserOn",cvPoint(Worm->SizeOfImage.width- 250,100),&font,cvScalar(255,255,255));
+	}
+
 	return 0;
 }
 

@@ -5,7 +5,7 @@
 # 
 gitHash: ecfe57ec4674f684c4c4939436565c554e6b66dd
 gitBuildTime: "Mon Mar 27 21:53:53     2017"
-ExperimentTime: "Fri Apr 07 21:05:55 2017\n"
+ExperimentTime: "Tue Mar 28 10:30:19 2017\n"
 DLPwidth: 1024
 DLPheight: 768
 CCDwidth: 1024
@@ -15,308 +15,308 @@ PairOfPoints:
    -
       DLP:
          x: 200
+         y: 100
+      CCD:
+         x: 952
+         y: 5
+   -
+      DLP:
+         x: 300
+         y: 100
+      CCD:
+         x: 817
+         y: 13
+   -
+      DLP:
+         x: 400
+         y: 100
+      CCD:
+         x: 684
+         y: 12
+   -
+      DLP:
+         x: 500
+         y: 100
+      CCD:
+         x: 552
+         y: 14
+   -
+      DLP:
+         x: 600
+         y: 100
+      CCD:
+         x: 418
+         y: 18
+   -
+      DLP:
+         x: 700
+         y: 100
+      CCD:
+         x: 285
+         y: 18
+   -
+      DLP:
+         x: 800
+         y: 100
+      CCD:
+         x: 154
+         y: 13
+   -
+      DLP:
+         x: 200
          y: 200
       CCD:
-         x: 933
-         y: 89
+         x: 952
+         y: 145
    -
       DLP:
          x: 300
          y: 200
       CCD:
-         x: 799
-         y: 91
+         x: 815
+         y: 148
    -
       DLP:
          x: 400
          y: 200
       CCD:
-         x: 664
-         y: 93
+         x: 683
+         y: 151
    -
       DLP:
          x: 500
          y: 200
       CCD:
-         x: 531
-         y: 94
+         x: 549
+         y: 151
    -
       DLP:
          x: 600
          y: 200
       CCD:
-         x: 401
-         y: 93
+         x: 417
+         y: 152
    -
       DLP:
          x: 700
          y: 200
       CCD:
-         x: 270
-         y: 94
+         x: 287
+         y: 151
    -
       DLP:
          x: 800
          y: 200
       CCD:
-         x: 137
-         y: 92
+         x: 156
+         y: 151
    -
       DLP:
          x: 200
          y: 300
       CCD:
-         x: 932
-         y: 222
+         x: 951
+         y: 279
    -
       DLP:
          x: 300
          y: 300
       CCD:
-         x: 797
-         y: 224
+         x: 815
+         y: 283
    -
       DLP:
          x: 400
          y: 300
       CCD:
-         x: 664
-         y: 225
+         x: 678
+         y: 282
    -
       DLP:
          x: 500
          y: 300
       CCD:
-         x: 530
-         y: 228
+         x: 550
+         y: 284
    -
       DLP:
          x: 600
          y: 300
       CCD:
-         x: 401
-         y: 226
+         x: 419
+         y: 283
    -
       DLP:
          x: 700
          y: 300
       CCD:
-         x: 269
-         y: 227
+         x: 288
+         y: 283
    -
       DLP:
          x: 800
          y: 300
       CCD:
-         x: 137
-         y: 226
+         x: 156
+         y: 282
    -
       DLP:
          x: 900
          y: 300
       CCD:
-         x: 4
-         y: 224
+         x: 22
+         y: 278
    -
       DLP:
          x: 200
          y: 400
       CCD:
-         x: 929
-         y: 354
+         x: 948
+         y: 412
    -
       DLP:
          x: 300
          y: 400
       CCD:
-         x: 795
-         y: 357
+         x: 813
+         y: 414
    -
       DLP:
          x: 400
          y: 400
       CCD:
-         x: 662
-         y: 357
+         x: 680
+         y: 414
    -
       DLP:
          x: 500
          y: 400
       CCD:
-         x: 529
-         y: 358
+         x: 548
+         y: 414
    -
       DLP:
          x: 600
          y: 400
       CCD:
-         x: 399
-         y: 358
+         x: 418
+         y: 414
    -
       DLP:
          x: 700
          y: 400
       CCD:
-         x: 267
-         y: 358
+         x: 287
+         y: 414
    -
       DLP:
          x: 800
          y: 400
       CCD:
-         x: 137
-         y: 357
+         x: 156
+         y: 413
    -
       DLP:
          x: 900
          y: 400
       CCD:
-         x: 6
-         y: 357
+         x: 21
+         y: 415
    -
       DLP:
          x: 200
          y: 500
       CCD:
-         x: 930
-         y: 489
+         x: 947
+         y: 545
    -
       DLP:
          x: 300
          y: 500
       CCD:
-         x: 794
-         y: 487
+         x: 812
+         y: 545
    -
       DLP:
          x: 400
          y: 500
       CCD:
-         x: 661
-         y: 489
+         x: 680
+         y: 546
    -
       DLP:
          x: 500
          y: 500
       CCD:
-         x: 529
-         y: 489
+         x: 546
+         y: 543
    -
       DLP:
          x: 600
          y: 500
       CCD:
-         x: 399
-         y: 488
+         x: 417
+         y: 544
    -
       DLP:
          x: 700
          y: 500
       CCD:
-         x: 270
-         y: 489
+         x: 289
+         y: 544
    -
       DLP:
          x: 800
          y: 500
       CCD:
-         x: 133
-         y: 488
-   -
-      DLP:
-         x: 900
-         y: 500
-      CCD:
-         x: 8
-         y: 484
+         x: 157
+         y: 544
    -
       DLP:
          x: 200
          y: 600
       CCD:
-         x: 928
-         y: 620
+         x: 947
+         y: 676
    -
       DLP:
          x: 300
          y: 600
       CCD:
-         x: 794
-         y: 619
+         x: 812
+         y: 676
    -
       DLP:
          x: 400
          y: 600
       CCD:
-         x: 662
-         y: 620
+         x: 680
+         y: 677
    -
       DLP:
          x: 500
          y: 600
       CCD:
-         x: 531
-         y: 618
+         x: 549
+         y: 675
    -
       DLP:
          x: 600
          y: 600
       CCD:
-         x: 398
-         y: 619
+         x: 419
+         y: 674
    -
       DLP:
          x: 700
          y: 600
       CCD:
-         x: 267
-         y: 619
+         x: 286
+         y: 675
    -
       DLP:
          x: 800
          y: 600
       CCD:
-         x: 136
-         y: 619
-   -
-      DLP:
-         x: 200
-         y: 700
-      CCD:
-         x: 928
-         y: 749
-   -
-      DLP:
-         x: 300
-         y: 700
-      CCD:
-         x: 794
-         y: 752
-   -
-      DLP:
-         x: 400
-         y: 700
-      CCD:
-         x: 663
-         y: 752
-   -
-      DLP:
-         x: 500
-         y: 700
-      CCD:
-         x: 530
-         y: 750
-   -
-      DLP:
-         x: 600
-         y: 700
-      CCD:
-         x: 397
-         y: 750
-   -
-      DLP:
-         x: 700
-         y: 700
-      CCD:
-         x: 268
-         y: 749
+         x: 156
+         y: 670

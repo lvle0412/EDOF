@@ -1162,7 +1162,7 @@ int CreateWormHUDS(IplImage* TempImage, WormAnalysisData* Worm, WormAnalysisPara
 		}
 	}
 	if (Params->SecondLaser>0){
-		switch(Params->FirstLaserName){
+		switch(Params->SecondLaserName){
 			case 0:
 				cvPutText(TempImage,"BlueLaserOn",cvPoint(Worm->SizeOfImage.width- 250,100),&font,cvScalar(255,255,255));
 				break;

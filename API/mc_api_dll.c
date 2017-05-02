@@ -193,6 +193,24 @@ int MC_API_GetSecondLaserPower(SharedMemory_handle sm){
 }
 
 /*
+ * Set the laser name. 1 for blue, 2 for green, 3 for red.
+ */
+int MC_API_SetFirstLaserName(SharedMemory_handle sm, int name){
+	int ret=ip_WriteValue(sm,"int_firstLaserName",(void *) &name, sizeof(int));
+	if (ret!=MC_API_OK) return MC_API_ERROR;
+	return MC_API_OK;
+}
+
+/*
+ * Set the laser name. 1 for blue, 2 for green, 3 for red.
+ */
+int MC_API_SetSecondLaserName(SharedMemory_handle sm, int name){
+	int ret=ip_WriteValue(sm,"int_secondLaserName",(void *) &name, sizeof(int));
+	if (ret!=MC_API_OK) return MC_API_ERROR;
+	return MC_API_OK;
+}
+
+/*
  * Get the laser name. 1 for blue, 2 for green, 3 for red.
  * Returns MC_API_ERROR if the value cannot be acquired.
  */
@@ -213,6 +231,8 @@ int MC_API_GetSecondLaserName(SharedMemory_handle sm){
 	if (ret!=MC_API_OK) return MC_API_ERROR;
 	return val;
 }
+
+
 
 /** Current Frame **/
 

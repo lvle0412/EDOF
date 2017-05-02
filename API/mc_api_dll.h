@@ -144,6 +144,11 @@ int MC_API_GetSecondLaserPower(SharedMemory_handle sm);
 int MC_API_GetFirstLaserName(SharedMemory_handle sm);
 int MC_API_GetSecondLaserName(SharedMemory_handle sm);
 
+/*
+ * Set the laser name. 1 for blue, 2 for green, 3 for red.
+ */
+int MC_API_SetFirstLaserName(SharedMemory_handle sm, int name);
+int MC_API_SetSecondLaserName(SharedMemory_handle sm, int name);
 
 /*
  * Set current frame

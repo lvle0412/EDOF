@@ -282,8 +282,32 @@ int AppendWormFrameToDisk(WormAnalysisData* Worm, WormAnalysisParam* Params, Wri
 		}
 
 		cvStartWriteStruct(fs,"LaserPower",CV_NODE_MAP,NULL);
-			cvWriteInt(fs,"Green",Params->GreenLaser);
-			cvWriteInt(fs,"Blue",Params->BlueLaser);
+			switch(Params->FirstLaserName){
+				case 0:
+					cvWriteInt(fs,"Blue",Params->FirstLaser);
+					break;
+				case 1:
+					cvWriteInt(fs,"Green",Params->FirstLaser);
+					break;
+				case 2:
+					cvWriteInt(fs,"Red",Params->FirstLaser);
+					break;
+				default:
+					cvWriteInt(fs,"FirstLaser",Params->FirstLaser);
+				}
+			switch(Params->SecondLaserName){
+				case 0:
+					cvWriteInt(fs,"Blue",Params->SecondLaser);
+					break;
+				case 1:
+					cvWriteInt(fs,"Green",Params->SecondLaser);
+					break;
+				case 2:
+					cvWriteInt(fs,"Red",Params->SecondLaser);
+					break;
+				default:
+					cvWriteInt(fs,"FirstLaser",Params->SecondLaser);
+				}
 		cvEndWriteStruct(fs);
 
 		/** Head Curvature Information **/

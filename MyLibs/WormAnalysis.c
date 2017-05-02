@@ -301,8 +301,10 @@ WormAnalysisParam* CreateWormAnalysisParam(){
 	ParamPtr->IllumFloodEverything=0;
 
 	/** Laser Power **/
-	ParamPtr->GreenLaser=-1;
-	ParamPtr->BlueLaser=-1;
+	ParamPtr->FirstLaser=-1;
+	ParamPtr->SecondLaser=-1;
+	ParamPtr->FirstLaserName=-1;
+	ParamPtr->SecondLaserName=-1;
 
 	/** Real Time Curvature Analysis **/
 	ParamPtr->CurvatureAnalyzeOn = 0;
@@ -1144,11 +1146,35 @@ int CreateWormHUDS(IplImage* TempImage, WormAnalysisData* Worm, WormAnalysisPara
 	cvPutText(TempImage,frame,cvPoint(Worm->SizeOfImage.width- 200,Worm->SizeOfImage.height - 10),&font,cvScalar(255,255,255) );
 
 	/** Print laser shutter status **/
-	if (Params->GreenLaser>0){
-		cvPutText(TempImage,"GreenLaserOn",cvPoint(Worm->SizeOfImage.width- 250,70),&font,cvScalar(255,255,255));
+	if (Params->FirstLaser>0){
+		switch(Params->FirstLaserName){
+			case 0:
+				cvPutText(TempImage,"BlueLaserOn",cvPoint(Worm->SizeOfImage.width- 250,70),&font,cvScalar(255,255,255));
+				break;
+			case 1:
+				cvPutText(TempImage,"GreenLaserOn",cvPoint(Worm->SizeOfImage.width- 250,70),&font,cvScalar(255,255,255));
+				break;
+			case 2:
+				cvPutText(TempImage,"RedLaserOn",cvPoint(Worm->SizeOfImage.width- 250,70),&font,cvScalar(255,255,255));
+				break;
+			default:
+				cvPutText(TempImage,"FirstLaserOn",cvPoint(Worm->SizeOfImage.width- 250,70),&font,cvScalar(255,255,255));
+		}
 	}
-	if (Params->BlueLaser>0){
-		cvPutText(TempImage,"BlueLaserOn",cvPoint(Worm->SizeOfImage.width- 250,100),&font,cvScalar(255,255,255));
+	if (Params->SecondLaser>0){
+		switch(Params->FirstLaserName){
+			case 0:
+				cvPutText(TempImage,"BlueLaserOn",cvPoint(Worm->SizeOfImage.width- 250,100),&font,cvScalar(255,255,255));
+				break;
+			case 1:
+				cvPutText(TempImage,"GreenLaserOn",cvPoint(Worm->SizeOfImage.width- 250,100),&font,cvScalar(255,255,255));
+				break;
+			case 2:
+				cvPutText(TempImage,"RedLaserOn",cvPoint(Worm->SizeOfImage.width- 250,100),&font,cvScalar(255,255,255));
+				break;
+			default:
+				cvPutText(TempImage,"SecondLaserOn",cvPoint(Worm->SizeOfImage.width- 250,100),&font,cvScalar(255,255,255));
+		}
 	}
 
 	return 0;

@@ -125,8 +125,12 @@ typedef struct WormAnalysisParamStruct{
 	
 
 	/** Laser Power **/
-	int GreenLaser;
-	int BlueLaser;
+	int FirstLaser;
+	int SecondLaser;
+
+	/** Laser Name **/
+	int FirstLaserName;
+	int SecondLaserName;
 
 	/** Real Time Curvature Analysis **/
 	int CurvatureAnalyzeOn;

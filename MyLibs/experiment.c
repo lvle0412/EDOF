@@ -1756,16 +1756,19 @@ void SyncAPI(Experiment* exp){
 	/** Load in Info From Laser Controller **/
 	if (MC_API_isLaserControllerPresent(exp->sm)) {
 		//printf("successfully register laser controller! \n");
-		exp->Params->GreenLaser=MC_API_GetGreenLaserPower(exp->sm);
-		exp->Params->BlueLaser=MC_API_GetBlueLaserPower(exp->sm);
-		
+		exp->Params->FirstLaser=MC_API_GetFirstLaserPower(exp->sm);
+		exp->Params->SecondLaser=MC_API_GetSecondLaserPower(exp->sm);
+		exp->Params->FirstLaserName=MC_API_GetFirstLaserName(exp->sm);
+		exp->Params->SecondLaserName=MC_API_GetSecondLaserName(exp->sm);
 		//printf("DLP is %d \n", exp->Params->DLPOn);
 		//printf("GreenLaser is %d \n", exp->Params->GreenLaser);
 		
 
 	} else {
-		exp->Params->GreenLaser=-1;
-		exp->Params->BlueLaser=-1;
+		exp->Params->FirstLaser=-1;
+		exp->Params->SecondLaser=-1;
+		exp->Params->FirstLaserName=-1;
+		exp->Params->SecondLaserName=-1;
 	}
 
 

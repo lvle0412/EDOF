@@ -306,7 +306,7 @@ int AppendWormFrameToDisk(WormAnalysisData* Worm, WormAnalysisParam* Params, Wri
 					cvWriteInt(fs,"Red",Params->SecondLaser);
 					break;
 				default:
-					cvWriteInt(fs,"FirstLaser",Params->SecondLaser);
+					cvWriteInt(fs,"SecondLaser",Params->SecondLaser);
 				}
 		cvEndWriteStruct(fs);
 

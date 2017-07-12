@@ -611,7 +611,7 @@ UINT Thread2(LPVOID lpdwParam) {
 		//}
 
 		k++;
-		cvWaitKey(30);
+		cvWaitKey(20);
 
 	}
 

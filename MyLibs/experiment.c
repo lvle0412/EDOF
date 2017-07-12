@@ -2025,7 +2025,7 @@ int HandleStageTracker(Experiment* exp){
 			
 			/** Adjust the stage velocity to keep that point centered in the field of view **/
 			exp->Worm->stageVelocity=AdjustStageToKeepObjectAtTarget(exp->stage,PtOnWorm,exp->stageFeedbackTarget,exp->Params->stageSpeedFactor, exp->Params->stageROIRadius);
-			/**findStagePosition(exp->stage, &(exp->Worm->stagePosition.x),&(exp->Worm->stagePosition.y)); **/
+			findStagePosition(exp->stage, &(exp->Worm->stagePosition.x),&(exp->Worm->stagePosition.y));
 			}
 		}
 		if (exp->Params->stageTrackingOn==0){/** Tracking Should be off **/

@@ -1999,6 +1999,7 @@ int ShutOffStage(Experiment* exp){
 	haltStage(exp->stage);
 }
 
+
 /*
  * Update the Stage Tracker.
  * If the Stage tracker is not initialized, don't do anything.
@@ -2025,7 +2026,7 @@ int HandleStageTracker(Experiment* exp){
 			
 			/** Adjust the stage velocity to keep that point centered in the field of view **/
 			exp->Worm->stageVelocity=AdjustStageToKeepObjectAtTarget(exp->stage,PtOnWorm,exp->stageFeedbackTarget,exp->Params->stageSpeedFactor, exp->Params->stageROIRadius);
-			findStagePosition(exp->stage, &(exp->Worm->stagePosition.x),&(exp->Worm->stagePosition.y));
+			//findStagePosition(exp->stage, &(exp->Worm->stagePosition.x),&(exp->Worm->stagePosition.y));
 			}
 		}
 		if (exp->Params->stageTrackingOn==0){/** Tracking Should be off **/
@@ -2042,6 +2043,25 @@ int HandleStageTracker(Experiment* exp){
 			//printf("The stage is already halted in HandleStageTracker()\n.");
 		}
 
+	}
+	return 0;
+}
+
+
+/*
+ * Update the Stage Tracker Position.
+ * If the Stage tracker is not initialized, don't do anything.
+*/
+int RecordStageTracker(Experiment* exp){
+	if (exp->stageIsPresent==1){ /** If the Stage is Present **/
+		if (exp->stage==NULL) return 0;
+
+		if (exp->Params->stageTrackingOn==1){
+			if (exp->Params->OnOff==0){ /** if the analysis system is off **/
+			} else {
+			findStagePosition(exp->stage, &(exp->Worm->stagePosition.x),&(exp->Worm->stagePosition.y));
+			}
+		}
 	}
 	return 0;
 }

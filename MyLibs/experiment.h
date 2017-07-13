@@ -494,6 +494,12 @@ int InvokeStage(Experiment* exp);
  */
 int HandleStageTracker(Experiment* exp);
 
+/*
+ * Update the Stage Tracker Position.
+ * If the Stage tracker is not initialized, don't do anything.
+*/
+int RecordStageTracker(Experiment* exp);
+
 int ShutOffStage(Experiment* exp);
 
 

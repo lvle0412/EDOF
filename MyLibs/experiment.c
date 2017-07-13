@@ -182,7 +182,6 @@ Experiment* CreateExperimentStruct() {
 	exp->stage=NULL;
 	exp->stageVel=cvPoint(0,0);
 	exp->stageCenter=cvPoint(0,0);
-	exp->stageFeedbackTarget=cvPoint(512,384);
 	exp->stageIsTurningOff=0;
 
 	/** Macros **/
@@ -308,15 +307,15 @@ int HandleCommandLineArguments(Experiment* exp) {
 			break;
 		case 'x': /** adjust the target for stage feedback loop by these certain number of pixels **/
 				if (optarg != NULL) {
-					exp->stageFeedbackTarget.x = atoi(optarg);
+					exp->Worm->stageFeedbackTarget.x = atoi(optarg);
 				}
-				printf("Stage feedback target x= %d pixels.\n",exp->stageFeedbackTarget.x );
+				printf("Stage feedback target x= %d pixels.\n",exp->Worm->stageFeedbackTarget.x );
 		break;
 		case 'y': /** adjust the target for stage feedback loop by these certain number of pixels **/
 				if (optarg != NULL) {
-					exp->stageFeedbackTarget.y = atoi(optarg);
+					exp->Worm->stageFeedbackTarget.y = atoi(optarg);
 				}
-				printf("Stage feedback target y= %d pixels.\n",exp->stageFeedbackTarget.y );
+				printf("Stage feedback target y= %d pixels.\n",exp->Worm->stageFeedbackTarget.y );
 		break;
 
 
@@ -758,9 +757,9 @@ void on_mouse( int event, int x, int y, int flags, void* param){
 
 	switch (event){
 		case CV_EVENT_RBUTTONUP:{
-			exp->stageFeedbackTarget.x=x;
-			exp->stageFeedbackTarget.y=y;
-			printf("Centering target set to: x=%d, y=%d\n",exp->stageFeedbackTarget.x,exp->stageFeedbackTarget.y);
+			exp->Worm->stageFeedbackTarget.x=x;
+			exp->Worm->stageFeedbackTarget.y=y;
+			printf("Centering target set to: x=%d, y=%d\n",exp->Worm->stageFeedbackTarget.x,exp->Worm->stageFeedbackTarget.y);
 		}
 
 	}
@@ -1511,8 +1510,8 @@ _TICTOC_TOC_FUNC
  */
 void MarkRecenteringTarget(Experiment* exp){
 
-	CvPoint a=cvPoint( exp->stageFeedbackTarget.x +2, exp->stageFeedbackTarget.y +2);
-	CvPoint b=cvPoint(exp->stageFeedbackTarget.x -2, exp->stageFeedbackTarget.y -2);
+	CvPoint a=cvPoint( exp->Worm->stageFeedbackTarget.x +2, exp->Worm->stageFeedbackTarget.y +2);
+	CvPoint b=cvPoint(exp->Worm->stageFeedbackTarget.x -2, exp->Worm->stageFeedbackTarget.y -2);
 	cvRectangle(exp->HUDS,a,b, cvScalar(255,255,255),1);
 
 }
@@ -2025,7 +2024,7 @@ int HandleStageTracker(Experiment* exp){
 			CvPoint* PtOnWorm= (CvPoint*) cvGetSeqElem(exp->Worm->Segmented->Centerline, exp->Params->stageTargetSegment);
 			
 			/** Adjust the stage velocity to keep that point centered in the field of view **/
-			exp->Worm->stageVelocity=AdjustStageToKeepObjectAtTarget(exp->stage,PtOnWorm,exp->stageFeedbackTarget,exp->Params->stageSpeedFactor, exp->Params->stageROIRadius);
+			exp->Worm->stageVelocity=AdjustStageToKeepObjectAtTarget(exp->stage,PtOnWorm,exp->Worm->stageFeedbackTarget,exp->Params->stageSpeedFactor, exp->Params->stageROIRadius);
 			//findStagePosition(exp->stage, &(exp->Worm->stagePosition.x),&(exp->Worm->stagePosition.y));
 			}
 		}

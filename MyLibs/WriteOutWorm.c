@@ -281,6 +281,13 @@ int AppendWormFrameToDisk(WormAnalysisData* Worm, WormAnalysisParam* Params, Wri
 			cvEndWriteStruct(fs);
 		}
 
+		if (Params->stageTrackingOn){
+			cvStartWriteStruct(fs,"StageFeedbackTarget",CV_NODE_MAP,NULL);
+				cvWriteInt(fs,"i",Worm->stageFeedbackTarget.x);
+				cvWriteInt(fs,"j",Worm->stageFeedbackTarget.y);
+			cvEndWriteStruct(fs);
+		}
+		
 		cvStartWriteStruct(fs,"LaserPower",CV_NODE_MAP,NULL);
 			switch(Params->FirstLaserName){
 				case 0:

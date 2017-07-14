@@ -526,7 +526,7 @@ UINT Thread2(LPVOID lpdwParam) {
 					HandleStageTracker(exp);
 					RecordStageTracker(exp);
 					TICTOC::timer().toc("HandleStageTracker()");
-					printf("Now the tracking thread is recording the %dth frame.",exp->frameNum);
+					printf("Now the tracking thread is recording the %dth frame.",exp->Worm->frameNum);
 			}
 		}
 		k++;

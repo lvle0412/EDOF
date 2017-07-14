@@ -1388,7 +1388,6 @@ void FinishRecording(Experiment* exp) {
 void StartFrameRateTimer(Experiment* exp) {
 	exp->prevTime = clock();
 	exp->prevFrames = 0;
-
 }
 
 /*
@@ -1418,10 +1417,8 @@ void CalculateAndPrintFrameRateAndInfo(Experiment* exp) {
 		exp->prevFrames = exp->Worm->frameNum;
 		exp->prevTime = exp->Worm->timestamp;
 
-
 		if (exp->Params->stageTrackingOn==1){
-
-			printf(" current velocity: %d, %d\n",exp->Worm->stageVelocity.x, exp->Worm->stageVelocity.y);
+			printf("current velocity: %d, %d\n",exp->Worm->stageVelocity.x, exp->Worm->stageVelocity.y);
 			printf("current stage position: %d, %d\n",exp->Worm->stagePosition.x, exp->Worm->stagePosition.y);
 		}
 	}

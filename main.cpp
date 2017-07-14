@@ -26,8 +26,6 @@
  *	freely moving Caenorhabditis elegans," Nature Methods, Submitted (2010).
  */
 
-
-
 /*
  * ~/workspace/OpticalMindControl/main.cpp
  * main.cpp
@@ -66,10 +64,8 @@
 
 using namespace std;
 
-
 //OpenCV Headers
 #include "opencv2/highgui/highgui_c.h"
-
 
 //Andy's Personal Headers
 #include "MyLibs/AndysOpenCVLib.h"
@@ -85,7 +81,6 @@ using namespace std;
 #include "API/mc_api_dll.h"
 #include "MyLibs/experiment.h"
 #include "Talk2Stage.h"
-
 
 //3rd Party Libraries
 #include "3rdPartyLibs/tictoc.h"
@@ -106,9 +101,7 @@ int main (int argc, char** argv){
 	int DEBUG=0;
 	if (DEBUG){
 		cvNamedWindow("Debug");
-	//	cvNamedWindow("Debug2");
 	}
-
 
 	/** Display output about the OpenCV setup currently installed **/
 	DisplayOpenCVInstall();
@@ -116,11 +109,9 @@ int main (int argc, char** argv){
 	/** Create a new experiment object **/
 	Experiment* exp=CreateExperimentStruct();
 
-
 	/** Create memory and objects **/
 	InitializeExperiment(exp);
 	exp->e=0; //set errors to zero.
-
 
 	/** Deal with CommandLineArguments **/
 	LoadCommandLineArguments(exp,argc,argv);
@@ -145,7 +136,6 @@ int main (int argc, char** argv){
 	/** Setup Segmentation Gui **/
 	AssignWindowNames(exp);
 
-
 	/** Start New Thread **/
 	DWORD dwThreadId;
 	HANDLE hThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE) Thread, (void*) exp,
@@ -154,7 +144,6 @@ int main (int argc, char** argv){
 		printf("Cannot create thread.\n");
 		return -1;
 	}
-
 
 	/** Start New Thread2 and Thread3**/
 	if (exp->stageIsPresent) {
@@ -166,7 +155,6 @@ int main (int argc, char** argv){
 			return -1;
 		}
 	}
-
 
 	// wait for thread
 	DispThreadHasStarted=FALSE;
@@ -187,7 +175,6 @@ int main (int argc, char** argv){
 	/** Quit now if we have some errors **/
 	if(exp->e != 0) return -1;
 
-
 	/** Giant While Loop Where Everything Happens **/
 	TICTOC::timer().tic("WholeLoop");
 	int VideoRanOut=0;
@@ -200,6 +187,7 @@ int main (int argc, char** argv){
 			/** Set error to zero **/
 			exp->e=0;
 			TICTOC::timer().tic("GrabFrame()");
+
 			/** Grab a frame **/
 			int ret=0;
 			ret=GrabFrame(exp);
@@ -218,17 +206,14 @@ int main (int argc, char** argv){
 				continue;
 			}
 
-
 			/** Calculate the frame rate and every second print the result **/
 			CalculateAndPrintFrameRateAndInfo(exp);
-
 
 			/** Do we even bother doing analysis?**/
 			if (exp->Params->OnOff==0){
 				/**Don't perform any analysis**/;
 				continue;
 			}
-			
 			
 			/**** Functions to decide if Illumination Should be on Or Off ***/
 			/** Handle Transient Illumination Timing **/
@@ -237,23 +222,17 @@ int main (int argc, char** argv){
 			/** Handle head-tail illumination sweep **/
 			HandleIlluminationSweep(exp);
 
-
-			
 			/** Load Image into Our Worm Objects **/
-
 			if (exp->e == 0) exp->e=RefreshWormMemStorage(exp->Worm);
 			if (exp->e == 0) exp->e=LoadWormImg(exp->Worm,exp->fromCCD->iplimg);
 
 			/** Apply Levels**/  //Note this is slightly redundant with LoadWormImg
 			if (exp->e == 0) exp->e=simpleAdjustLevels(exp->fromCCD->iplimg, exp->Worm->ImgOrig, exp->Params->LevelsMin, exp->Params->LevelsMax);
 
-
 			TICTOC::timer().tic("EntireSegmentation");
 			/** Do Segmentation **/
 			DoSegmentation(exp);
 			TICTOC::timer().toc("EntireSegmentation");
-
-
 
 			/** Real-Time Curvature Phase Analysis, and phase induced illumination **/
 		    HandleCurvaturePhaseAnalysis(exp);
@@ -261,11 +240,9 @@ int main (int argc, char** argv){
 			/** If the DLP is not displaying right now, than turn off the mirrors */
 			ClearDLPifNotDisplayingNow(exp);
 
-
 			/* Transform the segmented worm coordinates into DLP space */
 			/* Note that this is much more computationally efficient than to transform the original image 
-			or to transform the resulting illumination pattern                                           */ 
-			
+			or to transform the resulting illumination pattern*/ 
 			TICTOC::timer().tic("TransformSegWormCam2DLP");
 			if (exp->e == 0){
 				TransformSegWormCam2DLP(exp->Worm->Segmented, exp->segWormDLP,exp->Calib);
@@ -275,7 +252,6 @@ int main (int argc, char** argv){
 			/** Handle the Choise of Illumination Protocol Here**/
 			/** ANDY: write this here **/
 			 HandleTimedSecondaryProtocolStep(exp->p,exp->Params);
-
 
 			/*** Do Some Illumination ***/
 			if (exp->e == 0) {
@@ -291,7 +267,6 @@ int main (int argc, char** argv){
 
 					if (!(exp->Params->ProtocolUse)) /** if not running the protocol **/{
 						/** Otherwise Actually illuminate the  region of the worm your interested in **/
-
 						DoOnTheFlyIllumination(exp);
 
 						/** Repeat but for the DLP space for sending to DLP **/
@@ -315,16 +290,13 @@ int main (int argc, char** argv){
 				printf("Error in exp->e in the mainloop! code line 295\n");
 			}
 
-
 			TICTOC::timer().tic("SendFrameToDLP");
 			if (exp->e == 0 && exp->Params->DLPOn && !(exp->SimDLP)) T2DLP_SendFrame((unsigned char *) exp->forDLP->binary, exp->myDLP); // Send image to DLP
 			TICTOC::timer().toc("SendFrameToDLP");
 		
-
 			/*** DIsplay Some Monitoring Output ***/
 			if (exp->e == 0) CreateWormHUDS(exp->HUDS,exp->Worm,exp->Params,exp->IlluminationFrame);
 			if (exp->e==0 && exp->stageIsPresent==1) MarkRecenteringTarget(exp);
-
 
 			if (exp->e == 0 &&  EverySoOften(exp->Worm->frameNum,exp->Params->DispRate) ){
 				TICTOC::timer().tic("DisplayOnScreen");
@@ -333,15 +305,12 @@ int main (int argc, char** argv){
 				TICTOC::timer().toc("DisplayOnScreen");
 			}
 
-
-
 			if (exp->e == 0) {
 
 				/** Send and Receive Values from API / Shared Memory **/
 				TICTOC::timer().tic("SyncAPI");
 				SyncAPI(exp);
 				TICTOC::timer().tic("SyncAPI");
-
 
 				/** Write Values to Disk **/
 				TICTOC::timer().tic("DoWriteToDisk()");
@@ -350,20 +319,16 @@ int main (int argc, char** argv){
 
 			}
 
-
 			if (exp->e != 0) {
 				printf("\nError in main loop. :(\n");
 				//where emergency stage shutoff used to go
-
 			}
 
 		}
 		if (UserWantsToStop) break;
 			TICTOC::timer().toc("OneLoop");
-
 	}
 	/** Shut down the main thread **/
-
 
 	TICTOC::timer().toc("WholeLoop");
 	/** Tell the display thread that the main thread is shutting down**/
@@ -372,7 +337,6 @@ int main (int argc, char** argv){
 	TICTOC::timer().tic("FinishRecording()");
 	FinishRecording(exp);
 	TICTOC::timer().toc("FinishRecording()");
-
 
 	if (!(exp->SimDLP)) 	{
 		T2DLP_clear(exp->myDLP);
@@ -389,12 +353,9 @@ int main (int argc, char** argv){
 		CloseFrameGrabber(exp->fg);
 	}
 
-
-
 	printf("%s",TICTOC::timer().generateReportCstr());
     if (!DispThreadHasStopped){
 	   printf("Waiting for DisplayThread to Stop...");
-
     }
 	while (!DispThreadHasStopped){
 		printf(".");
@@ -402,17 +363,13 @@ int main (int argc, char** argv){
 		cvWaitKey(10);
 	}
 
-
-
 	if (exp->stageIsPresent) {
 		ShutOffStage(exp);
 		printf("\nLast used stage centering coordinates x=%d, y=%d\n",exp->Worm->stageFeedbackTarget.x,exp->Worm->stageFeedbackTarget.y);
 	}
 
-
 	if ((!TrackThreadHasStopped)){
 	   printf("Waiting for TrackingThread to Stop...");
-
     }
 	while ((!TrackThreadHasStopped)){
 		printf(".");
@@ -420,7 +377,6 @@ int main (int argc, char** argv){
 		Sleep(500);
 		cvWaitKey(10);
 	}
-
 
 	VerifyProtocol(exp->p);
 	ReleaseExperiment(exp);
@@ -441,7 +397,7 @@ UINT Thread(LPVOID lpdwParam) {
 
 	SetupGUI(exp);
 	cvWaitKey(30);
-//	SetPriorityClass(GetCurrentProcess(), BELOW_NORMAL_PRIORITY_CLASS);
+	//SetPriorityClass(GetCurrentProcess(), BELOW_NORMAL_PRIORITY_CLASS);
 
 	printf("Beginning ProtocolStep Display\n");
 	DispThreadHasStarted = TRUE;
@@ -459,9 +415,6 @@ UINT Thread(LPVOID lpdwParam) {
 		cvShowImage("ProtoIllum",rectWorm);
 	}
 
-	//printf("DispThread: invoking stage...\n ");
-	//InvokeStage(exp);
-
 	printf("DispThread: Starting loop\n");
 
 	printf("Waiting a few ms to start the loop.\n");
@@ -471,122 +424,81 @@ UINT Thread(LPVOID lpdwParam) {
 	int k=0;
 	while (!MainThreadHasStopped) {
 
-
-
 		//needed for display window
-			if (PeekMessage(&Msg, NULL, 0, 0, PM_REMOVE))
-				DispatchMessage(&Msg);
+		if (PeekMessage(&Msg, NULL, 0, 0, PM_REMOVE))
+			DispatchMessage(&Msg);
 
+		TICTOC::timer().tic("DisplayThreadGuts");
+		TICTOC::timer().tic("cvShowImage");
+		if (exp->Params->OnOff){
+			cvShowImage("Display",exp->CurrentSelectedImg);
+		}else{
+			cvShowImage(exp->WinDisp, exp->fromCCD->iplimg);
+		}
+		TICTOC::timer().toc("cvShowImage");
 
-			TICTOC::timer().tic("DisplayThreadGuts");
-			TICTOC::timer().tic("cvShowImage");
-			if (exp->Params->OnOff){
-				cvShowImage("Display",exp->CurrentSelectedImg);
-			}else{
-				cvShowImage(exp->WinDisp, exp->fromCCD->iplimg);
-			}
-			TICTOC::timer().toc("cvShowImage");
+		if (MainThreadHasStopped==1) continue;
 
-			if (MainThreadHasStopped==1) continue;
+		/** If we are using protocols and we havec chosen a new protocol step **/
+		if (exp->Params->ProtocolUse &&  ( (prevProtocolStep!= exp->Params->ProtocolStep) || prevIllumFlipLR != exp->Params->IllumFlipLR  ) )  {
+			cvZero(rectWorm);
+			IllumRectWorm(rectWorm,exp->p,exp->Params->ProtocolStep,exp->Params->IllumFlipLR);
+			prevProtocolStep=exp->Params->ProtocolStep;
+			prevIllumFlipLR=exp->Params->IllumFlipLR;
+			/** Update the Protocol **/
+			cvShowImage("ProtoIllum",rectWorm);
+		}
 
+		TICTOC::timer().toc("DisplayThreadGuts");
+		UpdateGUI(exp);
 
+		key=cvWaitKey(20); //This controls how often the stage and GUI get updated
 
-			/** If we are using protocols and we havec chosen a new protocol step **/
-			if (exp->Params->ProtocolUse &&  ( (prevProtocolStep!= exp->Params->ProtocolStep) || prevIllumFlipLR != exp->Params->IllumFlipLR  ) )  {
-				cvZero(rectWorm);
-				IllumRectWorm(rectWorm,exp->p,exp->Params->ProtocolStep,exp->Params->IllumFlipLR);
-				prevProtocolStep=exp->Params->ProtocolStep;
-				prevIllumFlipLR=exp->Params->IllumFlipLR;
-				/** Update the Protocol **/
-				cvShowImage("ProtoIllum",rectWorm);
+		if (MainThreadHasStopped==1) continue;
 
-			}
+		if (HandleKeyStroke(key,exp)) {
+			printf("\n\nEscape key pressed!\n\n");
 
-			TICTOC::timer().toc("DisplayThreadGuts");
-			UpdateGUI(exp);
+			/** Let the Other thread know that the user wants to stop **/
+			UserWantsToStop=1;
 
-			key=cvWaitKey(20); //This controls how often the stage and GUI get updated
-
-
-			if (MainThreadHasStopped==1) continue;
-
-			if (HandleKeyStroke(key,exp)) {
-				printf("\n\nEscape key pressed!\n\n");
-
-				/** Let the Other thread know that the user wants to stop **/
-				UserWantsToStop=1;
-
-				/** Emergency Shut off the Stage **/
-				printf("Emergency stage shut off.");
-				if (exp->stageIsPresent) 
-					{
-						ShutOffStage(exp);
-					}
-				/** Exit the display thread immediately **/
-				DispThreadHasStopped=TRUE;
-				printf("\nDisplayThread: Goodbye!\n");
-				return 0;
-
-
-			}
-
-
+			/** Emergency Shut off the Stage **/
+			printf("Emergency stage shut off.");
+			if (exp->stageIsPresent) 
+				ShutOffStage(exp);
 			
-			UpdateGUI(exp);
+			/** Exit the display thread immediately **/
+			DispThreadHasStopped=TRUE;
+			printf("\nDisplayThread: Goodbye!\n");
+			return 0;
+		}
 
-			if(EverySoOften(k,1)){ //This determines how often the stage is updated
-				
-				/*
-				if (exp->e != 0 && exp->stageIsPresent) {
-					printf("\tAuto-safety STAGE SHUTOFF from dispThread!\n");
-					ShutOffStage(exp);
-				} else {
-				
-					// Do the Stage Tracking
-					
-					TICTOC::timer().tic("HandleStageTracker()");
-					HandleStageTracker(exp);
-					if ((EverySoOften(k,1))&&(exp->Params->stageTrackingOn==1)){
-					//findStagePosition(exp->stage, &(exp->Worm->stagePosition.x),&(exp->Worm->stagePosition.y));
-					}
-					
-					
-					TICTOC::timer().toc("HandleStageTracker()");
-				
-				}
-				*/
+		UpdateGUI(exp);
 
-				// Write the Recent Frame Number to File to be accessed by the Annotation System
-				
-				TICTOC::timer().tic("WriteRecentFrameNumberToFile()");
-				WriteRecentFrameNumberToFile(exp);
-				TICTOC::timer().toc("WriteRecentFrameNumberToFile()");
-
-
-			}
-				
-
-			k++;
+		if(EverySoOften(k,1)){ 
+			// Write the Recent Frame Number to File to be accessed by the Annotation System
+			TICTOC::timer().tic("WriteRecentFrameNumberToFile()");
+			WriteRecentFrameNumberToFile(exp);
+			TICTOC::timer().toc("WriteRecentFrameNumberToFile()");
+		}
 			
-
-
+		k++;
 	}
 
 	if (exp->stageIsPresent) 
-		{
-			ShutOffStage(exp);
-		}
+		ShutOffStage(exp);
 
 	//if (exp->pflag) cvReleaseImage(&rectWorm);
 
-	//	printf("%s",TICTOC::timer().generateReportCstr());
-		printf("\nDisplayThread: Goodbye!\n");
-		DispThreadHasStopped=TRUE;
+	printf("\nDisplayThread: Goodbye!\n");
+	DispThreadHasStopped=TRUE;
 	return 0;
 }
 
 
-
+/**
+ * Thread to track the worm. 
+ */
 UINT Thread2(LPVOID lpdwParam) {
 
 	Experiment* exp = (Experiment*) lpdwParam;
@@ -600,8 +512,6 @@ UINT Thread2(LPVOID lpdwParam) {
 	printf("TrackingThread: Starting loop\n");
 
 	int k = 0;
-	
-	int frameNumTemp=0;
 
 	while (!MainThreadHasStopped) {
 
@@ -611,40 +521,22 @@ UINT Thread2(LPVOID lpdwParam) {
 					printf("\tAuto-safety STAGE SHUTOFF from dispThread!\n");
 					ShutOffStage(exp);
 				} else {
-				
-					if (exp->Worm->frameNum>frameNumTemp){
-					// Do the Stage Tracking
-					
-						TICTOC::timer().tic("HandleStageTracker()");
-
-						HandleStageTracker(exp);
-						RecordStageTracker(exp);
-					
-						TICTOC::timer().toc("HandleStageTracker()");
-						frameNumTemp=exp->Worm->frameNum;
-					}
-				}
-
+					/**Do the Stage Tracking**/
+					TICTOC::timer().tic("HandleStageTracker()");
+					HandleStageTracker(exp);
+					RecordStageTracker(exp);
+					TICTOC::timer().toc("HandleStageTracker()");
+					printf("Now the trakcing thread is recording the %dth frame.",exp->frameNum);
+			}
 		}
-
-		//if (EverySoOften(k,100)){
-
-		//	printf("the x position of the stage is: %d \n",exp->Worm->stagePosition.x);
-		//	printf("the y position of the stage is: %d \n",exp->Worm->stagePosition.y);
-		//}
-
 		k++;
 		cvWaitKey(20);
-
 	}
 
 	if (exp->stageIsPresent)
-		{
-			ShutOffStage(exp);
-		}
+		ShutOffStage(exp);
 
 	printf("\nTrackingThread: Goodbye!\n");
 	TrackThreadHasStopped = TRUE;
 	return 0;
-
 }

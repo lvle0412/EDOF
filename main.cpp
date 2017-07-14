@@ -93,16 +93,13 @@ using namespace std;
 /** Global Variables (for multithreading) **/
 UINT Thread(LPVOID lpdwParam);
 UINT Thread2(LPVOID lpdwParam);
-UINT Thread3(LPVOID lpdwParam);
 
 IplImage* CurrentImg;
 bool DispThreadHasStarted;
 bool TrackThreadHasStarted;
-bool RecordTrackThreadHasStarted;
 bool MainThreadHasStopped;
 bool DispThreadHasStopped;
 bool TrackThreadHasStopped;
-bool RecordTrackThreadHasStopped;
 bool UserWantsToStop;
 
 int main (int argc, char** argv){
@@ -168,14 +165,6 @@ int main (int argc, char** argv){
 			printf("Cannot create tracking thread.\n");
 			return -1;
 		}
-
-		DWORD dwThreadId3;
-		HANDLE hThread3 = CreateThread(NULL, 0,
-				(LPTHREAD_START_ROUTINE) Thread3, (void*) exp, 0, &dwThreadId3);
-		if (hThread3 == NULL) {
-			printf("Cannot create recording tracking thread.\n");
-			return -1;
-		}
 	}
 
 
@@ -184,11 +173,9 @@ int main (int argc, char** argv){
 	DispThreadHasStopped=FALSE;
 	TrackThreadHasStarted = FALSE;
 	TrackThreadHasStopped = FALSE;
-	RecordTrackThreadHasStarted=FALSE;
-	RecordTrackThreadHasStopped=FALSE;
 	MainThreadHasStopped=FALSE;
 	
-	while (!DispThreadHasStarted||((exp->stageIsPresent) && (!TrackThreadHasStarted)&&(!RecordTrackThreadHasStarted)))
+	while (!DispThreadHasStarted||((exp->stageIsPresent) && (!TrackThreadHasStarted)))
 		Sleep(10);
 
 	/** SetUp Data Recording **/
@@ -355,6 +342,7 @@ int main (int argc, char** argv){
 				SyncAPI(exp);
 				TICTOC::timer().tic("SyncAPI");
 
+
 				/** Write Values to Disk **/
 				TICTOC::timer().tic("DoWriteToDisk()");
 				DoWriteToDisk(exp);
@@ -422,11 +410,11 @@ int main (int argc, char** argv){
 	}
 
 
-	if ((!TrackThreadHasStopped)||(!RecordTrackThreadHasStopped)){
-	   printf("Waiting for TrackingThread and RecordingTrackingThread to Stop...");
+	if ((!TrackThreadHasStopped)){
+	   printf("Waiting for TrackingThread to Stop...");
 
     }
-	while ((!TrackThreadHasStopped)||(!RecordTrackThreadHasStopped)){
+	while ((!TrackThreadHasStopped)){
 		printf(".");
 		Sleep(500);
 		cvWaitKey(10);
@@ -612,7 +600,7 @@ UINT Thread2(LPVOID lpdwParam) {
 
 	int k = 0;
 	
-	
+	int frameNumTemp=0;
 
 	while (!MainThreadHasStopped) {
 
@@ -623,14 +611,17 @@ UINT Thread2(LPVOID lpdwParam) {
 					ShutOffStage(exp);
 				} else {
 				
+					if (exp->Worm->frameNum>frameNumTemp){
 					// Do the Stage Tracking
 					
-					TICTOC::timer().tic("HandleStageTracker()");
+						TICTOC::timer().tic("HandleStageTracker()");
 
-					HandleStageTracker(exp);
+						HandleStageTracker(exp);
+						RecordStageTracker(exp);
 					
-					TICTOC::timer().toc("HandleStageTracker()");
-				
+						TICTOC::timer().toc("HandleStageTracker()");
+						frameNumTemp=exp->Worm->frameNum;
+					}
 				}
 
 		}
@@ -642,7 +633,7 @@ UINT Thread2(LPVOID lpdwParam) {
 		//}
 
 		k++;
-		cvWaitKey(20);
+		//cvWaitKey(20);
 
 	}
 
@@ -653,56 +644,6 @@ UINT Thread2(LPVOID lpdwParam) {
 
 	printf("\nTrackingThread: Goodbye!\n");
 	TrackThreadHasStopped = TRUE;
-	return 0;
-
-}
-
-
-UINT Thread3(LPVOID lpdwParam) {
-
-	Experiment* exp = (Experiment*) lpdwParam;
-	printf("RecordingTrackingThread: Hello!\n");
-	
-	RecordTrackThreadHasStarted=TRUE;
-
-	printf("RecordingTrackingThread: Starting loop\n");
-
-	int frameNumTemp=0;
-
-	while (!MainThreadHasStopped) {
-
-			if (exp->e != 0) {
-					printf("\tAuto-safety STAGE SHUTOFF from dispThread!\n");
-					ShutOffStage(exp);//Halt: stopped?
-				} else {
-			
-					if (exp->Worm->frameNum>frameNumTemp)
-					// Do the Stage Tracking
-					{
-						TICTOC::timer().tic("HandleStageTracker()");
-
-						RecordStageTracker(exp);
-					
-						TICTOC::timer().toc("HandleStageTracker()");
-
-						frameNumTemp=exp->Worm->frameNum;
-					}
-				}
-
-		//if (EverySoOften(k,100)){
-
-		//	printf("the x position of the stage is: %d \n",exp->Worm->stagePosition.x);
-		//	printf("the y position of the stage is: %d \n",exp->Worm->stagePosition.y);
-		//}
-	}
-
-	if (exp->stageIsPresent)
-	{
-		ShutOffStage(exp);
-	}
-
-	printf("\nRecordingTrackingThread: Goodbye!\n");
-	RecordTrackThreadHasStopped = TRUE;
 	return 0;
 
 }

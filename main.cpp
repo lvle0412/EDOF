@@ -416,6 +416,7 @@ int main (int argc, char** argv){
     }
 	while ((!TrackThreadHasStopped)){
 		printf(".");
+		printf("The value of MainThreadHasStopped is %d",MainThreadHasStopped);//Sometimes the loop can't be terminated but I don't know why.
 		Sleep(500);
 		cvWaitKey(10);
 	}
@@ -633,7 +634,7 @@ UINT Thread2(LPVOID lpdwParam) {
 		//}
 
 		k++;
-		//cvWaitKey(20);
+		cvWaitKey(20);
 
 	}
 

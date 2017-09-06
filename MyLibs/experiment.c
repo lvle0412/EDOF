@@ -714,10 +714,10 @@ void AssignWindowNames(Experiment* exp) {
 	char* control2 = (char*) malloc(strlen("MoreControls"));
 	char* control3 = (char*) malloc(strlen("EvenMoreControls"));
 
-	disp1 = "Display";
-	control1 = "Controls";
-	control2 = "MoreControls";
-	control3 = "EvenMoreControls";
+	strcpy(disp1, "Display");
+	strcpy(control1, "Controls");
+	strcpy(control2, "MoreControls");
+	strcpy(control3, "EvenMoreControls");
 
 	exp->WinDisp = disp1;
 	exp->WinCon1 = control1;

@@ -381,7 +381,9 @@ int main (int argc, char** argv){
 	*/
 
 	VerifyProtocol(exp->p);
+	
 	ReleaseExperiment(exp);
+
 	DestroyExperiment(&exp);
 
 	printf("\nMain Thread: Good bye.\n");

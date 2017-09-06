@@ -131,13 +131,18 @@ WormAnalysisData* CreateWormAnalysisDataStruct(){
  * Clears all the Memory and De-Allocates it
  */
 void DestroyWormAnalysisDataStruct(WormAnalysisData* Worm){
+
 	DestroySegmentedWormStruct(Worm->Segmented);
 	if (Worm->ImgOrig !=NULL)	cvReleaseImage(&(Worm->ImgOrig));
 	if (Worm->ImgThresh !=NULL) cvReleaseImage(&(Worm->ImgThresh));
 	if (Worm->ImgSmooth !=NULL) cvReleaseImage(&(Worm->ImgSmooth));
+
 	cvReleaseMemStorage(&((Worm)->MemScratchStorage));
 	cvReleaseMemStorage(&((Worm)->MemStorage));
+
 	free((Worm)->Segmented);
+	Worm->Segmented = NULL;
+
 	DestroyWormTimeEvolution(&(Worm->TimeEvolution));
 	free(Worm);
 	Worm=NULL;
@@ -373,26 +378,26 @@ void DestroyWormAnalysisParam(WormAnalysisParam* ParamPtr){
  * and sets everything else to null
  */
 SegmentedWorm* CreateSegmentedWormStruct(){
-/** Create a new instance of SegWorm **/
+	/** Create a new instance of SegWorm **/
 	SegmentedWorm* SegWorm;
-SegWorm= (SegmentedWorm*) malloc(sizeof(SegmentedWorm));
+	SegWorm= (SegmentedWorm*) malloc(sizeof(SegmentedWorm));
 
-SegWorm->Head=(CvPoint*) malloc (sizeof(CvPoint));
-SegWorm->Tail=(CvPoint*) malloc (sizeof(CvPoint));
+	SegWorm->Head=(CvPoint*) malloc (sizeof(CvPoint));
+	SegWorm->Tail=(CvPoint*) malloc (sizeof(CvPoint));
 
-SegWorm->centerOfWorm=(CvPoint*) malloc (sizeof(CvPoint));
-SegWorm->NumSegments=0;
+	SegWorm->centerOfWorm=(CvPoint*) malloc (sizeof(CvPoint));
+	SegWorm->NumSegments=0;
 
-/*** Setup Memory storage ***/
+	/*** Setup Memory storage ***/
 
-SegWorm->MemSegStorage=cvCreateMemStorage(0);
+	SegWorm->MemSegStorage=cvCreateMemStorage(0);
 
-/*** Allocate Memory for the sequences ***/
-SegWorm->Centerline=cvCreateSeq(CV_SEQ_ELTYPE_POINT,sizeof(CvSeq),sizeof(CvPoint),SegWorm->MemSegStorage);
-SegWorm->LeftBound=cvCreateSeq(CV_SEQ_ELTYPE_POINT,sizeof(CvSeq),sizeof(CvPoint),SegWorm->MemSegStorage);
-SegWorm->RightBound=cvCreateSeq(CV_SEQ_ELTYPE_POINT,sizeof(CvSeq),sizeof(CvPoint),SegWorm->MemSegStorage);
+	/*** Allocate Memory for the sequences ***/
+	SegWorm->Centerline=cvCreateSeq(CV_SEQ_ELTYPE_POINT,sizeof(CvSeq),sizeof(CvPoint),SegWorm->MemSegStorage);
+	SegWorm->LeftBound=cvCreateSeq(CV_SEQ_ELTYPE_POINT,sizeof(CvSeq),sizeof(CvPoint),SegWorm->MemSegStorage);
+	SegWorm->RightBound=cvCreateSeq(CV_SEQ_ELTYPE_POINT,sizeof(CvSeq),sizeof(CvPoint),SegWorm->MemSegStorage);
 
-return SegWorm;
+	return SegWorm;
 }
 
 /*
@@ -401,36 +406,30 @@ return SegWorm;
  *
  */
 SegmentedWorm* CreateSegmentedWormStructReuseMem(CvMemStorage* mem){
-/** Create a new instance of SegWorm **/
-SegmentedWorm* SegWorm;
-SegWorm= (SegmentedWorm*) malloc(sizeof(SegmentedWorm));
+	/** Create a new instance of SegWorm **/
+	SegmentedWorm* SegWorm;
+	SegWorm= (SegmentedWorm*) malloc(sizeof(SegmentedWorm));
 
-SegWorm->Head=NULL;
-SegWorm->Tail=NULL;
-SegWorm->centerOfWorm=NULL;
-SegWorm->NumSegments=0;
+	SegWorm->Head=NULL;
+	SegWorm->Tail=NULL;
+	SegWorm->centerOfWorm=NULL;
+	SegWorm->NumSegments=0;
 
-/*** Setup Memory storage ***/
+	/*** Setup Memory storage ***/
 
-SegWorm->MemSegStorage=mem;
+	SegWorm->MemSegStorage=mem;
 
-/*** Allocate Memory for the sequences ***/
-SegWorm->Centerline=cvCreateSeq(CV_SEQ_ELTYPE_POINT,sizeof(CvSeq),sizeof(CvPoint),SegWorm->MemSegStorage);
-SegWorm->LeftBound=cvCreateSeq(CV_SEQ_ELTYPE_POINT,sizeof(CvSeq),sizeof(CvPoint),SegWorm->MemSegStorage);
-SegWorm->RightBound=cvCreateSeq(CV_SEQ_ELTYPE_POINT,sizeof(CvSeq),sizeof(CvPoint),SegWorm->MemSegStorage);
+	/*** Allocate Memory for the sequences ***/
+	SegWorm->Centerline=cvCreateSeq(CV_SEQ_ELTYPE_POINT,sizeof(CvSeq),sizeof(CvPoint),SegWorm->MemSegStorage);
+	SegWorm->LeftBound=cvCreateSeq(CV_SEQ_ELTYPE_POINT,sizeof(CvSeq),sizeof(CvPoint),SegWorm->MemSegStorage);
+	SegWorm->RightBound=cvCreateSeq(CV_SEQ_ELTYPE_POINT,sizeof(CvSeq),sizeof(CvPoint),SegWorm->MemSegStorage);
 
-return SegWorm;
+	return SegWorm;
 }
 
 
 void DestroySegmentedWormStruct(SegmentedWorm* SegWorm){
-cvReleaseMemStorage(&(SegWorm->MemSegStorage));
-free((SegWorm->Head));
-free((SegWorm->Tail));
-free((SegWorm->centerOfWorm));
-
-
-free(SegWorm);
+	cvReleaseMemStorage(&(SegWorm->MemSegStorage));
 }
 
 

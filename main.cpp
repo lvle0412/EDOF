@@ -368,6 +368,7 @@ int main (int argc, char** argv){
 		printf("\nLast used stage centering coordinates x=%d, y=%d\n",exp->Worm->stageFeedbackTarget.x,exp->Worm->stageFeedbackTarget.y);
 	}
 
+	/*
 	if ((!TrackThreadHasStopped)){
 	   printf("Waiting for TrackingThread to Stop...");
     }
@@ -377,6 +378,7 @@ int main (int argc, char** argv){
 		Sleep(500);
 		cvWaitKey(10);
 	}
+	*/
 
 	VerifyProtocol(exp->p);
 	ReleaseExperiment(exp);

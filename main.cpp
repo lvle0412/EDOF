@@ -368,7 +368,6 @@ int main (int argc, char** argv){
 		printf("\nLast used stage centering coordinates x=%d, y=%d\n",exp->Worm->stageFeedbackTarget.x,exp->Worm->stageFeedbackTarget.y);
 	}
 
-<<<<<<< HEAD
 	/*
 	if ((!TrackThreadHasStopped)){
 	   printf("Waiting for TrackingThread to Stop...");
@@ -380,17 +379,6 @@ int main (int argc, char** argv){
 		cvWaitKey(10);
 	}
 	*/
-=======
-	//if ((!TrackThreadHasStopped)){
-	//   printf("Waiting for TrackingThread to Stop...");
-    //}
-	//while ((!TrackThreadHasStopped)){
-	//	printf(".");
-	//	printf("The value of MainThreadHasStopped is %d",MainThreadHasStopped);//Sometimes the loop can't be terminated but I don't know why.
-	//	Sleep(500);
-	//	cvWaitKey(10);
-	//}
->>>>>>> b9972b59ebf028ec3f6347fc041c2989d3ce1d58
 
 	VerifyProtocol(exp->p);
 	ReleaseExperiment(exp);

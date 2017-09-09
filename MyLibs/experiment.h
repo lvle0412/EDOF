@@ -174,7 +174,6 @@ typedef struct ExperimentStruct{
 	CvPoint stageCenter; // Point indicating center of stage.
 	int stageIsTurningOff; //1 indicates stage is turning off. 0 indicates stage is on or off.
 
-
 	/** MindControl API **/
 	SharedMemory_handle sm;
 

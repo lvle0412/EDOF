@@ -89,7 +89,6 @@ using namespace std;
 UINT Thread(LPVOID lpdwParam);
 UINT Thread2(LPVOID lpdwParam);
 
-IplImage* CurrentImg;
 bool DispThreadHasStarted;
 bool TrackThreadHasStarted;
 bool MainThreadHasStopped;

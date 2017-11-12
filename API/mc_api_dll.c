@@ -289,6 +289,34 @@ int MC_API_GetDLPOnOff(SharedMemory_handle sm){
 	return val;
 }
 
+/************* Tap is on / off ****************/
+
+/*
+ * Set Tap on/off
+ *  Returns MC_API_OK
+ *  Returns MC_API_ERROR if error.
+ */
+int MC_API_SetTapOnOff(SharedMemory_handle sm, int isOn){
+	int ret=ip_WriteValue(sm,"int_TapisOn",(void *) &isOn, sizeof(int));
+	if (ret!=MC_API_OK) return MC_API_ERROR;
+	return MC_API_OK;
+}
+
+
+/*
+ * Get Tap on/off
+ *  Returns 1 if on
+ *  Returns 0 if off
+ *  Returns MC_API_ERROR if error.
+ */
+int MC_API_GetTapOnOff(SharedMemory_handle sm){
+	int val=0;
+	int ret=ip_ReadValue(sm,"int_TapisOn",(void *) &val);
+	if (ret!=MC_API_OK) return MC_API_ERROR;
+	if (ret!=MC_API_TRUE && ret!=MC_API_FALSE) return MC_API_ERROR;
+	return val;
+}
+
 /*
  * Returns MC_API_OK if server is running
  * Returns MC_API_ERROR otherwise

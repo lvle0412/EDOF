@@ -213,7 +213,14 @@ int main (int argc, char** argv){
 				/**Don't perform any analysis**/;
 				continue;
 			}
-			
+
+			if (exp->e == 0){
+				/** Send and Receive Values from API / Shared Memory **/
+				TICTOC::timer().tic("SyncAPI");
+				SyncAPI(exp);
+				TICTOC::timer().tic("SyncAPI");
+			}
+
 			/**** Functions to decide if Illumination Should be on Or Off ***/
 			/** Handle Transient Illumination Timing **/
 			HandleIlluminationTiming(exp);
@@ -305,11 +312,6 @@ int main (int argc, char** argv){
 			}
 
 			if (exp->e == 0) {
-
-				/** Send and Receive Values from API / Shared Memory **/
-				TICTOC::timer().tic("SyncAPI");
-				SyncAPI(exp);
-				TICTOC::timer().tic("SyncAPI");
 
 				/** Write Values to Disk **/
 				TICTOC::timer().tic("DoWriteToDisk()");

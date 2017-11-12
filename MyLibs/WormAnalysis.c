@@ -357,6 +357,9 @@ WormAnalysisParam* CreateWormAnalysisParam(){
 
 	/** Labview **/
 	ParamPtr->Labview=0;
+
+	/** Tap **/
+	ParamPtr->Tap = 0;
 	return ParamPtr;
 }
 
@@ -1126,6 +1129,10 @@ int CreateWormHUDS(IplImage* TempImage, WormAnalysisData* Worm, WormAnalysisPara
 		if (Params->DLPOn) cvPutText(TempImage,"Did you forget to record?",cvPoint(20,100),&font,cvScalar(255,255,255));
 	}
 
+	/** Display DLP On Off **/
+	if (Params->Tap) {
+		cvPutText(TempImage,"Tap ON",cvPoint(20,40),&font,cvScalar(255,255,255));
+	}
 
 	/*** Let the user know if the illumination flood light is on ***/
 	if (Params->IllumFloodEverything){

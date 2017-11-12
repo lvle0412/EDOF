@@ -160,6 +160,8 @@ typedef struct WormAnalysisParamStruct{
 	/** Labview **/
 	int Labview;
 
+	/** Tap **/
+	int Tap;
 } WormAnalysisParam;
 
 /** These are computed and segmented information about the worm at the current frame**/

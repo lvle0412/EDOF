@@ -256,6 +256,9 @@ int AppendWormFrameToDisk(WormAnalysisData* Worm, WormAnalysisParam* Params, Wri
 		cvWriteInt(fs,"IllumInvert",Params->IllumInvert);
 		cvWriteInt(fs,"IllumFlipLR",Params->IllumFlipLR);
 
+		/** Tap Information **/
+		cvWriteInt(fs,"TapIsOn",Params->Tap);
+
 		CvPoint origin=ConvertSlidlerToWormSpace(Params->IllumSquareOrig,Params->DefaultGridSize);
 		cvStartWriteStruct(fs,"IllumRectOrigin",CV_NODE_MAP,NULL);
 			cvWriteInt(fs,"x",origin.x);

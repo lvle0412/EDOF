@@ -1754,6 +1754,10 @@ void SyncAPI(Experiment* exp){
 		exp->Params->Labview=MC_API_GetDLPOnOff(exp->sm);
 	}
 
+	if(exp->Params->Tap!=MC_API_GetTapOnOff(exp->sm)){
+		exp->Params->Tap=MC_API_GetTapOnOff(exp->sm);
+	}
+
 	/** Load in Info From Laser Controller **/
 	if (MC_API_isLaserControllerPresent(exp->sm)) {
 		//printf("successfully register laser controller! \n");

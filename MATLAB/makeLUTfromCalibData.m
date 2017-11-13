@@ -110,7 +110,7 @@ end
 
 LookUp_Array=reshape(LookUp,1,[]);  %Make the LookUp table a long linear array
 disp('Writing lookup table');
-fid = fopen('calib.dat', 'w');
+fid = fopen('C:\Users\USER\workspace\mindcontrol\bin\calib.dat', 'w');
 assert(fid~=0,'Error opening calib.dat for writing');
 fwrite(fid, LookUp_Array, ['integer*' num2str(SizeOfInt)]); %Write the disk
 fclose(fid);

@@ -152,7 +152,8 @@ typedef struct WormAnalysisParamStruct{
 	int stageSpeedFactor; // gain of feedback loop
 	int stageROIRadius;   // radius of the active zone
 	int stageTargetSegment; //segment along the worms centerline used for targeting
-
+	int stageRecording;
+	
 	/** Record Data Parameters **/
 	int Record;
 

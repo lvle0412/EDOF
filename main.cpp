@@ -89,7 +89,6 @@ using namespace std;
 UINT Thread(LPVOID lpdwParam);
 UINT Thread2(LPVOID lpdwParam);
 
-IplImage* CurrentImg;
 bool DispThreadHasStarted;
 bool TrackThreadHasStarted;
 bool MainThreadHasStopped;
@@ -368,18 +367,22 @@ int main (int argc, char** argv){
 		printf("\nLast used stage centering coordinates x=%d, y=%d\n",exp->Worm->stageFeedbackTarget.x,exp->Worm->stageFeedbackTarget.y);
 	}
 
-	//if ((!TrackThreadHasStopped)){
-	//   printf("Waiting for TrackingThread to Stop...");
-    //}
-	//while ((!TrackThreadHasStopped)){
-	//	printf(".");
-	//	printf("The value of MainThreadHasStopped is %d",MainThreadHasStopped);//Sometimes the loop can't be terminated but I don't know why.
-	//	Sleep(500);
-	//	cvWaitKey(10);
-	//}
+	/*
+	if ((!TrackThreadHasStopped)){
+	   printf("Waiting for TrackingThread to Stop...");
+    }
+	while ((!TrackThreadHasStopped)){
+		printf(".");
+		printf("The value of MainThreadHasStopped is %d",MainThreadHasStopped);//Sometimes the loop can't be terminated but I don't know why.
+		Sleep(500);
+		cvWaitKey(10);
+	}
+	*/
 
 	VerifyProtocol(exp->p);
+	
 	ReleaseExperiment(exp);
+
 	DestroyExperiment(&exp);
 
 	printf("\nMain Thread: Good bye.\n");

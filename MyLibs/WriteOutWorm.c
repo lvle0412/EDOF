@@ -274,7 +274,7 @@ int AppendWormFrameToDisk(WormAnalysisData* Worm, WormAnalysisParam* Params, Wri
 			cvEndWriteStruct(fs);
 		}
 		
-		if (Params->stageTrackingOn){
+		if (Params->stageTrackingOn && Params->stageRecording){
 			cvStartWriteStruct(fs,"StagePosition",CV_NODE_MAP,NULL);
 				cvWriteInt(fs,"i",Worm->stagePosition.x);
 				cvWriteInt(fs,"j",Worm->stagePosition.y);

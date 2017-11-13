@@ -1754,7 +1754,7 @@ void SyncAPI(Experiment* exp){
 		exp->Params->Labview=MC_API_GetDLPOnOff(exp->sm);
 	}
 
-	if(exp->Params->Tap!=MC_API_GetTapOnOff(exp->sm)){
+	if(exp->Params->Tap!=MC_API_GetTapOnOff(exp->sm) & MC_API_GetTapOnOff(exp->sm)>=0){
 		exp->Params->Tap=MC_API_GetTapOnOff(exp->sm);
 	}
 

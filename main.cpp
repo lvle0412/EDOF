@@ -182,7 +182,7 @@ int main (int argc, char** argv){
 		_TICTOC_TIC_FUNC
 		TICTOC::timer().tic("OneLoop");
 		if (isFrameReady(exp)) {
-
+ 			
 			/** Set error to zero **/
 			exp->e=0;
 			TICTOC::timer().tic("GrabFrame()");

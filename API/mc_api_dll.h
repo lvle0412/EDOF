@@ -182,10 +182,21 @@ int MC_API_SetDLPOnOff(SharedMemory_handle sm, int isOn);
 int MC_API_GetDLPOnOff(SharedMemory_handle sm);
 
 
+/*
+ * Set Tap on/off
+ *  Returns MC_API_OK
+ *  Returns MC_API_ERROR if error.
+ */
+int MC_API_SetTapOnOff(SharedMemory_handle sm, int tapisOn);
 
 
-
-
+/*
+ * Get Tap on/off
+ *  Returns 1 if on
+ *  Returns 0 if off
+ *  Returns MC_API_ERROR if error.
+ */
+int MC_API_GetTapOnOff(SharedMemory_handle sm);
 
 
 #ifdef __cplusplus

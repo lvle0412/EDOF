@@ -296,8 +296,8 @@ int MC_API_GetDLPOnOff(SharedMemory_handle sm){
  *  Returns MC_API_OK
  *  Returns MC_API_ERROR if error.
  */
-int MC_API_SetTapOnOff(SharedMemory_handle sm, int isOn){
-	int ret=ip_WriteValue(sm,"int_TapisOn",(void *) &isOn, sizeof(int));
+int MC_API_SetTapOnOff(SharedMemory_handle sm, int tapisOn){
+	int ret=ip_WriteValue(sm,"int_TapisOn",(void *) &tapisOn, sizeof(int));
 	if (ret!=MC_API_OK) return MC_API_ERROR;
 	return MC_API_OK;
 }

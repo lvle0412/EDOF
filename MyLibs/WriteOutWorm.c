@@ -256,9 +256,6 @@ int AppendWormFrameToDisk(WormAnalysisData* Worm, WormAnalysisParam* Params, Wri
 		cvWriteInt(fs,"IllumInvert",Params->IllumInvert);
 		cvWriteInt(fs,"IllumFlipLR",Params->IllumFlipLR);
 
-		/** Tap Information **/
-		cvWriteInt(fs,"TapIsOn",Params->Tap);
-
 		CvPoint origin=ConvertSlidlerToWormSpace(Params->IllumSquareOrig,Params->DefaultGridSize);
 		cvStartWriteStruct(fs,"IllumRectOrigin",CV_NODE_MAP,NULL);
 			cvWriteInt(fs,"x",origin.x);
@@ -277,7 +274,7 @@ int AppendWormFrameToDisk(WormAnalysisData* Worm, WormAnalysisParam* Params, Wri
 			cvEndWriteStruct(fs);
 		}
 		
-		if (Params->stageTrackingOn && Params->stageRecording){
+		if (Params->stageTrackingOn){
 			cvStartWriteStruct(fs,"StagePosition",CV_NODE_MAP,NULL);
 				cvWriteInt(fs,"i",Worm->stagePosition.x);
 				cvWriteInt(fs,"j",Worm->stagePosition.y);
@@ -319,6 +316,9 @@ int AppendWormFrameToDisk(WormAnalysisData* Worm, WormAnalysisParam* Params, Wri
 					cvWriteInt(fs,"SecondLaser",Params->SecondLaser);
 				}
 		cvEndWriteStruct(fs);
+
+		/** Tap Information **/
+		cvWriteInt(fs,"TapIsOn",Params->Tap);
 
 		/** Head Curvature Information **/
 		if (Params->CurvatureAnalyzeOn){

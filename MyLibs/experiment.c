@@ -49,6 +49,8 @@
 
 //OpenCV Headers
 #include "opencv2/highgui/highgui_c.h"
+//#include "opencv/cv.h"
+//#include "opencv/cxcore.h"
 #include <cv.h>
 #include <cxcore.h>
 
@@ -88,6 +90,7 @@ Experiment* CreateExperimentStruct() {
 	/** Simulation? True/False **/
 	exp->SimDLP = 0;
 	exp->VidFromFile = 0;
+	//exp->Labview = 0;
 
 	/** GuiWindowNames **/
 	exp->WinDisp = NULL;
@@ -242,7 +245,7 @@ int HandleCommandLineArguments(Experiment* exp) {
 	opterr = 0;
 
 	int c;
-	while ((c = getopt(exp->argc, exp->argv, "si:d:o:p:gtx:y:r?")) != -1) {
+	while ((c = getopt(exp->argc, exp->argv, "si:d:o:p:gtx:y:?")) != -1) {
 		switch (c) {
 
 		case 'i': /** specify input video file **/
@@ -299,18 +302,15 @@ int HandleCommandLineArguments(Experiment* exp) {
 				exp->UseFrameGrabber = TRUE;
 			}
 			break;
-
 		case 't': /** Use the stage tracking software **/
 			exp->stageIsPresent=1;
 			break;
-
 		case 'x': /** adjust the target for stage feedback loop by these certain number of pixels **/
 				if (optarg != NULL) {
 					exp->Worm->stageFeedbackTarget.x = atoi(optarg);
 				}
 				printf("Stage feedback target x= %d pixels.\n",exp->Worm->stageFeedbackTarget.x );
 		break;
-
 		case 'y': /** adjust the target for stage feedback loop by these certain number of pixels **/
 				if (optarg != NULL) {
 					exp->Worm->stageFeedbackTarget.y = atoi(optarg);
@@ -318,10 +318,7 @@ int HandleCommandLineArguments(Experiment* exp) {
 				printf("Stage feedback target y= %d pixels.\n",exp->Worm->stageFeedbackTarget.y );
 		break;
 
-		case 'r': /** Run in DLP simulation Mode **/
-			exp->Params->stageRecording = 1;
-			break;
-			
+
 		case '?':
 			if (optopt == '?') {
 				displayHelp();
@@ -717,10 +714,10 @@ void AssignWindowNames(Experiment* exp) {
 	char* control2 = (char*) malloc(strlen("MoreControls"));
 	char* control3 = (char*) malloc(strlen("EvenMoreControls"));
 
-	strcpy(disp1, "Display");
-	strcpy(control1, "Controls");
-	strcpy(control2, "MoreControls");
-	strcpy(control3, "EvenMoreControls");
+	disp1 = "Display";
+	control1 = "Controls";
+	control2 = "MoreControls";
+	control3 = "EvenMoreControls";
 
 	exp->WinDisp = disp1;
 	exp->WinCon1 = control1;
@@ -1422,9 +1419,7 @@ void CalculateAndPrintFrameRateAndInfo(Experiment* exp) {
 
 		if (exp->Params->stageTrackingOn==1){
 			printf("current velocity: %d, %d\n",exp->Worm->stageVelocity.x, exp->Worm->stageVelocity.y);
-			if (exp->Params->stageRecording==1){
-				printf("current stage position: %d, %d\n",exp->Worm->stagePosition.x, exp->Worm->stagePosition.y);
-			}
+			printf("current stage position: %d, %d\n",exp->Worm->stagePosition.x, exp->Worm->stagePosition.y);
 		}
 	}
 }
@@ -1754,10 +1749,6 @@ void SyncAPI(Experiment* exp){
 		exp->Params->Labview=MC_API_GetDLPOnOff(exp->sm);
 	}
 
-	if(exp->Params->Tap!=MC_API_GetTapOnOff(exp->sm) & MC_API_GetTapOnOff(exp->sm)>=0){
-		exp->Params->Tap=MC_API_GetTapOnOff(exp->sm);
-	}
-
 	/** Load in Info From Laser Controller **/
 	if (MC_API_isLaserControllerPresent(exp->sm)) {
 		//printf("successfully register laser controller! \n");
@@ -1776,7 +1767,9 @@ void SyncAPI(Experiment* exp){
 		exp->Params->SecondLaserName=-1;
 	}
 
-
+	if(exp->Params->Tap!=MC_API_GetTapOnOff(exp->sm) && MC_API_GetTapOnOff(exp->sm)>=0){
+		exp->Params->Tap=MC_API_GetTapOnOff(exp->sm);
+	}
 
 
 	return;
@@ -2062,10 +2055,9 @@ int RecordStageTracker(Experiment* exp){
 		if (exp->stage==NULL) return 0;
 
 		if (exp->Params->stageTrackingOn==1){
-			if (exp->Params->OnOff==0 && exp->Params->stageRecording){ /** if the analysis system is off **/
-			} 
-			else {
-				findStagePosition(exp->stage, &(exp->Worm->stagePosition.x),&(exp->Worm->stagePosition.y));
+			if (exp->Params->OnOff==0){ /** if the analysis system is off **/
+			} else {
+			findStagePosition(exp->stage, &(exp->Worm->stagePosition.x),&(exp->Worm->stagePosition.y));
 			}
 		}
 	}

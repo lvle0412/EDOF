@@ -89,6 +89,7 @@ using namespace std;
 UINT Thread(LPVOID lpdwParam);
 UINT Thread2(LPVOID lpdwParam);
 
+IplImage* CurrentImg;
 bool DispThreadHasStarted;
 bool TrackThreadHasStarted;
 bool MainThreadHasStopped;
@@ -182,7 +183,7 @@ int main (int argc, char** argv){
 		_TICTOC_TIC_FUNC
 		TICTOC::timer().tic("OneLoop");
 		if (isFrameReady(exp)) {
- 			
+
 			/** Set error to zero **/
 			exp->e=0;
 			TICTOC::timer().tic("GrabFrame()");
@@ -213,14 +214,7 @@ int main (int argc, char** argv){
 				/**Don't perform any analysis**/;
 				continue;
 			}
-
-			if (exp->e == 0){
-				/** Send and Receive Values from API / Shared Memory **/
-				TICTOC::timer().tic("SyncAPI");
-				SyncAPI(exp);
-				TICTOC::timer().tic("SyncAPI");
-			}
-
+			
 			/**** Functions to decide if Illumination Should be on Or Off ***/
 			/** Handle Transient Illumination Timing **/
 			HandleIlluminationTiming(exp);
@@ -313,6 +307,11 @@ int main (int argc, char** argv){
 
 			if (exp->e == 0) {
 
+				/** Send and Receive Values from API / Shared Memory **/
+				TICTOC::timer().tic("SyncAPI");
+				SyncAPI(exp);
+				TICTOC::timer().tic("SyncAPI");
+
 				/** Write Values to Disk **/
 				TICTOC::timer().tic("DoWriteToDisk()");
 				DoWriteToDisk(exp);
@@ -369,22 +368,18 @@ int main (int argc, char** argv){
 		printf("\nLast used stage centering coordinates x=%d, y=%d\n",exp->Worm->stageFeedbackTarget.x,exp->Worm->stageFeedbackTarget.y);
 	}
 
-	/*
-	if ((!TrackThreadHasStopped)){
-	   printf("Waiting for TrackingThread to Stop...");
-    }
-	while ((!TrackThreadHasStopped)){
-		printf(".");
-		printf("The value of MainThreadHasStopped is %d",MainThreadHasStopped);//Sometimes the loop can't be terminated but I don't know why.
-		Sleep(500);
-		cvWaitKey(10);
-	}
-	*/
+	//if ((!TrackThreadHasStopped)){
+	//   printf("Waiting for TrackingThread to Stop...");
+    //}
+	//while ((!TrackThreadHasStopped)){
+	//	printf(".");
+	//	printf("The value of MainThreadHasStopped is %d",MainThreadHasStopped);//Sometimes the loop can't be terminated but I don't know why.
+	//	Sleep(500);
+	//	cvWaitKey(10);
+	//}
 
 	VerifyProtocol(exp->p);
-	
 	ReleaseExperiment(exp);
-
 	DestroyExperiment(&exp);
 
 	printf("\nMain Thread: Good bye.\n");

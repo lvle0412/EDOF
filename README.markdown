@@ -1,3 +1,6 @@
+In this branch, a option is added to remind the program whether to do stage position recording.
+======================
+
 Welcome to MindControl
 ======================
 

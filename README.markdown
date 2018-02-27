@@ -2,12 +2,12 @@ Mindcontrol Tutorial
 ====================
 Introduction
 -------------------------------------------------------
-This is a modified version of branch master. The branch assembles the branch StagePosition. The code offers an option called “r” to manually open or close stage position recording functions. The program also fixed some bugs at branch master.
+This is a modified version of branch master. The branch assembles the branch StagePositionRecording. The program can be used to communicate with other programs to get the information whether that program is tapping the stage to give the worm a mechanical stimulation. The program will show the status of tapping machine and record these information to *.yaml file.
 
 Authors
 -------------------------------------------------------
-The project is based on branch StagePosition and written by Gao Fan. 
+The project is based on branch StagePositionRecording and written by Gao Fan. 
 
 How to use
 -------------------------------------------------------
-When you inputting command lines at cmd.exe, add another option “r” to record the stage positon. For example “colbert.exe -r -g -t -o filename -d Directory”.
+Use the GUI as how you use the program of master branch.

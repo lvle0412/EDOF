@@ -267,23 +267,61 @@ int AppendWormFrameToDisk(WormAnalysisData* Worm, WormAnalysisParam* Params, Wri
 			cvWriteInt(fs,"y",Params->IllumSquareRad.height);
 		cvEndWriteStruct(fs);
 
-		if (Params->stageTrackingOn){
-			cvStartWriteStruct(fs,"StageVelocity",CV_NODE_MAP,NULL);
-				cvWriteInt(fs,"i",Worm->stageVelocity.x);
-				cvWriteInt(fs,"j",Worm->stageVelocity.y);
-			cvEndWriteStruct(fs);
-		}
-		
-		if (Params->stageTrackingOn){
+		// if (Params->stageTrackingOn){
+			// cvStartWriteStruct(fs,"StageVelocity",CV_NODE_MAP,NULL);
+				// cvWriteInt(fs,"i",Worm->stageVelocity.x);
+				// cvWriteInt(fs,"j",Worm->stageVelocity.y);
+			// cvEndWriteStruct(fs);
+		// }
+	
+		if (Params->stageTrackingOn && Params->stageRecording){
 			cvStartWriteStruct(fs,"StagePosition",CV_NODE_MAP,NULL);
 				cvWriteInt(fs,"i",Worm->stagePosition.x);
 				cvWriteInt(fs,"j",Worm->stagePosition.y);
 			cvEndWriteStruct(fs);
 		}
 
+		if (Params->stageTrackingOn && Params->stageRecording){
+			cvStartWriteStruct(fs,"WormSpeed",CV_NODE_MAP,NULL);
+				cvWriteInt(fs,"integer",Worm->WormSpeed);
+				cvWriteInt(fs,"decimal",100*(Worm->WormSpeed-long(Worm->WormSpeed)));
+			cvEndWriteStruct(fs);
+		}
+	
+		if (Params->stageTrackingOn){
+			cvStartWriteStruct(fs,"StageFeedbackTarget",CV_NODE_MAP,NULL);
+				cvWriteInt(fs,"i",Worm->stageFeedbackTarget.x);
+				cvWriteInt(fs,"j",Worm->stageFeedbackTarget.y);
+			cvEndWriteStruct(fs);
+		}
+		
 		cvStartWriteStruct(fs,"LaserPower",CV_NODE_MAP,NULL);
-			cvWriteInt(fs,"Green",Params->GreenLaser);
-			cvWriteInt(fs,"Blue",Params->BlueLaser);
+			switch(Params->FirstLaserName){
+				case 0:
+					cvWriteInt(fs,"Blue",Params->FirstLaser);
+					break;
+				case 1:
+					cvWriteInt(fs,"Green",Params->FirstLaser);
+					break;
+				case 2:
+					cvWriteInt(fs,"Red",Params->FirstLaser);
+					break;
+				default:
+					cvWriteInt(fs,"FirstLaser",Params->FirstLaser);
+				}
+			switch(Params->SecondLaserName){
+				case 0:
+					cvWriteInt(fs,"Blue",Params->SecondLaser);
+					break;
+				case 1:
+					cvWriteInt(fs,"Green",Params->SecondLaser);
+					break;
+				case 2:
+					cvWriteInt(fs,"Red",Params->SecondLaser);
+					break;
+				default:
+					cvWriteInt(fs,"SecondLaser",Params->SecondLaser);
+				}
 		cvEndWriteStruct(fs);
 
 		/** Head Curvature Information **/

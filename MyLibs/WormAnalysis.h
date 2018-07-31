@@ -125,8 +125,12 @@ typedef struct WormAnalysisParamStruct{
 	
 
 	/** Laser Power **/
-	int GreenLaser;
-	int BlueLaser;
+	int FirstLaser;
+	int SecondLaser;
+
+	/** Laser Name **/
+	int FirstLaserName;
+	int SecondLaserName;
 
 	/** Real Time Curvature Analysis **/
 	int CurvatureAnalyzeOn;
@@ -148,10 +152,13 @@ typedef struct WormAnalysisParamStruct{
 	int stageSpeedFactor; // gain of feedback loop
 	int stageROIRadius;   // radius of the active zone
 	int stageTargetSegment; //segment along the worms centerline used for targeting
-
+	int stageRecording;
+	
 	/** Record Data Parameters **/
 	int Record;
 
+	/** Labview **/
+	int Labview;
 
 } WormAnalysisParam;
 
@@ -222,8 +229,8 @@ typedef struct WormImageAnalysisStruct{
 	/** Information about location on plate **/
 	CvPoint stageVelocity; //compensating velocity of stage.
 	CvPoint stagePosition; //Position of the motorized stage.
-
-
+	CvPoint stageFeedbackTarget;//Target of the stage feedback loop as a point in the image
+	double WormSpeed; // Worm speed in real time, in stage unit per millisecond.
 	//WormIlluminationData* Illum;
 }WormAnalysisData;
 
@@ -418,7 +425,7 @@ int AddMeanHeadCurvature(WormTimeEvolution* TimeEvolution, double CurrHeadCurvat
  * The Boundary is placed in Worm.Boundary
  *
  */
-void FindWormBoundary(WormAnalysisData* Worm, WormAnalysisParam* WormParams);
+int FindWormBoundary(WormAnalysisData* Worm, WormAnalysisParam* WormParams);
 
 
 
@@ -572,6 +579,10 @@ int PrevFrameImproveWormHeadTail(WormAnalysisData* Worm, WormAnalysisParam* Para
  */
 CvPoint ConvertSlidlerToWormSpace(CvPoint SliderOrigin,CvSize gridSize);
 
-
+/* Calculate the worm's speed in real time based on StagePosition update.
+*  PSP PrevStagePosition, SP StagePosition, PT PrevTime, TS TimeStamp.
+*/
+double CalculateRTWormSpeed(const CvPoint& PSP, const CvPoint& SP, const long& PT, const unsigned long& TS);
+ 
 
 #endif /* WORMANALYSIS_H_ */

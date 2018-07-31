@@ -49,8 +49,6 @@
 
 //OpenCV Headers
 #include "opencv2/highgui/highgui_c.h"
-//#include "opencv/cv.h"
-//#include "opencv/cxcore.h"
 #include <cv.h>
 #include <cxcore.h>
 
@@ -73,6 +71,7 @@
 #include "../API/mc_api_dll.h"
 
 #include "experiment.h"
+
 
 /*
  * Creates a new experiment object and sets values to zero.
@@ -139,7 +138,7 @@ Experiment* CreateExperimentStruct() {
 
 	/** Information about the Previous frame's Worm **/
 	exp->PrevWorm = NULL;
-
+	exp->PrevStagePosition = cvPoint(0,0);
 	/** Segmented Worm in DLP Space **/
 	exp->segWormDLP = NULL;
 
@@ -175,13 +174,12 @@ Experiment* CreateExperimentStruct() {
 	exp->nframes = 0;
 	exp->prevFrames = 0;
 	exp->prevTime = 0;
-
+	exp->prevTime2 = 0;
 	/** Stage Control **/
 	exp->stageIsPresent=0;
 	exp->stage=NULL;
 	exp->stageVel=cvPoint(0,0);
 	exp->stageCenter=cvPoint(0,0);
-	exp->stageFeedbackTarget=cvPoint(512,384);
 	exp->stageIsTurningOff=0;
 
 	/** Macros **/
@@ -196,6 +194,7 @@ Experiment* CreateExperimentStruct() {
 	/** Error Handling **/
 	exp->e = 0;
 
+	
 	return exp;
 
 }
@@ -245,8 +244,9 @@ int HandleCommandLineArguments(Experiment* exp) {
 	opterr = 0;
 
 	int c;
-	while ((c = getopt(exp->argc, exp->argv, "si:d:o:p:gtx:y:?")) != -1) {
+	while ((c = getopt(exp->argc, exp->argv, "si:d:o:p:gtx:y:r?")) != -1) {
 		switch (c) {
+
 		case 'i': /** specify input video file **/
 			exp->VidFromFile = 1;
 			exp->infname = optarg;
@@ -301,23 +301,29 @@ int HandleCommandLineArguments(Experiment* exp) {
 				exp->UseFrameGrabber = TRUE;
 			}
 			break;
+
 		case 't': /** Use the stage tracking software **/
 			exp->stageIsPresent=1;
 			break;
+
 		case 'x': /** adjust the target for stage feedback loop by these certain number of pixels **/
 				if (optarg != NULL) {
-					exp->stageFeedbackTarget.x = atoi(optarg);
+					exp->Worm->stageFeedbackTarget.x = atoi(optarg);
 				}
-				printf("Stage feedback target x= %d pixels.\n",exp->stageFeedbackTarget.x );
+				printf("Stage feedback target x= %d pixels.\n",exp->Worm->stageFeedbackTarget.x );
 		break;
+
 		case 'y': /** adjust the target for stage feedback loop by these certain number of pixels **/
 				if (optarg != NULL) {
-					exp->stageFeedbackTarget.y = atoi(optarg);
+					exp->Worm->stageFeedbackTarget.y = atoi(optarg);
 				}
-				printf("Stage feedback target y= %d pixels.\n",exp->stageFeedbackTarget.y );
+				printf("Stage feedback target y= %d pixels.\n",exp->Worm->stageFeedbackTarget.y );
 		break;
 
-
+		case 'r': /** Set stage recording on **/
+			exp->Params->stageRecording = 1;
+		break;
+			
 		case '?':
 			if (optopt == '?') {
 				displayHelp();
@@ -713,10 +719,10 @@ void AssignWindowNames(Experiment* exp) {
 	char* control2 = (char*) malloc(strlen("MoreControls"));
 	char* control3 = (char*) malloc(strlen("EvenMoreControls"));
 
-	disp1 = "Display";
-	control1 = "Controls";
-	control2 = "MoreControls";
-	control3 = "EvenMoreControls";
+	strcpy(disp1, "Display");
+	strcpy(control1, "Controls");
+	strcpy(control2, "MoreControls");
+	strcpy(control3, "EvenMoreControls");
 
 	exp->WinDisp = disp1;
 	exp->WinCon1 = control1;
@@ -756,9 +762,9 @@ void on_mouse( int event, int x, int y, int flags, void* param){
 
 	switch (event){
 		case CV_EVENT_RBUTTONUP:{
-			exp->stageFeedbackTarget.x=x;
-			exp->stageFeedbackTarget.y=y;
-			printf("Centering target set to: x=%d, y=%d\n",exp->stageFeedbackTarget.x,exp->stageFeedbackTarget.y);
+			exp->Worm->stageFeedbackTarget.x=x;
+			exp->Worm->stageFeedbackTarget.y=y;
+			printf("Centering target set to: x=%d, y=%d\n",exp->Worm->stageFeedbackTarget.x,exp->Worm->stageFeedbackTarget.y);
 		}
 
 	}
@@ -824,7 +830,7 @@ void SetupGUI(Experiment* exp) {
 			(int) NULL);
 
 	cvCreateTrackbar("IllumDuration", exp->WinCon1,
-			&(exp->Params->IllumDuration), 70, (int) NULL);
+			&(exp->Params->IllumDuration), 150, (int) NULL);
 	cvCreateTrackbar("DLPFlashOn", exp->WinCon1,
 			&(exp->Params->DLPOnFlash), 1, (int) NULL);
 
@@ -882,11 +888,8 @@ void SetupGUI(Experiment* exp) {
 			&(exp->Params->IllumRefractoryPeriod), 70, (int) NULL);
 
 	//Use the minimum DLP On and Refractory Period?
-	cvCreateTrackbar("StayOn&Refract", exp->WinCon2,
-					&(exp->Params->StayOnAndRefract), 1, (int) NULL);
-
-
-
+	cvCreateTrackbar("StayOn&Refract", exp->WinCon2,&(exp->Params->StayOnAndRefract), 1, (int) NULL);
+		
 
 	/** If we have loaded a protocol, set up protocol specific sliders **/
 	if (exp->pflag) {
@@ -1050,10 +1053,14 @@ void RollVideoInput(Experiment* exp) {
 
 			/**Use Frame Grabber **/
 		} else {
-			/** Use Basler USB3 Camera **/
+			/** Use ImagingSource USB Camera **/
 
 			/** Turn on Camera **/
-			if (T2Cam_Initialize(exp->MyCamera)!=EXP_SUCCESS) exp->e=EXP_ERROR;
+			T2Cam_InitializeLib();
+			T2Cam_AllocateCamData(&(exp->MyCamera));
+			T2Cam_ShowDeviceSelectionDialog(&(exp->MyCamera));
+			/** Start Grabbing Frames and Update the Internal Frame Number iFrameNumber **/
+			T2Cam_GrabFramesAsFastAsYouCan(&(exp->MyCamera));
 		}
 
 	}
@@ -1104,11 +1111,6 @@ void InitializeExperiment(Experiment* exp) {
 	Frame* fromCCD = CreateFrame(cvSize(NSIZEX, NSIZEY));
 	Frame* forDLP = CreateFrame(cvSize(NSIZEX, NSIZEY));
 	Frame* IlluminationFrame = CreateFrame(cvSize(NSIZEX, NSIZEY));
-
-
-	CamData* MyCamera = T2Cam_CreateCamData();
-
-	exp->MyCamera = MyCamera;
 
 	exp->fromCCD = fromCCD;
 	exp->forDLP = forDLP;
@@ -1229,21 +1231,12 @@ int GrabFrame(Experiment* exp) {
 
 		} else {
 
-			/** Acqure from Basler USB3 Cam **/
+			/** Acqure from ImagingSource USB Cam **/
 
-			if (T2Cam_GrabFrame(exp->MyCamera)==EXP_SUCCESS){
+			exp->lastFrameSeenOutside = exp->MyCamera->iFrameNumber;
+			/*** Create a local copy of the image***/
+			LoadFrameWithBin(exp->MyCamera->iImageData, exp->fromCCD);
 
-				if ((int) exp->MyCamera->grabResult.SizeX != exp->fromCCD->size.width || (int) exp->MyCamera->grabResult.SizeY != exp->fromCCD->size.height) {
-				
-
-					printf("Size from Camera does not match size in IplImage fromCCD!\n");
-
-					return EXP_ERROR;
-				}
-
-				LoadFrameWithBin(exp->MyCamera->ImageRawData, exp->fromCCD);
-
-			}
 		}
 
 	} else {
@@ -1293,7 +1286,7 @@ int isFrameReady(Experiment* exp) {
 	if (!(exp->VidFromFile) && !(exp->UseFrameGrabber)) {
 		/** If This isn't a simulation.. **/
 		/** And if we arent using the frame grabber **/
-		return 1;
+		return (exp->MyCamera->iFrameNumber > exp->lastFrameSeenOutside);
 	} else {
 		/** Otherwise just keep chugging... **/
 
@@ -1399,8 +1392,8 @@ void FinishRecording(Experiment* exp) {
  */
 void StartFrameRateTimer(Experiment* exp) {
 	exp->prevTime = clock();
+	exp->prevTime2 = clock();
 	exp->prevFrames = 0;
-
 }
 
 /*
@@ -1430,11 +1423,11 @@ void CalculateAndPrintFrameRateAndInfo(Experiment* exp) {
 		exp->prevFrames = exp->Worm->frameNum;
 		exp->prevTime = exp->Worm->timestamp;
 
-
 		if (exp->Params->stageTrackingOn==1){
-
-			printf(" current velocity: %d, %d\n",exp->Worm->stageVelocity.x, exp->Worm->stageVelocity.y);
-			printf("current stage position: %d, %d\n",exp->Worm->stagePosition.x, exp->Worm->stagePosition.y);
+			printf("current velocity: %d, %d\n",exp->Worm->stageVelocity.x, exp->Worm->stageVelocity.y);
+			if (exp->Params->stageRecording==1){				
+				printf("Real time worm speed: %.2f SU/ms\n", exp->Worm->WormSpeed);									
+			}
 		}
 	}
 }
@@ -1480,7 +1473,7 @@ void DoSegmentation(Experiment* exp) {
 	 */
 	TICTOC::timer().tic("_FindWormBoundary",exp->e);
 	if (!(exp->e))
-		FindWormBoundary(exp->Worm, exp->Params);
+		exp->e = FindWormBoundary(exp->Worm, exp->Params);
 	TICTOC::timer().toc("_FindWormBoundary",exp->e);
 
 	/*** Find Worm Head and Tail ***/
@@ -1522,8 +1515,8 @@ _TICTOC_TOC_FUNC
  */
 void MarkRecenteringTarget(Experiment* exp){
 
-	CvPoint a=cvPoint( exp->stageFeedbackTarget.x +2, exp->stageFeedbackTarget.y +2);
-	CvPoint b=cvPoint(exp->stageFeedbackTarget.x -2, exp->stageFeedbackTarget.y -2);
+	CvPoint a=cvPoint( exp->Worm->stageFeedbackTarget.x +2, exp->Worm->stageFeedbackTarget.y +2);
+	CvPoint b=cvPoint(exp->Worm->stageFeedbackTarget.x -2, exp->Worm->stageFeedbackTarget.y -2);
 	cvRectangle(exp->HUDS,a,b, cvScalar(255,255,255),1);
 
 }
@@ -1759,23 +1752,27 @@ void SyncAPI(Experiment* exp){
 	/** Write out to the MindControl API **/
 	MC_API_SetCurrentFrame(exp->sm, exp->Worm->frameNum);
 
-	exp->Params->DLPOn=MC_API_GetDLPOnOff(exp->sm);
-
-	
+	if(exp->Params->Labview!=MC_API_GetDLPOnOff(exp->sm)){
+		exp->Params->DLPOn=MC_API_GetDLPOnOff(exp->sm);
+		exp->Params->Labview=MC_API_GetDLPOnOff(exp->sm);
+	}
 
 	/** Load in Info From Laser Controller **/
 	if (MC_API_isLaserControllerPresent(exp->sm)) {
 		//printf("successfully register laser controller! \n");
-		exp->Params->GreenLaser=MC_API_GetGreenLaserPower(exp->sm);
-		exp->Params->BlueLaser=MC_API_GetBlueLaserPower(exp->sm);
-		
+		exp->Params->FirstLaser=MC_API_GetFirstLaserPower(exp->sm);
+		exp->Params->SecondLaser=MC_API_GetSecondLaserPower(exp->sm);
+		exp->Params->FirstLaserName=MC_API_GetFirstLaserName(exp->sm);
+		exp->Params->SecondLaserName=MC_API_GetSecondLaserName(exp->sm);
 		//printf("DLP is %d \n", exp->Params->DLPOn);
 		//printf("GreenLaser is %d \n", exp->Params->GreenLaser);
 		
 
 	} else {
-		exp->Params->GreenLaser=-1;
-		exp->Params->BlueLaser=-1;
+		exp->Params->FirstLaser=-1;
+		exp->Params->SecondLaser=-1;
+		exp->Params->FirstLaserName=-1;
+		exp->Params->SecondLaserName=-1;
 	}
 
 
@@ -2006,6 +2003,7 @@ int ShutOffStage(Experiment* exp){
 	haltStage(exp->stage);
 }
 
+
 /*
  * Update the Stage Tracker.
  * If the Stage tracker is not initialized, don't do anything.
@@ -2031,8 +2029,8 @@ int HandleStageTracker(Experiment* exp){
 			CvPoint* PtOnWorm= (CvPoint*) cvGetSeqElem(exp->Worm->Segmented->Centerline, exp->Params->stageTargetSegment);
 			
 			/** Adjust the stage velocity to keep that point centered in the field of view **/
-			exp->Worm->stageVelocity=AdjustStageToKeepObjectAtTarget(exp->stage,PtOnWorm,exp->stageFeedbackTarget,exp->Params->stageSpeedFactor, exp->Params->stageROIRadius);
-			findStagePosition(exp->stage, &(exp->Worm->stagePosition.x),&(exp->Worm->stagePosition.y));
+			exp->Worm->stageVelocity=AdjustStageToKeepObjectAtTarget(exp->stage,PtOnWorm,exp->Worm->stageFeedbackTarget,exp->Params->stageSpeedFactor, exp->Params->stageROIRadius);
+			// findStagePosition(exp->stage, &(exp->Worm->stagePosition.x),&(exp->Worm->stagePosition.y));
 			}
 		}
 		if (exp->Params->stageTrackingOn==0){/** Tracking Should be off **/
@@ -2054,4 +2052,28 @@ int HandleStageTracker(Experiment* exp){
 }
 
 
+/*
+ * Update the Stage Tracker Position.
+ * If the Stage tracker is not initialized, don't do anything.
+*/
+int RecordStageTracker(Experiment* exp){
+	if (exp->stageIsPresent==1){ /** If the Stage is Present **/
+		if (exp->stage==NULL) return 0;
+
+		if (exp->Params->stageTrackingOn==1){
+	
+			if (exp->Params->OnOff==0 && exp->Params->stageRecording){ /** if the analysis system is off **/
+			} 
+			else {				
+				findStagePosition(exp->stage, &(exp->Worm->stagePosition.x),&(exp->Worm->stagePosition.y));
+				exp->Worm->WormSpeed=CalculateRTWormSpeed(exp->PrevStagePosition,exp->Worm->stagePosition,exp->prevTime2, exp->Worm->timestamp);			
+				exp->PrevStagePosition=exp->Worm->stagePosition;
+				exp->prevTime2=exp->Worm->timestamp;
+
+			}
+		}
+	}
+	return 0;
+	
+}
 

@@ -72,7 +72,7 @@ using namespace std;
 #include "MyLibs/Talk2FrameGrabber.h"
 #include "MyLibs/Talk2DLP.h"
 #include "MyLibs/AndysComputations.h"
-#include "MyLibs/version.h"
+#include "version.h"
 
 
 

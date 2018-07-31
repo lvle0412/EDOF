@@ -56,7 +56,7 @@
 #ifndef TALK2CAMERA_H_
  #error "#include Talk2Camera.h" must appear in source files before "#include experiment.h"
 #endif
-#ifndef TALK2CAMERA_H_
+#ifndef TALK2STAGE_H_
  #error "#include Talk2Stage.h" must appear in source files before "#include experiment.h"
 #endif
 #ifndef TALK2FRAMEGRABBER_H_
@@ -71,6 +71,7 @@
 
 
 
+
 #define EXP_ERROR -1
 #define EXP_SUCCESS 0
 #define EXP_VIDEO_RAN_OUT 1
@@ -79,8 +80,7 @@ typedef struct ExperimentStruct{
 	/** Simulation? True/false **/
 	int SimDLP; //1= simulate the DLP, 0= real DLP
 	int VidFromFile; // 1 =Video from File, 0=Video From Camera
-
-
+	//int Labview //begin to use labview code to control DLP and Shutter
 	/** GuiWindowNames **/
 	char* WinDisp ;
 	char* WinCon1;
@@ -127,6 +127,8 @@ typedef struct ExperimentStruct{
 
 	/** Information about the Previous frame's Worm **/
 	WormGeom* PrevWorm;
+	CvPoint PrevStagePosition ;
+	
 
 	/** Segmented Worm in DLP Space **/
 	SegmentedWorm* segWormDLP;
@@ -162,8 +164,8 @@ typedef struct ExperimentStruct{
 	/** Frame Rate Information **/
 	int nframes;
 	int prevFrames;
-	long prevTime;
-
+	unsigned long prevTime;
+	unsigned long prevTime2; // only for calculating wormspeed, update sits different with prevTime.
 	/** Macros **/
 	int RECORDVID;
 	int RECORDDATA;
@@ -173,9 +175,7 @@ typedef struct ExperimentStruct{
 	HANDLE stage; // Handle to USB stage object
 	CvPoint stageVel; //Current velocity of stage
 	CvPoint stageCenter; // Point indicating center of stage.
-	CvPoint stageFeedbackTarget; //Target of the stage feedback loop as a point in the image
 	int stageIsTurningOff; //1 indicates stage is turning off. 0 indicates stage is on or off.
-
 
 	/** MindControl API **/
 	SharedMemory_handle sm;
@@ -494,6 +494,14 @@ int InvokeStage(Experiment* exp);
  * the stage to halt and update flags.
  */
 int HandleStageTracker(Experiment* exp);
+
+/*
+ * Update the Stage Tracker Position.
+ * If the Stage tracker is not initialized, don't do anything.
+ * Also calculate worm speed in real time based on stageposition update.
+*/
+int RecordStageTracker(Experiment* exp);
+
 
 int ShutOffStage(Experiment* exp);
 

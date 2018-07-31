@@ -105,7 +105,7 @@ HANDLE InitializeUsbStage(){
 
 		/** Open the Serial Port **/
 		HANDLE hSerial;
-		hSerial = CreateFile("COM3", GENERIC_READ | GENERIC_WRITE, FILE_SHARE_WRITE | FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+		hSerial = CreateFile("\\\\.\\COM13", GENERIC_READ | GENERIC_WRITE, FILE_SHARE_WRITE | FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
 		if(hSerial==INVALID_HANDLE_VALUE){
 			if(GetLastError()==ERROR_FILE_NOT_FOUND){
 				//serial port does not exist.

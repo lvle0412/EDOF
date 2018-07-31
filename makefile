@@ -59,11 +59,8 @@ OPENCV2_SOURCE_DIR=C:/opencv/sources
 #BitFlow (frame grabber SDK)
 BitFlow_DIR = C:/BitFlow\ SDK\ 5.70/
 
-#Basler USB3.0 camera
-pylon_DIR = C:/Program\ Files/Basler/pylon\ 4/pylonc/lib/x64
-
 #Git Version control
-GIT=C:/Program\ Files/Git/bin/git
+GIT=C:/Progra~2/Git/bin/git
 #C:\Users\nji\AppData\Local\Programs\Git\bin\git.exe
 
 
@@ -84,12 +81,10 @@ targetDir=bin
 
 CCC=x86_64-w64-mingw32-g++.exe
 COMPFLAGS= -v  -O2 -c
-CXXFLAGS= -c -v -O2 -Wall -mwindows
 #-c option means compile only (do not link)
 
 CXX = $(CCC)
 LINKFLAGS=  -v -W  -O2 -DNDEBUG 
-LINKFLAGS2= -v -O2 -Wall -mwindows -DNDEBUG
 
 
 #======================
@@ -263,14 +258,6 @@ ALP_OBJS=$(ALP_STATIC) $(ALP_DLL)
 
 
 
-#=========================
-# Basler USB3.0 SDK
-#=========================
-pylonObj = $(pylon_DIR)/PylonC_MD_VC100.lib
-
-
-
-
 #=================================
 # MindContorl API
 #================================
@@ -293,7 +280,6 @@ TimerLibrary=tictoc.o timer.o
 #Hardware Independent linkable objects
 hw_ind= version.o AndysComputations.o AndysOpenCVLib.o TransformLib.o IllumWormProtocol.o  $(WormSpecificLibs) $(TimerLibrary) $(openCVobjs)
 
-
 #=========================
 # Top-level Make Targets
 #=========================
@@ -302,8 +288,6 @@ hw_ind= version.o AndysComputations.o AndysOpenCVLib.o TransformLib.o IllumWormP
 makecolbert: $(targetDir)/colbert.exe $(targetDir)/calibrate_colbert_first.exe
 
 makevirtual: $(targetDir)/VirtualColbert.exe
-
-maketracking: $(targetDir)/IRTracking.exe
 
 all_tests: test_DLP test_CV test_FG test_Stage
 
@@ -332,20 +316,6 @@ $(targetDir)/VirtualColbert.exe : VirtualColbert.o \
 		$(targetDir)/mc_api.dll \
 		$(hw_ind)	
 	$(CXX) $(LINKFLAGS) -o $(targetDir)/VirtualColbert.exe VirtualColbert.o $(targetDir)/mc_api.dll DontTalk2FrameGrabber.o Talk2Stage.o DontTalk2Camera.o DontTalk2DLP.o $(hw_ind) $(LinkerWinAPILibObj) 
-
-
-
-$(targetDir)/IRTracking.exe :IRTracking.o \
-		DontTalk2FrameGrabber.o \
-		DontTalk2DLP.o \
-		Talk2Stage.o \
-		Talk2Camera.o \
-		$(openCVobjs) \
-		$(targetDir)/mc_api.dll \
-		$(hw_ind)
-	$(CXX) $(LINKFLAGS) -o $(targetDir)/IRTracking.exe IRTracking.o $(targetDir)/mc_api.dll $(pylonObj) DontTalk2FrameGrabber.o Talk2Stage.o Talk2Camera.o DontTalk2DLP.o $(hw_ind) $(LinkerWinAPILibObj) 
-
-
 
 
 $(targetDir)/colbert.exe : colbert.o \
@@ -417,23 +387,7 @@ VirtualColbert.o : main.cpp  \
 		$(MyLibs)/IllumWormProtocol.h \
 		$(MyLibs)/TransformLib.h \
 		$(MyLibs)/experiment.h
-	$(CXX) $(COMPFLAGS) -o VirtualColbert.o main.cpp -I$(MyLibs) -I$(3rdPartyLibs) $(openCVinc)  -I$(bfIncDir)
-
-
-
-IRTracking.o : main.cpp  \
-		$(MyLibs)/Talk2DLP.h \
-		$(MyLibs)/Talk2Camera.h \
-		$(MyLibs)/TransformLib.h \
-		$(MyLibs)/AndysOpenCVLib.h \
-		$(MyLibs)/Talk2FrameGrabber.h \
-		$(MyLibs)/AndysComputations.h \
-		$(MyLibs)/WormAnalysis.h \
-		$(MyLibs)/WriteOutWorm.h \
-		$(MyLibs)/IllumWormProtocol.h \
-		$(MyLibs)/TransformLib.h \
-		$(MyLibs)/experiment.h
-	$(CXX) $(COMPFLAGS) -o IRTracking.o main.cpp -I$(MyLibs) -I$(3rdPartyLibs) $(openCVinc)  -I$(bfIncDir)
+	$(CXX) $(COMPFLAGS) -o VirtualColbert.o main.cpp -I$(MyLibs) $(openCVinc)  -I$(bfIncDir)
 
 colbert.o : main.cpp  \
 		$(MyLibs)/Talk2DLP.h \
@@ -448,7 +402,7 @@ colbert.o : main.cpp  \
 		$(MyLibs)/IllumWormProtocol.h \
 		$(MyLibs)/TransformLib.h \
 		$(MyLibs)/experiment.h
-	$(CXX) $(COMPFLAGS) -o colbert.o main.cpp -I$(MyLibs) -I$(3rdPartyLibs) $(openCVinc) -I$(bfIncDir) 
+	$(CXX) $(COMPFLAGS) -o colbert.o main.cpp -I$(MyLibs) $(openCVinc) -I$(bfIncDir) 
 
 calibrate_colbert_first.o : calibrateFG.cpp \
 		$(MyLibs)/Talk2DLP.h \
@@ -463,7 +417,7 @@ calibrate_colbert_first.o : calibrateFG.cpp \
 		$(MyLibs)/IllumWormProtocol.h \
 		$(MyLibs)/TransformLib.h \
 		$(MyLibs)/experiment.h
-	$(CXX) $(COMPFLAGS) calibrateFG.cpp -o calibrate_colbert_first.o -I$(MyLibs)-I$(3rdPartyLibs) -I$(bfIncDir) -I $(openCVinc)
+	$(CXX) $(COMPFLAGS) calibrateFG.cpp -o calibrate_colbert_first.o -I$(MyLibs) -I$(bfIncDir) -I $(openCVinc)
 
 
 testFG.o : $(MyLibs)/Talk2FrameGrabber.h testFG.cpp
@@ -485,7 +439,7 @@ testStage.o: testStage.c
 #=============================
 
 experiment.o: $(MyLibs)/experiment.c $(MyLibs)/experiment.h 
-	$(CCC) $(COMPFLAGS) $(MyLibs)/experiment.c $ -I$(MyLibs) -I$(3rdPartyLibs) $(openCVinc) -I$(bfIncDir)
+	$(CCC) $(COMPFLAGS) $(MyLibs)/experiment.c $ -I$(MyLibs) $(openCVinc) -I$(bfIncDir)
 
 #Note I am using the C++ compiler here
 AndysOpenCVLib.o : $(MyLibs)/AndysOpenCVLib.c $(MyLibs)/AndysOpenCVLib.h 
@@ -523,11 +477,6 @@ Talk2FrameGrabber.o: $(MyLibs)/Talk2FrameGrabber.cpp $(MyLibs)/Talk2FrameGrabber
 Talk2DLP.o: $(MyLibs)/Talk2DLP.cpp $(MyLibs)/Talk2DLP.h
 	$(CCC) $(COMPFLAGS) $(MyLibs)/Talk2DLP.cpp -I$(MyLibs) -I$(ALP_INC_DIR)
 
-Talk2Camera.o: $(MyLibs)/Talk2Camera.cpp $(MyLibs)/Talk2Camera.h 
-	$(CCC) $(COMPFLAGS) $(MyLibs)/Talk2Camera.cpp -I$(3rdPartyLibs) 
-
-
-
 
 	
 	
@@ -551,7 +500,7 @@ timer.o: $(3rdPartyLibs)/Timer.cpp $(3rdPartyLibs)/Timer.h
 #
 
 DontTalk2Camera.o : $(MyLibs)/DontTalk2Camera.c $(MyLibs)/Talk2Camera.h
-	$(CCC) $(COMPFLAGS) $(MyLibs)/DontTalk2Camera.c -I$(MyLibs) -I$(3rdPartyLibs) $(TailOpts)
+	$(CCC) $(COMPFLAGS) $(MyLibs)/DontTalk2Camera.c -I$(MyLibs)  $(TailOpts)
 
 DontTalk2FrameGrabber.o: $(MyLibs)/DontTalk2FrameGrabber.cpp $(MyLibs)/Talk2FrameGrabber.h
 	$(CCC) $(COMPFLAGS) $(MyLibs)/DontTalk2FrameGrabber.cpp  -I$(bfIncDir)

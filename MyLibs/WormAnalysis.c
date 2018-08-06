@@ -121,6 +121,7 @@ WormAnalysisData* CreateWormAnalysisDataStruct(){
 	WormPtr->stagePosition=cvPoint(0,0);
 	WormPtr->stageFeedbackTarget=cvPoint(512,384);
 	WormPtr->WormSpeed = 0;
+	WormPtr->WormIsMovingForward=0;
 	return WormPtr;
 }
 
@@ -1466,4 +1467,37 @@ double CalculateRTWormSpeed(const CvPoint& PSP, const CvPoint& SP, const long& P
 	t=TS-PT;
 	speed=dist/(double)t;	
 	return speed;
+}
+
+/*  Calculate the direction of the worm is moving on. 
+	Returns 1 if the worm is moving forward.
+	Returns 2 if the worm is reversing.
+*/
+int IsWormGoingForwardOrReversing(const SegmentedWorm* PrevSW, const SegementedWorm* SW){
+	int NeckNum=0.1*PrevSW->NumSegments; // Determines where the neck is whcih is counted from head tip.
+	CvPoint* Neck=(CvPoint*) cvGetSeqElem(PrevSW->Centerline,NeckNum); // Find where the neck is in the coordination.
+	CvPoint PrevCentroid=GetMeanOfPoints(PrevSW->Centerline); // Find centroid of these two frams
+	CvPoint Centroid=GetMeanOfPoints(SW->Centerline);
+
+	CvPoint HeadingTO, Motion
+	HeadingTO.x=(Neck->x)-(PrevCentroid.x);
+	HeadingTO.y=(Neck->y)-(PrevCentroid.y);
+	Motion.x=(Centroid.x)-(PrevCentroid.x);
+	Motion.y=(Centroid.y)-(PrevCentroid.y);
+
+	int dirction=0;
+	dirction=(HeadingTO.x)*(Motion.x)+(HeadingTO.y)*(Motion.y);
+	if (dirction>0){
+		return 1;
+	}
+	else if (dirction<0){
+		return 2;
+	}
+	else if (dirction=0){
+		return 0;
+	}
+	else{
+		return -1;
+	}
+
 }

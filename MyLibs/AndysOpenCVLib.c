@@ -328,7 +328,7 @@ int PushToSeqBuffer(CvSeq* seq, void* element, int MaxBuffSize){
 /*
  *
  * Given a sequence of x,y CvPoints, this function returns a point
- * containing the mean x and mean y values of the points.
+ * containing the mid x and mid y values of the points.
  *
  */
 CvPoint  GetMedianOfPoints(CvSeq* seq){
@@ -356,6 +356,28 @@ CvPoint  GetMedianOfPoints(CvSeq* seq){
 		pt=(CvPoint*) cvGetSeqElem( seq, midpoint);
 		xmed=pt->x;
 		return cvPoint(xmed,ymed);
+}
+
+/*
+ *
+ * Given a sequence of x,y CvPoints, this function returns a point
+ * containing the mean x and mean y values of the points.
+ *
+ */
+
+CvPoint GetMeanOfPoints(CvSeq* seq){
+	int seqsize=seq->total;
+	int x=0, y=0;
+	CvPoint* tempPt
+	for (int i = 0; i < seqsize; ++i)
+	{
+		tempPt=cvGetSeqElem( seq, i);
+		x+=tempPt->x;
+		y+=tempPt->y;
+	}
+	x=x/seqsize;
+	y=y/seqsize;
+	return cvPoint(x,y);
 }
 
 

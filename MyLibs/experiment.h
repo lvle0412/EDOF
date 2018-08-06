@@ -124,6 +124,7 @@ typedef struct ExperimentStruct{
 
 	/** Information about Our Worm **/
 	WormAnalysisData* Worm;
+	SegmentedWorm* PrevSW; // Segmented worm information of the previous frame.
 
 	/** Information about the Previous frame's Worm **/
 	WormGeom* PrevWorm;
@@ -132,6 +133,8 @@ typedef struct ExperimentStruct{
 
 	/** Segmented Worm in DLP Space **/
 	SegmentedWorm* segWormDLP;
+
+	/** Segmented Worm 
 
 	/** internal IplImage **/
 	IplImage* SubSampled; // Image used to subsample stuff
@@ -504,6 +507,8 @@ int RecordStageTracker(Experiment* exp);
 
 
 int ShutOffStage(Experiment* exp);
+
+
 
 
 #endif /* EXPERIMENT_H_ */

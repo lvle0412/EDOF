@@ -139,6 +139,7 @@ Experiment* CreateExperimentStruct() {
 	/** Information about the Previous frame's Worm **/
 	exp->PrevWorm = NULL;
 	exp->PrevStagePosition = cvPoint(0,0);
+	exp->PrevSW=NULL;
 	/** Segmented Worm in DLP Space **/
 	exp->segWormDLP = NULL;
 
@@ -1121,7 +1122,7 @@ void InitializeExperiment(Experiment* exp) {
 	WormAnalysisParam* Params = CreateWormAnalysisParam();
 	InitializeEmptyWormImages(Worm, cvSize(NSIZEX, NSIZEY));
 	InitializeWormMemStorage(Worm);
-
+	exp->PrevSW=CreateSegmentedWormStruct();
 	/** Create SegWormDLP object using memory from the worm object **/
 	exp->segWormDLP = CreateSegmentedWormStruct();
 
@@ -1426,8 +1427,16 @@ void CalculateAndPrintFrameRateAndInfo(Experiment* exp) {
 		if (exp->Params->stageTrackingOn==1){
 			printf("current velocity: %d, %d\n",exp->Worm->stageVelocity.x, exp->Worm->stageVelocity.y);
 			if (exp->Params->stageRecording==1){				
-				printf("Real time worm speed: %.2f SU/ms\n", exp->Worm->WormSpeed);									
+				printf("Real time worm speed: %.2f SU/ms\n", exp->Worm->WormSpeed);
+				if (exp->Worm->WormIsMovingForward==1){
+					printf("Moving forward.\n");
+				}
+				else if (exp->Worm->WormIsMovingForward==2){
+					printf("Reversing.\n");
+				}			
+
 			}
+
 		}
 	}
 }
@@ -1679,7 +1688,7 @@ int HandleKeyStroke(int c, Experiment* exp) {
 		break;
 
 	/** Timed Secondary Protocol Illumination **/
-    case 'q':
+	case 'q':
 		Toggle(&(exp->Params->ProtocolSecondaryIsOn));
 		break;
 		
@@ -2066,10 +2075,11 @@ int RecordStageTracker(Experiment* exp){
 			} 
 			else {				
 				findStagePosition(exp->stage, &(exp->Worm->stagePosition.x),&(exp->Worm->stagePosition.y));
-				exp->Worm->WormSpeed=CalculateRTWormSpeed(exp->PrevStagePosition,exp->Worm->stagePosition,exp->prevTime2, exp->Worm->timestamp);			
+				exp->Worm->WormSpeed=CalculateRTWormSpeed(exp->PrevStagePosition,exp->Worm->stagePosition,exp->prevTime2, exp->Worm->timestamp);
+				exp->Worm->WormIsMovingForward=IsWormGoingForwardOrReversing(exp->PrevSW,exp->Worm->Segmented);
+				exp->PrevSW=exp->Worm->Segmented;			
 				exp->PrevStagePosition=exp->Worm->stagePosition;
 				exp->prevTime2=exp->Worm->timestamp;
-
 			}
 		}
 	}

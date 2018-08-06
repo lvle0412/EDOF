@@ -1473,15 +1473,16 @@ double CalculateRTWormSpeed(const CvPoint& PSP, const CvPoint& SP, const long& P
 	Returns 1 if the worm is moving forward.
 	Returns 2 if the worm is reversing.
 */
-int IsWormGoingForwardOrReversing(const SegmentedWorm* PrevSW, const SegementedWorm* SW){
+int IsWormGoingForwardOrReversing(SegmentedWorm* PrevSW, SegmentedWorm* SW){
 	int NeckNum=0.1*PrevSW->NumSegments; // Determines where the neck is whcih is counted from head tip.
 	CvPoint* Neck=(CvPoint*) cvGetSeqElem(PrevSW->Centerline,NeckNum); // Find where the neck is in the coordination.
 	CvPoint PrevCentroid=GetMeanOfPoints(PrevSW->Centerline); // Find centroid of these two frams
 	CvPoint Centroid=GetMeanOfPoints(SW->Centerline);
 
-	CvPoint HeadingTO, Motion
-	HeadingTO.x=(Neck->x)-(PrevCentroid.x);
-	HeadingTO.y=(Neck->y)-(PrevCentroid.y);
+	CvPoint HeadingTO;
+	CvPoint Motion;
+	HeadingTO.x=-(Neck->x)+(PrevCentroid.x);
+	HeadingTO.y=-(Neck->y)+(PrevCentroid.y);
 	Motion.x=(Centroid.x)-(PrevCentroid.x);
 	Motion.y=(Centroid.y)-(PrevCentroid.y);
 

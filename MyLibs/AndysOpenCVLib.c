@@ -368,10 +368,10 @@ CvPoint  GetMedianOfPoints(CvSeq* seq){
 CvPoint GetMeanOfPoints(CvSeq* seq){
 	int seqsize=seq->total;
 	int x=0, y=0;
-	CvPoint* tempPt
+	CvPoint* tempPt;
 	for (int i = 0; i < seqsize; ++i)
 	{
-		tempPt=cvGetSeqElem( seq, i);
+		tempPt=(CvPoint*)cvGetSeqElem( seq, i);
 		x+=tempPt->x;
 		y+=tempPt->y;
 	}

@@ -589,6 +589,6 @@ double CalculateRTWormSpeed(const CvPoint& PSP, const CvPoint& SP, const long& P
 	Returns 1 if the worm is moving forward.
 	Returns 2 if the worm is reversing.
 */
-int IsWormGoingForwardOrReversing(const SegmentedWorm* PrevSW, const SegementedWorm* SW);
+int IsWormGoingForwardOrReversing(SegmentedWorm* PrevSW, SegmentedWorm* SW);
 
 #endif /* WORMANALYSIS_H_ */

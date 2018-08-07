@@ -2079,14 +2079,9 @@ int RecordStageTracker(Experiment* exp){
 			else {				
 				findStagePosition(exp->stage, &(exp->Worm->stagePosition.x),&(exp->Worm->stagePosition.y));
 				exp->Worm->WormSpeed=CalculateRTWormSpeed(exp->PrevStagePosition,exp->Worm->stagePosition,exp->prevTime2, exp->Worm->timestamp);
-				exp->Worm->WormIsMovingForward=IsWormGoingForwardOrReversing(exp->PrevSW,exp->Worm->Segmented);
-
-				(exp->Worm->Segmented->test)++;
-				printf("PrevSw:%p, SW:%p\nPrevtest=%d,test=%d\n",(void*)exp->PrevSW,(void*)exp->Worm->Segmented,exp->PrevSW->test,exp->Worm->Segmented->test);	
-				printf("PrevHead(%d),Head(%d)\n",exp->PrevSW->Head->x,exp->Worm->Segmented->Head->x);	
 				exp->PrevStagePosition=exp->Worm->stagePosition;
 				exp->prevTime2=exp->Worm->timestamp;
-				*(exp->PrevSW)=*(exp->Worm->Segmented);
+				
 			}
 		}
 	}
@@ -2094,3 +2089,12 @@ int RecordStageTracker(Experiment* exp){
 	
 }
 
+/* Use a high level function to do the dirction recognition*/
+int JudgeMovingDirction(Experiment* exp){
+	exp->Worm->WormIsMovingForward=IsWormGoingForwardOrReversing(exp->PrevSW,exp->Worm->Segmented);
+	(exp->Worm->Segmented->test)++; // Use for debug.
+	printf("PrevSw:%p, SW:%p\nPrevtest=%d,test=%d\n",(void*)exp->PrevSW,(void*)exp->Worm->Segmented,exp->PrevSW->test,exp->Worm->Segmented->test);	
+	printf("PrevHead(%d),Head(%d)\n",exp->PrevSW->Head->x,exp->Worm->Segmented->Head->x);	
+	*(exp->PrevSW)=*(exp->Worm->Segmented);	
+	return 0;		
+}

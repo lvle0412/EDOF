@@ -319,7 +319,7 @@ int main (int argc, char** argv){
 				TICTOC::timer().toc("DoWriteToDisk()");
 
 			}
-
+			JudgeMovingDirction(Experiment* exp);
 			if (exp->e != 0) {
 				printf("\nError in main loop. :(\n");
 				//where emergency stage shutoff used to go

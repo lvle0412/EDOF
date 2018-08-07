@@ -283,8 +283,7 @@ int AppendWormFrameToDisk(WormAnalysisData* Worm, WormAnalysisParam* Params, Wri
 
 		if (Params->stageTrackingOn && Params->stageRecording){
 			cvStartWriteStruct(fs,"WormSpeed",CV_NODE_MAP,NULL);
-				cvWriteInt(fs,"integer",Worm->WormSpeed);
-				cvWriteInt(fs,"decimal",100*(Worm->WormSpeed-long(Worm->WormSpeed)));
+				cvWriteReal(fs,"v",Worm->WormSpeed);				
 			cvEndWriteStruct(fs);
 		}
 		if (Params->stageTrackingOn && Params->stageRecording){

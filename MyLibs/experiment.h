@@ -508,6 +508,8 @@ int RecordStageTracker(Experiment* exp);
 
 int ShutOffStage(Experiment* exp);
 
+/* Use a high level function to do the dirction recognition*/
+int JudgeMovingDirction(Experiment* exp);
 
 
 

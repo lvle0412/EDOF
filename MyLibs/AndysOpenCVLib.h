@@ -171,7 +171,7 @@ CvPoint  GetMedianOfPoints(CvSeq* seq);
  * thus, the centroid.
  *
  */
-CvPoint GetMeanOfPoints(CvSeq* seq);
+int GetMeanOfPoints(CvSeq* seq, double* centroid);
 
 /*
  * Draws a square on "image" with radius "radius" centered on point "pt"

@@ -172,6 +172,7 @@ typedef struct SegmentedWormStruct{
 	CvMemStorage* MemSegStorage;
 	int NumSegments;
 	CvPoint* centerOfWorm;
+	int test;
 } SegmentedWorm;
 
 

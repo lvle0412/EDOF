@@ -365,9 +365,20 @@ CvPoint  GetMedianOfPoints(CvSeq* seq){
  *
  */
 
-CvPoint GetMeanOfPoints(CvSeq* seq){
+int GetMeanOfPoints(CvSeq* seq, double* centroid){
+	// double centroid[2];
+	centroid[0]=-1;
+	centroid[1]=-1;
+	if (seq==NULL){
+		printf("ERROR. seq is null");
+		return 0;
+	}
+	if (seq->total==0){
+		printf("ERROR in GetMeanOfPoints. seq has no elements!");
+		return 0;
+	}
 	int seqsize=seq->total;
-	int x=0, y=0;
+	double x=0, y=0;
 	CvPoint* tempPt;
 	for (int i = 0; i < seqsize; ++i)
 	{
@@ -375,9 +386,9 @@ CvPoint GetMeanOfPoints(CvSeq* seq){
 		x+=tempPt->x;
 		y+=tempPt->y;
 	}
-	x=x/seqsize;
-	y=y/seqsize;
-	return cvPoint(x,y);
+	centroid[0]=(double)x/(double)seqsize;
+	centroid[1]=(double)y/(double)seqsize;	
+	return 1;
 }
 
 

@@ -1167,7 +1167,7 @@ void ReleaseExperiment(Experiment* exp) {
 	/** The segmented worm DLP structure **/
 	// Note that the memorystorage for the Cvseq's are in exp->worm->Memorystorage
 	free(exp->segWormDLP);
-
+	free(exp->PrevSW);
 	/** Free up Worm Objects **/
 	if (exp->Worm != NULL) {
 		DestroyWormAnalysisDataStruct((exp->Worm));
@@ -1426,6 +1426,7 @@ void CalculateAndPrintFrameRateAndInfo(Experiment* exp) {
 
 		if (exp->Params->stageTrackingOn==1){
 			printf("current velocity: %d, %d\n",exp->Worm->stageVelocity.x, exp->Worm->stageVelocity.y);
+			
 			if (exp->Params->stageRecording==1){				
 				printf("Real time worm speed: %.2f SU/ms\n", exp->Worm->WormSpeed);
 				if (exp->Worm->WormIsMovingForward==1){
@@ -1434,9 +1435,11 @@ void CalculateAndPrintFrameRateAndInfo(Experiment* exp) {
 				else if (exp->Worm->WormIsMovingForward==2){
 					printf("Reversing.\n");
 				}			
+				else
+					printf("%d\n",exp->Worm->WormIsMovingForward);
 
 			}
-
+			
 		}
 	}
 }
@@ -2077,9 +2080,13 @@ int RecordStageTracker(Experiment* exp){
 				findStagePosition(exp->stage, &(exp->Worm->stagePosition.x),&(exp->Worm->stagePosition.y));
 				exp->Worm->WormSpeed=CalculateRTWormSpeed(exp->PrevStagePosition,exp->Worm->stagePosition,exp->prevTime2, exp->Worm->timestamp);
 				exp->Worm->WormIsMovingForward=IsWormGoingForwardOrReversing(exp->PrevSW,exp->Worm->Segmented);
-				exp->PrevSW=exp->Worm->Segmented;			
+
+				(exp->Worm->Segmented->test)++;
+				printf("PrevSw:%p, SW:%p\nPrevtest=%d,test=%d\n",(void*)exp->PrevSW,(void*)exp->Worm->Segmented,exp->PrevSW->test,exp->Worm->Segmented->test);	
+				printf("PrevHead(%d),Head(%d)\n",exp->PrevSW->Head->x,exp->Worm->Segmented->Head->x);	
 				exp->PrevStagePosition=exp->Worm->stagePosition;
 				exp->prevTime2=exp->Worm->timestamp;
+				*(exp->PrevSW)=*(exp->Worm->Segmented);
 			}
 		}
 	}

@@ -186,6 +186,7 @@ int main (int argc, char** argv){
 
 			/** Set error to zero **/
 			exp->e=0;
+			// *(exp->PrevSW)=*(exp->Worm->Segmented);
 			TICTOC::timer().tic("GrabFrame()");
 
 			/** Grab a frame **/

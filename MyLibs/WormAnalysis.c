@@ -399,7 +399,7 @@ SegmentedWorm* CreateSegmentedWormStruct(){
 	SegWorm->Centerline=cvCreateSeq(CV_SEQ_ELTYPE_POINT,sizeof(CvSeq),sizeof(CvPoint),SegWorm->MemSegStorage);
 	SegWorm->LeftBound=cvCreateSeq(CV_SEQ_ELTYPE_POINT,sizeof(CvSeq),sizeof(CvPoint),SegWorm->MemSegStorage);
 	SegWorm->RightBound=cvCreateSeq(CV_SEQ_ELTYPE_POINT,sizeof(CvSeq),sizeof(CvPoint),SegWorm->MemSegStorage);
-
+	SegWorm->test = 1;
 	return SegWorm;
 }
 
@@ -1475,30 +1475,43 @@ double CalculateRTWormSpeed(const CvPoint& PSP, const CvPoint& SP, const long& P
 */
 int IsWormGoingForwardOrReversing(SegmentedWorm* PrevSW, SegmentedWorm* SW){
 	int NeckNum=0.1*PrevSW->NumSegments; // Determines where the neck is whcih is counted from head tip.
+	int SuccessfulFindCentroid=0;
+
 	CvPoint* Neck=(CvPoint*) cvGetSeqElem(PrevSW->Centerline,NeckNum); // Find where the neck is in the coordination.
-	CvPoint PrevCentroid=GetMeanOfPoints(PrevSW->Centerline); // Find centroid of these two frams
-	CvPoint Centroid=GetMeanOfPoints(SW->Centerline);
 
-	CvPoint HeadingTO;
-	CvPoint Motion;
-	HeadingTO.x=-(Neck->x)+(PrevCentroid.x);
-	HeadingTO.y=-(Neck->y)+(PrevCentroid.y);
-	Motion.x=(Centroid.x)-(PrevCentroid.x);
-	Motion.y=(Centroid.y)-(PrevCentroid.y);
+	double PrevCentroid[2];
+	double Centroid[2];
 
+	SuccessfulFindCentroid=GetMeanOfPoints(PrevSW->Centerline,PrevCentroid); // Find centroid of these two frams
+	if (SuccessfulFindCentroid==0)
+		return -2;
+
+	GetMeanOfPoints(SW->Centerline,Centroid);
+
+	double HeadingTO[2];
+	double Motion[2];
+	HeadingTO[0]=-(Neck->x)+(PrevCentroid[0]);
+	HeadingTO[1]=-(Neck->y)+(PrevCentroid[1]);
+	Motion[0]=(Centroid[0])-(PrevCentroid[0]);
+	Motion[1]=(Centroid[1])-(PrevCentroid[1]);
+	printf("PrevCentroid(%.7f,%.7f  )  ",PrevCentroid[0],PrevCentroid[1]);
+	printf("Centroid(%.7f,%.7f\n)  ",Centroid[0],Centroid[1]);
+	printf("HeadingTO(%.7f,%.7f  )  ",HeadingTO[0],HeadingTO[1]);
+	printf("Motion(%.7f,%.7f)\n",Motion[0],Motion[1]);
 	int dirction=0;
-	dirction=(HeadingTO.x)*(Motion.x)+(HeadingTO.y)*(Motion.y);
+	dirction=(HeadingTO[0])*(Motion[0])+(HeadingTO[1])*(Motion[1]);
 	if (dirction>0){
 		return 1;
 	}
 	else if (dirction<0){
 		return 2;
 	}
-	else if (dirction=0){
+	else if (dirction==0){
 		return 0;
 	}
 	else{
 		return -1;
 	}
+	printf("Good!\n");
 
 }

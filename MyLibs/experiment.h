@@ -125,7 +125,7 @@ typedef struct ExperimentStruct{
 	/** Information about Our Worm **/
 	WormAnalysisData* Worm;
 	SegmentedWorm* PrevSW; // Segmented worm information of the previous frame.
-
+	CvPoint PrevCW;
 	/** Information about the Previous frame's Worm **/
 	WormGeom* PrevWorm;
 	CvPoint PrevStagePosition ;

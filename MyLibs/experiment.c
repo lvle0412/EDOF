@@ -140,6 +140,8 @@ Experiment* CreateExperimentStruct() {
 	exp->PrevWorm = NULL;
 	exp->PrevStagePosition = cvPoint(0,0);
 	exp->PrevSW=NULL;
+	exp->PrevCW.x=0;
+	exp->PrevCW.y=0;
 	/** Segmented Worm in DLP Space **/
 	exp->segWormDLP = NULL;
 
@@ -2091,10 +2093,11 @@ int RecordStageTracker(Experiment* exp){
 
 /* Use a high level function to do the dirction recognition*/
 int JudgeMovingDirction(Experiment* exp){
-	exp->Worm->WormIsMovingForward=IsWormGoingForwardOrReversing(exp->PrevSW,exp->Worm->Segmented);
-	(exp->Worm->Segmented->test)++; // Use for debug.
-	printf("PrevSw:%p, SW:%p\nPrevtest=%d,test=%d\n",(void*)exp->PrevSW,(void*)exp->Worm->Segmented,exp->PrevSW->test,exp->Worm->Segmented->test);	
-	printf("PrevHead(%d),Head(%d)\n",exp->PrevSW->Head->x,exp->Worm->Segmented->Head->x);	
+	exp->Worm->WormIsMovingForward=IsWormGoingForwardOrReversing(exp->PrevSW,exp->Worm->Segmented,exp->PrevCW);
+	// (exp->Worm->Segmented->test)++; // Use for debug.
+	// printf("PrevSw:%p, SW:%p\n",(void*)exp->PrevSW,(void*)exp->Worm->Segmented);	
+	// printf("PrevHead(%d),Head(%d)\n",exp->PrevSW->Head->x,exp->Worm->Segmented->Head->x);	
 	*(exp->PrevSW)=*(exp->Worm->Segmented);	
+	exp->PrevCW=*(exp->Worm->Segmented->centerOfWorm);
 	return 0;		
 }

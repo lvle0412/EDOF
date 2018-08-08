@@ -319,7 +319,7 @@ int main (int argc, char** argv){
 				TICTOC::timer().toc("DoWriteToDisk()");
 
 			}
-			JudgeMovingDirction(exp);
+			
 			if (exp->e != 0) {
 				printf("\nError in main loop. :(\n");
 				//where emergency stage shutoff used to go
@@ -527,6 +527,7 @@ UINT Thread2(LPVOID lpdwParam) {
 				} else {
 					/**Do the Stage Tracking**/
 					TICTOC::timer().tic("HandleStageTracker()");
+					JudgeMovingDirction(exp);
 					HandleStageTracker(exp);
 					RecordStageTracker(exp);
 					TICTOC::timer().toc("HandleStageTracker()");

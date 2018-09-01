@@ -120,7 +120,11 @@ WormAnalysisData* CreateWormAnalysisDataStruct(){
 	WormPtr->stageVelocity=cvPoint(0,0);
 	WormPtr->stagePosition=cvPoint(0,0);
 	WormPtr->stageFeedbackTarget=cvPoint(512,384);
-	WormPtr->WormSpeed = 0;
+	WormPtr->WormSpeed = 0;	
+
+	/** Forward or backward the worm is going, 1 for forward, -1 for backward, -2 for no status **/
+	WormPtr->WormIsMovingForward=-2;
+	
 	return WormPtr;
 }
 
@@ -261,7 +265,7 @@ WormAnalysisParam* CreateWormAnalysisParam(){
 	ParamPtr->OnOff=0;
 
 	/** Single Frame Analysis Parameters **/
-	ParamPtr->BinThresh=100;
+	ParamPtr->BinThresh=150;
 	ParamPtr->GaussSize=4;
 	ParamPtr->LengthScale=30;
 	ParamPtr->LengthOffset=ParamPtr->LengthScale/2;
@@ -351,7 +355,7 @@ WormAnalysisParam* CreateWormAnalysisParam(){
 	ParamPtr->stageSpeedFactor=25;
 	ParamPtr->stageROIRadius=250;
 	ParamPtr->stageTargetSegment=40;
-	ParamPtr->stageRecording=1;
+	ParamPtr->stageRecording=0;
 
 	/**Record Parameters **/
 	ParamPtr->Record=0;
@@ -388,8 +392,10 @@ SegmentedWorm* CreateSegmentedWormStruct(){
 	SegWorm->Tail=(CvPoint*) malloc (sizeof(CvPoint));
 
 	SegWorm->centerOfWorm=(CvPoint*) malloc (sizeof(CvPoint));
-	SegWorm->NumSegments=0;
-
+	*(SegWorm->centerOfWorm)=cvPoint(0,0);
+	SegWorm->NumSegments=0;	
+	SegWorm->Neck=(CvPoint*)malloc(sizeof(CvPoint));
+	*(SegWorm->Neck)=cvPoint(0,0);
 	/*** Setup Memory storage ***/
 
 	SegWorm->MemSegStorage=cvCreateMemStorage(0);
@@ -397,8 +403,7 @@ SegmentedWorm* CreateSegmentedWormStruct(){
 	/*** Allocate Memory for the sequences ***/
 	SegWorm->Centerline=cvCreateSeq(CV_SEQ_ELTYPE_POINT,sizeof(CvSeq),sizeof(CvPoint),SegWorm->MemSegStorage);
 	SegWorm->LeftBound=cvCreateSeq(CV_SEQ_ELTYPE_POINT,sizeof(CvSeq),sizeof(CvPoint),SegWorm->MemSegStorage);
-	SegWorm->RightBound=cvCreateSeq(CV_SEQ_ELTYPE_POINT,sizeof(CvSeq),sizeof(CvPoint),SegWorm->MemSegStorage);
-
+	SegWorm->RightBound=cvCreateSeq(CV_SEQ_ELTYPE_POINT,sizeof(CvSeq),sizeof(CvPoint),SegWorm->MemSegStorage);	
 	return SegWorm;
 }
 
@@ -1053,8 +1058,7 @@ int SegmentWorm(WormAnalysisData* Worm, WormAnalysisParam* Params){
 
 	/*** Compute Centerline, from Head To Tail ***/
 	FindCenterline(NBoundA,NBoundB,Worm->Centerline);
-
-
+	
 
 	/*** Smooth the Centerline***/
 	CvSeq* SmoothUnresampledCenterline = smoothPtSequence (Worm->Centerline, 0.5*Worm->Centerline->total/Params->NumSegments, Worm->MemScratchStorage);
@@ -1067,9 +1071,11 @@ int SegmentWorm(WormAnalysisData* Worm, WormAnalysisParam* Params){
 
 	resampleSeqConstPtsPerArcLength(SmoothUnresampledCenterline,Worm->Segmented->Centerline,Params->NumSegments);
 
-	/** Save the location of the centerOfWorm as the point halfway down the segmented centerline **/
+	/** Save the location of the centerOfWorm as the point halfway down the segmented centerline 
+	 *  Save the location of the neck of the worm to analyze the dirction of the worm is moving
+	 */
 	Worm->Segmented->centerOfWorm= CV_GET_SEQ_ELEM( CvPoint , Worm->Segmented->Centerline, Worm->Segmented->NumSegments / 2 );
-
+	Worm->Segmented->Neck=CV_GET_SEQ_ELEM( CvPoint , Worm->Segmented->Centerline, Worm->Segmented->NumSegments / 10 );
 	/*** Remove Repeat Points***/
 	//RemoveSequentialDuplicatePoints (Worm->Segmented->Centerline);
 
@@ -1374,7 +1380,7 @@ void LoadWormGeom(WormGeom* SimpleWorm, WormAnalysisData* Worm){
 	ClearWormGeom(SimpleWorm);
 	SimpleWorm->Head=*(Worm->Head);
 	SimpleWorm->Tail=*(Worm->Tail);
-	SimpleWorm->Perimeter=Worm->Boundary->total;
+	SimpleWorm->Perimeter=Worm->Boundary->total;	
 }
 
 
@@ -1466,4 +1472,46 @@ double CalculateRTWormSpeed(const CvPoint& PSP, const CvPoint& SP, const long& P
 	t=TS-PT;
 	speed=dist/(double)t;	
 	return speed;
+}
+
+
+/*  Calculate the direction of the worm is moving on. 
+	Returns 1 if the worm is moving forward.
+	Returns -1 if the worm is reversing.
+	Returns 0 if the worm pauses.
+	Returns -2 if error.
+*/
+int IsWormGoingForwardOrReversing(SegmentedWorm* SW,CvPoint PrevCW){
+	if (PrevCW.x<1)
+		return -2;
+	// int NeckNum=0.1*(SW->NumSegments); // Determines where the neck is whcih is counted from head tip.
+	// int NeckNum=10;
+	
+	// CvPoint *Neck=(CvPoint*)cvGetSeqElem(SW->Centerline,NeckNum); // Find where the neck is in the coordination.
+	// printf("neck(%d,%d)\n",Neck->x,Neck->y);
+	
+	
+	if ((SW->Neck->x)<1)
+		return -2;
+	CvPoint HeadingTO=cvPoint(0,0);
+	CvPoint Motion=cvPoint(0,0);
+	HeadingTO.x=(SW->Neck->x)-(SW->centerOfWorm->x);
+	HeadingTO.y=(SW->Neck->y)-(SW->centerOfWorm->y);
+	Motion.x=(SW->centerOfWorm->x)-(PrevCW.x);
+	Motion.y=(SW->centerOfWorm->y)-(PrevCW.y);
+	// printf("PrevCOW(%d,%d  )  ",PrevCW.x,PrevCW.y);
+	// printf("COW(%d,%d\n)  ",SW->centerOfWorm->x,SW->centerOfWorm->y);
+	// printf("HeadingTO(%d,%d  )  ",HeadingTO.x,HeadingTO.y);
+	// printf("Motion(%d,%d)\n",Motion.x,Motion.y);
+	
+	int dirction=0;
+	dirction=(HeadingTO.x)*(Motion.x)+(HeadingTO.y)*(Motion.y);
+	if (dirction>0)
+		return 1;		
+	else if (dirction<0)
+		return -1;		
+	else	
+		return 0;	
+	
+	return -2;
 }

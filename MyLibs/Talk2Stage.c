@@ -297,7 +297,7 @@ int findStagePosition(HANDLE s, int* x, int* y){
 	
 	*x=atoi(Stage_x);
 	*y=atoi(Stage_y);
-	
+
 	free(Stage_x);
 	free(Stage_y);
 	free(read_buff);

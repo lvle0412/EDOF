@@ -160,12 +160,18 @@ void DisplayOpenCVInstall();
 
 /*
  *
- * Given a sequence of x,y CvPoints, this function returns a point containing the mean x and mean y values of the points.
+ * Given a sequence of x,y CvPoints, this function returns a point containing the mid x and mid y values of the points.
  *
  */
 CvPoint  GetMedianOfPoints(CvSeq* seq);
 
-
+/*
+ *
+ * Given a sequence of x,y CvPoints, this function returns a point containing the mean x and mean y values of the points,
+ * thus, the centroid.
+ *
+ */
+int GetMeanOfPoints(CvSeq* seq, double* centroid);
 
 /*
  * Draws a square on "image" with radius "radius" centered on point "pt"

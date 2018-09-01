@@ -267,12 +267,12 @@ int AppendWormFrameToDisk(WormAnalysisData* Worm, WormAnalysisParam* Params, Wri
 			cvWriteInt(fs,"y",Params->IllumSquareRad.height);
 		cvEndWriteStruct(fs);
 
-		// if (Params->stageTrackingOn){
-			// cvStartWriteStruct(fs,"StageVelocity",CV_NODE_MAP,NULL);
-				// cvWriteInt(fs,"i",Worm->stageVelocity.x);
-				// cvWriteInt(fs,"j",Worm->stageVelocity.y);
-			// cvEndWriteStruct(fs);
-		// }
+		if (Params->stageTrackingOn){
+			cvStartWriteStruct(fs,"StageVelocity",CV_NODE_MAP,NULL);
+				cvWriteInt(fs,"i",Worm->stageVelocity.x);
+				cvWriteInt(fs,"j",Worm->stageVelocity.y);
+			cvEndWriteStruct(fs);
+		}
 	
 		if (Params->stageTrackingOn && Params->stageRecording){
 			cvStartWriteStruct(fs,"StagePosition",CV_NODE_MAP,NULL);
@@ -280,14 +280,15 @@ int AppendWormFrameToDisk(WormAnalysisData* Worm, WormAnalysisParam* Params, Wri
 				cvWriteInt(fs,"j",Worm->stagePosition.y);
 			cvEndWriteStruct(fs);
 		}
-
+/*
 		if (Params->stageTrackingOn && Params->stageRecording){
 			cvStartWriteStruct(fs,"WormSpeed",CV_NODE_MAP,NULL);
-				cvWriteInt(fs,"integer",Worm->WormSpeed);
-				cvWriteInt(fs,"decimal",100*(Worm->WormSpeed-long(Worm->WormSpeed)));
+				cvWriteReal(fs,"v",Worm->WormSpeed);				
 			cvEndWriteStruct(fs);
 		}
-	
+*/						
+		// cvWriteInt(fs,"WormIsMovingForward",Worm->WormIsMovingForward);
+
 		if (Params->stageTrackingOn){
 			cvStartWriteStruct(fs,"StageFeedbackTarget",CV_NODE_MAP,NULL);
 				cvWriteInt(fs,"i",Worm->stageFeedbackTarget.x);

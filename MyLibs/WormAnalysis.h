@@ -171,7 +171,9 @@ typedef struct SegmentedWormStruct{
 	CvPoint* Tail;
 	CvMemStorage* MemSegStorage;
 	int NumSegments;
-	CvPoint* centerOfWorm;
+	CvPoint* centerOfWorm;	
+	int Necknum;
+	CvPoint* Neck;
 } SegmentedWorm;
 
 
@@ -230,8 +232,9 @@ typedef struct WormImageAnalysisStruct{
 	CvPoint stageVelocity; //compensating velocity of stage.
 	CvPoint stagePosition; //Position of the motorized stage.
 	CvPoint stageFeedbackTarget;//Target of the stage feedback loop as a point in the image
-	double WormSpeed; // Worm speed in real time, in stage unit per millisecond.
+	double WormSpeed; // Worm speed in real time, in stage unit per millisecond.	
 	//WormIlluminationData* Illum;
+	int WormIsMovingForward;
 }WormAnalysisData;
 
 
@@ -251,7 +254,7 @@ typedef struct WormImageAnalysisStruct{
  */
 typedef struct WormGeomStruct{
 	CvPoint Head;
-	CvPoint Tail;
+	CvPoint Tail;	
 	int Perimeter;
 }WormGeom;
 
@@ -583,6 +586,13 @@ CvPoint ConvertSlidlerToWormSpace(CvPoint SliderOrigin,CvSize gridSize);
 *  PSP PrevStagePosition, SP StagePosition, PT PrevTime, TS TimeStamp.
 */
 double CalculateRTWormSpeed(const CvPoint& PSP, const CvPoint& SP, const long& PT, const unsigned long& TS);
- 
+
+/*  Calculate the direction of the worm is moving on. 
+	Returns 1 if the worm is moving forward.
+	Returns -1 if the worm is reversing.
+	Returns 0 if the worm pauses.
+	Returns -2 if error.	
+*/
+int IsWormGoingForwardOrReversing(SegmentedWorm* SW, CvPoint PrevCW);
 
 #endif /* WORMANALYSIS_H_ */

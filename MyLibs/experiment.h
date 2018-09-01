@@ -123,15 +123,18 @@ typedef struct ExperimentStruct{
 	WormAnalysisParam* Params;
 
 	/** Information about Our Worm **/
-	WormAnalysisData* Worm;
-
+	WormAnalysisData* Worm;	
+	
 	/** Information about the Previous frame's Worm **/
 	WormGeom* PrevWorm;
-	CvPoint PrevStagePosition ;
+	CvPoint PrevStagePosition;
+	CvPoint PrevcenterOfWorm;
 	
 
 	/** Segmented Worm in DLP Space **/
 	SegmentedWorm* segWormDLP;
+
+	/** Segmented Worm 
 
 	/** internal IplImage **/
 	IplImage* SubSampled; // Image used to subsample stuff
@@ -183,6 +186,7 @@ typedef struct ExperimentStruct{
 	/** Scratch CvMemoryStorage **/
 	CvMemStorage* scratchMem;
 
+	
 	/** Error Handling **/
 	int e;
 
@@ -504,6 +508,15 @@ int RecordStageTracker(Experiment* exp);
 
 
 int ShutOffStage(Experiment* exp);
+
+/* Use a high level function to do the dirction recognition,
+ * returns 1 if the worm moves forward,
+ * returns -1 if the worm moves backward,
+ * returns 0 if the worm pauses,
+ * returns 2 if no PrevcenterOfWorm
+*/
+int JudgeMovingDirction(Experiment* exp);
+
 
 
 #endif /* EXPERIMENT_H_ */

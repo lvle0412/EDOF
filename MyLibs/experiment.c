@@ -139,6 +139,8 @@ Experiment* CreateExperimentStruct() {
 	/** Information about the Previous frame's Worm **/
 	exp->PrevWorm = NULL;
 	exp->PrevStagePosition = cvPoint(0,0);
+	exp->PrevcenterOfWorm.x=0;
+	exp->PrevcenterOfWorm.y=0;
 	/** Segmented Worm in DLP Space **/
 	exp->segWormDLP = NULL;
 
@@ -188,8 +190,7 @@ Experiment* CreateExperimentStruct() {
 
 	/** MindControl API **/
 	exp->sm=NULL;
-
-	exp->scratchMem =cvCreateMemStorage(0);
+	exp->scratchMem =cvCreateMemStorage(0);	
 
 	/** Error Handling **/
 	exp->e = 0;
@@ -330,6 +331,7 @@ int HandleCommandLineArguments(Experiment* exp) {
 				return -1;
 			}
 			/** What is this? This looks bening but wrong to me.. -andy 26 Feb 2010 **/
+			/*
 			if (optopt == 'i' || optopt == 'c' || optopt == 'd' || optopt
 					== 's') {
 				fprintf(stderr, "Option -%c requires an argument.\n", optopt);
@@ -344,6 +346,7 @@ int HandleCommandLineArguments(Experiment* exp) {
 				displayHelp();
 				return -11;
 			}
+			*/
 		default:
 			displayHelp();
 			return -1;
@@ -1121,7 +1124,7 @@ void InitializeExperiment(Experiment* exp) {
 	WormAnalysisParam* Params = CreateWormAnalysisParam();
 	InitializeEmptyWormImages(Worm, cvSize(NSIZEX, NSIZEY));
 	InitializeWormMemStorage(Worm);
-
+	
 	/** Create SegWormDLP object using memory from the worm object **/
 	exp->segWormDLP = CreateSegmentedWormStruct();
 
@@ -1166,7 +1169,7 @@ void ReleaseExperiment(Experiment* exp) {
 	/** The segmented worm DLP structure **/
 	// Note that the memorystorage for the Cvseq's are in exp->worm->Memorystorage
 	free(exp->segWormDLP);
-
+	
 	/** Free up Worm Objects **/
 	if (exp->Worm != NULL) {
 		DestroyWormAnalysisDataStruct((exp->Worm));
@@ -1425,9 +1428,18 @@ void CalculateAndPrintFrameRateAndInfo(Experiment* exp) {
 
 		if (exp->Params->stageTrackingOn==1){
 			printf("current velocity: %d, %d\n",exp->Worm->stageVelocity.x, exp->Worm->stageVelocity.y);
+			
 			if (exp->Params->stageRecording==1){				
-				printf("Real time worm speed: %.2f SU/ms\n", exp->Worm->WormSpeed);									
+				printf("Real time worm speed: %.2f SU/ms\n", exp->Worm->WormSpeed);
+				
 			}
+			
+		}
+		if (exp->Worm->WormIsMovingForward==1){
+			printf("Moving forward.\n");
+		}
+		else if (exp->Worm->WormIsMovingForward==-1){
+			printf("Reversing.\n");
 		}
 	}
 }
@@ -1504,7 +1516,8 @@ void DoSegmentation(Experiment* exp) {
 	/** Update PrevWorm Info **/
 	if (!(exp->e))
 		LoadWormGeom(exp->PrevWorm, exp->Worm);
-
+	
+	
 	/*** </segmentworm> ***/
 _TICTOC_TOC_FUNC
 }
@@ -1679,7 +1692,7 @@ int HandleKeyStroke(int c, Experiment* exp) {
 		break;
 
 	/** Timed Secondary Protocol Illumination **/
-    case 'q':
+	case 'q':
 		Toggle(&(exp->Params->ProtocolSecondaryIsOn));
 		break;
 		
@@ -2066,10 +2079,10 @@ int RecordStageTracker(Experiment* exp){
 			} 
 			else {				
 				findStagePosition(exp->stage, &(exp->Worm->stagePosition.x),&(exp->Worm->stagePosition.y));
-				exp->Worm->WormSpeed=CalculateRTWormSpeed(exp->PrevStagePosition,exp->Worm->stagePosition,exp->prevTime2, exp->Worm->timestamp);			
+				exp->Worm->WormSpeed=CalculateRTWormSpeed(exp->PrevStagePosition,exp->Worm->stagePosition,exp->prevTime2, exp->Worm->timestamp);
 				exp->PrevStagePosition=exp->Worm->stagePosition;
 				exp->prevTime2=exp->Worm->timestamp;
-
+				
 			}
 		}
 	}
@@ -2077,3 +2090,10 @@ int RecordStageTracker(Experiment* exp){
 	
 }
 
+/* Use a high level function to do the dirction recognition*/
+
+int JudgeMovingDirction(Experiment* exp){
+	exp->Worm->WormIsMovingForward=IsWormGoingForwardOrReversing(exp->Worm->Segmented,exp->PrevcenterOfWorm);		
+	exp->PrevcenterOfWorm=*(exp->Worm->Segmented->centerOfWorm);
+	return 0;
+}

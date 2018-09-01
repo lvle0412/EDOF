@@ -186,6 +186,7 @@ int main (int argc, char** argv){
 
 			/** Set error to zero **/
 			exp->e=0;
+			// *(exp->PrevSW)=*(exp->Worm->Segmented);
 			TICTOC::timer().tic("GrabFrame()");
 
 			/** Grab a frame **/
@@ -234,6 +235,7 @@ int main (int argc, char** argv){
 			DoSegmentation(exp);
 			TICTOC::timer().toc("EntireSegmentation");
 
+			
 			/** Real-Time Curvature Phase Analysis, and phase induced illumination **/
 		    HandleCurvaturePhaseAnalysis(exp);
 
@@ -318,7 +320,7 @@ int main (int argc, char** argv){
 				TICTOC::timer().toc("DoWriteToDisk()");
 
 			}
-
+			
 			if (exp->e != 0) {
 				printf("\nError in main loop. :(\n");
 				//where emergency stage shutoff used to go
@@ -526,6 +528,8 @@ UINT Thread2(LPVOID lpdwParam) {
 				} else {
 					/**Do the Stage Tracking**/
 					TICTOC::timer().tic("HandleStageTracker()");
+					/**Judge the worm is moving forward or reversing**/
+					JudgeMovingDirction(exp);					
 					HandleStageTracker(exp);
 					RecordStageTracker(exp);
 					TICTOC::timer().toc("HandleStageTracker()");

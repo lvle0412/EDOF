@@ -43,6 +43,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include "AndysComputations.h"
+
 #include "AndysOpenCVLib.h"
 #include <limits.h>
 
@@ -319,6 +321,30 @@ int PushToSeqBuffer(CvSeq* seq, void* element, int MaxBuffSize){
 }
 
 
+/*
+ * A cvSeq can be used as a buffer. This function allows one to push multiple element
+ * onto the front of a cvSeq buffer.
+ *
+ * If the buffer is full, it automatically tosses the first K oldest
+ * element in the buffer.
+ */
+int PushMultiToSeqBuffer(CvSeq* seq, void* elements, int k, int MaxBuffSize){
+	if (seq==0 || element==0 || MaxBuffSize<1) return A_ERROR;
+
+	/** push the value on **/
+	cvSeqPushMulti(seq, elements, k, CV_FRONT);
+
+	/** if full, pop off the last value **/
+	void* popped_pt;
+	while (seq->total > MaxBuffSize){
+		cvSeqPopMulti(seq, popped_pt, k, CV_BACK);
+	} ;
+
+	return A_OK;
+}
+
+
+
 
 
 /*******************************************************************************/
@@ -387,7 +413,7 @@ int GetMeanOfPoints(CvSeq* seq, double* centroid){
 		y+=tempPt->y;
 	}
 	centroid[0]=(double)x/(double)seqsize;
-	centroid[1]=(double)y/(double)seqsize;	
+	centroid[1]=(double)y/(double)seqsize;
 	return 1;
 }
 
@@ -1177,6 +1203,115 @@ int extractCurvatureOfSeq(const CvSeq* seq, double* curvature, double sigma,CvMe
 
 
 
+/*
+ * extractEigenwormOfSeq
+ *
+ *
+ * Find eigenmode coefficients of eigenworms a1, a2, a3, a4, a5
+ *
+ * seq is sequence of points, CvPoint (int)
+ * eigenmodes contains K_MODE basis vectors.
+ *
+ * Defined as difference in angle between adjacent tangent vectors.
+ * The tangent angle sequence has one less element than the original sequence.
+ *
+ * Sigma is the size of the gaussian kernal.
+ *
+ */
+int extractEigenwormOfSeq(const CvSeq *seq, const double *eigenmodes[], CvSeq *delayseq, int k_mode, int k_delay, double sigma, CvMemStorage *mem){
+
+	int DEBUG_FLAG=0;
+
+	if (seq== NULL || curvature == NULL) return A_ERROR;
+	if (seq->elem_size!=sizeof(CvPoint)) return A_ERROR;
+
+	if (DEBUG_FLAG) {
+		printf("Before smoothing:\n");
+		printSeq((CvSeq*)seq);
+	}
+
+	/** Smooth the sequence **/
+	CvSeq* sseq=smoothPtSequenceIntToDouble(seq, sigma, mem);
+	if (DEBUG_FLAG) {
+		printf("After smoothing:\n");
+		printSeqDouble(sseq);
+	}
+	int N=sseq->total;
+
+	double *x = (double *) malloc (N * sizeof(double));
+	double *y = (double *) malloc (N * sizeof(double));
+
+	double *diff_x = (double *) malloc( (N-1) * sizeof(double));  /* difference of adjacent x coordinate */
+	double *diff_y = (double *) malloc( (N-1)* sizeof(double)); /* difference of adjacent y coordinate */
+	double *theta = (double *) malloc( (N-1) * sizeof(double)); /* angle of the tangent vector */
+
+
+	/** Generate array of floats from inputs **/
+	int j;
+	for (j = 0; j < N; j++) {
+		x[j] = (double) ((CvPoint2D64f *) cvGetSeqElem(sseq, j))->x;
+		y[j] = (double) ((CvPoint2D64f *) cvGetSeqElem(sseq, j))->y;
+		if (DEBUG_FLAG) printf("Double %d: ( %f , %f)\n",j,x[j],y[j]);
+	}
+
+	/** Calculate tangent vectors **/
+   int i;
+	 double theta_sum = 0;
+	 double theta_mean = 0;
+	 for (i=0;i< N-1;i++){
+		 *(diff_x+i) = *(x+i+1)-*(x+i);
+		 *(diff_y+i) = *(y+i+1)-*(y+i);
+		 if (DEBUG_FLAG) printf("Diff %d: %f, %f\n",i, *(diff_x+i), *(diff_y+i));
+		 *(theta+i) = atan2(-*(diff_y+i),*(diff_x+i)); /* calculate the angle of tangent vector */
+		 theta_sum += *(theta+i);
+		 }
+	 theta_mean = theta_sum/(N-1);
+
+	 for (i=0; i<N-1; i++){
+		 *(theta+i)=*(theta+i) - theta_mean; /* subtract the mean */
+	 }
+
+	 double *a;
+	 for (i=0; i<k_mode; i++){
+		 *(a+i) = cdot(theta,eigenmodes[i],N-1);
+	 }
+
+	 PushMultiToSeqBuffer(delayseq,a,k_mode,k_mode*k_delay);
+
+	free(theta);
+	free(diff_x);
+	free(diff_y);
+	free(x);
+	free(y);
+	return A_OK;
+}
+
+/*
+ *  extract the coefficients of embeddingmodes
+ */
+
+ int extractTakenEmbeddingDimensions(const CvSeq *delayseq, const double *embeddingmodes[],double *embeddingcoefficients, int embeddingdimensions){
+
+
+	 int N=delayseq->total;
+	 double *x = (double *) malloc (N * sizeof(double));
+	 double *tempPt;
+	 int j;
+	 for (j = 0; j < N; j++) {
+		 tempPt = (double *) cvGetSeqElem(seq, j);
+		 x[j] = *tempPt;
+	 }
+
+	 int i;
+	 for (i=0; i<embeddingdimensions; i++){
+		 *(embeddingcoefficients+i) = cdot(x,embeddingmodes[i],N);
+	 }
+
+	 free(x);
+	 return A_OK;
+
+ }
+
 
 /*
  * Given a point, and a boundary, this function returns the coordinates of the closest point on the boundary.
@@ -1686,6 +1821,3 @@ int simpleAdjustLevels(const IplImage* src, IplImage* dest, int min, int max){
 
 	return 0;
 }
-
-
-

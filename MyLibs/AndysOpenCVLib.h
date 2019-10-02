@@ -41,6 +41,7 @@
 #define A_ERROR -1
 
 
+
 /*
  *
  * This is a pair of cvPoints
@@ -426,6 +427,29 @@ int extractCurvatureOfSeq(const CvSeq* seq, double* curvature, double sigma,CvMe
  */
 int extractCurvatureOfSeqDouble(const CvSeq* seq, double* curvature, double sigma,CvMemStorage* mem);
 
+/*
+ * extractEigenwormOfSeq
+ *
+ *
+ * Find eigenmode coefficients of eigenworms such as a1, a2, a3, a4, a5
+ *
+ * seq is sequence of points, CvPoint (int)
+ * eigenmodes contains k_mode basis vectors.
+ *
+ * The tangent angle sequence has one less element than the original sequence.
+ *
+ * Sigma is the size of the gaussian kernal.
+ *
+ */
+ int extractEigenwormOfSeq(const CvSeq *seq, const double *eigenmodes[], CvSeq *delayseq, int k_mode, int k_delay, double sigma, CvMemStorage *mem);
+
+ /*
+  *  extract the coefficients of embeddingmodes
+  */
+
+int extractTakenEmbeddingDimensions(const CvSeq *delayseq, const double *embeddingmodes[], double *embeddingcoefficients, int embeddingdimensions);
+
+
 /**** Testing Functions ****/
 
 /*
@@ -469,6 +493,16 @@ int PushToSeqBuffer(CvSeq* seq, void* element, int MaxBuffSize);
 
 
 /*
+ * A cvSeq can be used as a buffer. This function allows one to push multiple element
+ * onto the front of a cvSeq buffer.
+ *
+ * If the buffer is full, it automatically tosses the first K oldest
+ * element in the buffer.
+ */
+int PushMultiToSeqBuffer(CvSeq* seq, void* element, int k, int MaxBuffSize);
+
+
+/*
  *  Adjust the pixel levels of an image
  *  Creates a lookup table and applies it
  */
@@ -499,5 +533,3 @@ void printSeqScalarDoubles(CvSeq* Seq);
  */
 int SeqDoublesToArr(const CvSeq* seq, double** arr);
 #endif /* ANDYSOPENCVLIB_H_ */
-
-

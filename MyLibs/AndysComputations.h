@@ -159,4 +159,10 @@ void printDoubleArr(const double* arr, int N);
  *uses qsort under the hood
  */
 double MedianOfDoubleArr(const double* arr, int N);
+
+/*
+ * compute the dot product of two vectors
+ * with N elements
+ */
+double cdot(const double* vec1, const double* vec2, int N);
 #endif /* ANDYSCOMPUTATIONS_H_ */

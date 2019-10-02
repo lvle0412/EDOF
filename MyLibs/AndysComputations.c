@@ -282,3 +282,18 @@ void printDoubleArr(const double* arr, int N){
 		printf("%d: %f\n",i,arr[i]);
 	}
 }
+
+/*
+ * compute the dot product of two vectors
+ * with N elements
+ */
+
+double cdot(const double* arr1, const double* arr2, int N){
+
+	double dotproduct = 0;
+
+	for (i=0; i<N; i++){
+		dotproduct += (*(arr1+i)) * (*(arr2+i));
+	}
+	return dotproduct;
+}

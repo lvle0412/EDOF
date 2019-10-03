@@ -120,11 +120,11 @@ WormAnalysisData* CreateWormAnalysisDataStruct(){
 	WormPtr->stageVelocity=cvPoint(0,0);
 	WormPtr->stagePosition=cvPoint(0,0);
 	WormPtr->stageFeedbackTarget=cvPoint(512,384);
-	WormPtr->WormSpeed = 0;	
+	WormPtr->WormSpeed = 0;
 
 	/** Forward or backward the worm is going, 1 for forward, -1 for backward, -2 for no status **/
 	WormPtr->WormIsMovingForward=-2;
-	
+
 	return WormPtr;
 }
 
@@ -346,9 +346,9 @@ WormAnalysisParam* CreateWormAnalysisParam(){
 	ParamPtr->ProtocolSecondaryStep=0;
 	ParamPtr->ProtocolSecondaryDuration=15;
 	ParamPtr->ProtocolSecondaryIsOn=0;
-	
+
 	/** Timed Protocol Internal Timer Variables **/
-	ParamPtr->ProtocolSecondaryStartTime=0; //Time that the secondary protocol step began	
+	ParamPtr->ProtocolSecondaryStartTime=0; //Time that the secondary protocol step began
 
 	/** Stage Control Parameters **/
 	ParamPtr->stageTrackingOn=0;
@@ -393,7 +393,7 @@ SegmentedWorm* CreateSegmentedWormStruct(){
 
 	SegWorm->centerOfWorm=(CvPoint*) malloc (sizeof(CvPoint));
 	*(SegWorm->centerOfWorm)=cvPoint(0,0);
-	SegWorm->NumSegments=0;	
+	SegWorm->NumSegments=0;
 	SegWorm->Neck=(CvPoint*)malloc(sizeof(CvPoint));
 	*(SegWorm->Neck)=cvPoint(0,0);
 	/*** Setup Memory storage ***/
@@ -403,7 +403,7 @@ SegmentedWorm* CreateSegmentedWormStruct(){
 	/*** Allocate Memory for the sequences ***/
 	SegWorm->Centerline=cvCreateSeq(CV_SEQ_ELTYPE_POINT,sizeof(CvSeq),sizeof(CvPoint),SegWorm->MemSegStorage);
 	SegWorm->LeftBound=cvCreateSeq(CV_SEQ_ELTYPE_POINT,sizeof(CvSeq),sizeof(CvPoint),SegWorm->MemSegStorage);
-	SegWorm->RightBound=cvCreateSeq(CV_SEQ_ELTYPE_POINT,sizeof(CvSeq),sizeof(CvPoint),SegWorm->MemSegStorage);	
+	SegWorm->RightBound=cvCreateSeq(CV_SEQ_ELTYPE_POINT,sizeof(CvSeq),sizeof(CvPoint),SegWorm->MemSegStorage);
 	return SegWorm;
 }
 
@@ -485,14 +485,20 @@ WormTimeEvolution* CreateWormTimeEvolution(){
 	/*** Setup Memory storage ***/
 	TimeEv->MemTimeEvolutionStorage=cvCreateMemStorage(0);
 	TimeEv->MeanHeadCurvatureBuffer=cvCreateSeq(0,sizeof(CvSeq),sizeof(double),TimeEv->MemTimeEvolutionStorage);
+	TimeEv->EigenWormBuffer=cvCreateSeq(0,sizeof(CvSeq),sizeof(double),TimeEv->MemTimeEvolutionStorage);
 	TimeEv->derivativeOfHeadCurvature=0;
 	TimeEv->currMeanHeadCurvature=0;
+	TimeEv->currEigenModes=(double*) malloc(K_MODE * (sizeof(double)));
+	TimeEv->currPhaseSpaceModes=(double*) malloc(DIMENSIONS * (sizeof(double)));
 
 	return TimeEv;
 }
 
 int DestroyWormTimeEvolution(WormTimeEvolution** TimeEvolution){
 	(*TimeEvolution)->MeanHeadCurvatureBuffer=NULL;
+	(*TimeEvolution)->EigenWormBuffer=NULL;
+	free((*TimeEvolution)->currEigenModes);
+	free((*TimeEvolution)->currPhaseSpaceModes);
 	cvReleaseMemStorage(&( (*TimeEvolution)->MemTimeEvolutionStorage ));
 	free(*TimeEvolution);
 	*TimeEvolution=NULL;
@@ -522,6 +528,63 @@ int AddMeanHeadCurvature(WormTimeEvolution* TimeEvolution, double CurrHeadCurvat
 	/** Set Current Mean Head Curvature **/
 	TimeEvolution->currMeanHeadCurvature = CurrHeadCurvature;
 
+	return A_OK;
+}
+
+/*
+ * AddEigenmodes to the delay sequences for phase plane analysis
+ */
+
+int AddEigenmodes(WormTimeEvolution* TimeEvolution, WormAnalysisParam* AnalysisParam){
+	if (TimeEvolution==NULL || AnalysisParam==NULL) {
+		printf("AddEigenmodes Error!");
+				return A_ERROR;
+	}
+
+	int DEBUG_INFO=0; // print out
+
+	int MaxBuff;
+	if (DEBUG_INFO!=0) printf("CurvaturePhaseNumFrames=%d\n",AnalysisParam->CurvaturePhaseNumFrames);
+	if (AnalysisParam->k_delay>0){
+		MaxBuff=AnalysisParam->k_delay * K_MODE;
+	}else{
+		MaxBuff=1;
+	}
+
+	if (DEBUG_INFO!=0) printf("MaxBuff=%d\n",MaxBuff);
+
+	/** Push onto Bufeer **/
+	PushMultiToSeqBuffer(TimeEvolution->EigenWormBuffer, TimeEvolution->currEigenModes, K_MODE, MaxBuff);
+
+	return A_OK;
+}
+
+/*
+ * compute the embedding modes based on the delay sequences and embedding vectors derived from SVD.
+ */
+
+int TakenEmbedding(WormTimeEvolution* TimeEvolution, const double *embeddingVectors[]){
+
+	if (TimeEvolution==NULL || AnalysisParam==NULL) {
+		printf("TakenEmbedding Error!");
+				return A_ERROR;
+	}
+
+	int N=TimeEvolution->EigenWormBuffer->total;
+	double *x = (double *) malloc (N * sizeof(double));
+	double *tempPt;
+	int j;
+	for (j = 0; j < N; j++) {
+		tempPt = (double *) cvGetSeqElem(TimeEvolution->EigenWormBuffer, j);
+		x[j] = *tempPt;
+	}
+
+	int i;
+	for (i=0; i<DIMENSIONS; i++){
+		*(TimeEvolution->currPhaseSpaceModes+i) = cdot(x,embeddingVectors[i],N);
+	}
+
+	free(x);
 	return A_OK;
 }
 
@@ -577,7 +640,7 @@ int FindWormBoundary(WormAnalysisData* Worm, WormAnalysisParam* Params){
 		printf("Cannot find the worm! \n");
 		return -1;
 	}
-	
+
 	/** Dilate and Erode **/
 	if (Params->DilateErode==1){
 		TICTOC::timer().tic("DilateAndErode");
@@ -644,7 +707,7 @@ int GivenBoundaryFindWormHeadTail(WormAnalysisData* Worm, WormAnalysisParam* Par
 	/* Create A Matrix to store all of the cross products along the boundary.
 	 */
 	CvSeq* CrossProds= cvCreateSeq(CV_32SC1,sizeof(CvSeq),sizeof(int),Worm->MemScratchStorage);
-	
+
 	//We walk around the boundary using the high-speed reader and writer objects.
 	CvSeqReader ForeReader; //ForeReader reads delta pixels ahead
 	CvSeqReader Reader; 	//Reader reads delta pixels behind
@@ -700,7 +763,7 @@ int GivenBoundaryFindWormHeadTail(WormAnalysisData* Worm, WormAnalysisParam* Par
 		/** Store the Dot Product in our Mat **/
 		DotProdVal=PointDot(&AheadVec,&BehindVec);
 		cvSeqPush(DotProds,&DotProdVal); //<--- ANDY CONTINUE HERE!
-		
+
 		/** Store the Cross Product in our Mat **/
 		CrossProdVal=PointCross(&AheadVec,&BehindVec);
 		cvSeqPush(CrossProds,&CrossProdVal);
@@ -753,8 +816,8 @@ int GivenBoundaryFindWormHeadTail(WormAnalysisData* Worm, WormAnalysisParam* Par
 	/* That way, if for some reason there is no reasonable head found, the default 			*/
 	/* will at least be a pretty good gueess												*/
 	int SecondMostCurvyIndex = (Worm->TailIndex+ TotalBPts/2)%TotalBPts;
-	
-	
+
+
 
 	for (i = 0; i < TotalBPts; i++) {
 		DotProdPtr =(int*) cvGetSeqElem(DotProds,i);
@@ -771,7 +834,7 @@ int GivenBoundaryFindWormHeadTail(WormAnalysisData* Worm, WormAnalysisParam* Par
 	}
 
 	Worm->Head = (CvPoint*) cvGetSeqElem(Worm->Boundary,
-			SecondMostCurvyIndex);  
+			SecondMostCurvyIndex);
 
 	Worm->HeadIndex = SecondMostCurvyIndex;
 	cvClearMemStorage(Worm->MemScratchStorage);
@@ -1058,7 +1121,7 @@ int SegmentWorm(WormAnalysisData* Worm, WormAnalysisParam* Params){
 
 	/*** Compute Centerline, from Head To Tail ***/
 	FindCenterline(NBoundA,NBoundB,Worm->Centerline);
-	
+
 
 	/*** Smooth the Centerline***/
 	CvSeq* SmoothUnresampledCenterline = smoothPtSequence (Worm->Centerline, 0.5*Worm->Centerline->total/Params->NumSegments, Worm->MemScratchStorage);
@@ -1071,7 +1134,7 @@ int SegmentWorm(WormAnalysisData* Worm, WormAnalysisParam* Params){
 
 	resampleSeqConstPtsPerArcLength(SmoothUnresampledCenterline,Worm->Segmented->Centerline,Params->NumSegments);
 
-	/** Save the location of the centerOfWorm as the point halfway down the segmented centerline 
+	/** Save the location of the centerOfWorm as the point halfway down the segmented centerline
 	 *  Save the location of the neck of the worm to analyze the dirction of the worm is moving
 	 */
 	Worm->Segmented->centerOfWorm= CV_GET_SEQ_ELEM( CvPoint , Worm->Segmented->Centerline, Worm->Segmented->NumSegments / 2 );
@@ -1147,7 +1210,7 @@ int CreateWormHUDS(IplImage* TempImage, WormAnalysisData* Worm, WormAnalysisPara
 
 	}
 
-	char frame[30]; // these are freed automatically 
+	char frame[30]; // these are freed automatically
 					// SEE http://stackoverflow.com/questions/1335230/is-the-memory-of-a-character-array-freed-by-going-out-of-scope
 	sprintf(frame,"%d",Worm->frameNum);
 	cvPutText(TempImage,frame,cvPoint(Worm->SizeOfImage.width- 200,Worm->SizeOfImage.height - 10),&font,cvScalar(255,255,255) );
@@ -1380,7 +1443,7 @@ void LoadWormGeom(WormGeom* SimpleWorm, WormAnalysisData* Worm){
 	ClearWormGeom(SimpleWorm);
 	SimpleWorm->Head=*(Worm->Head);
 	SimpleWorm->Tail=*(Worm->Tail);
-	SimpleWorm->Perimeter=Worm->Boundary->total;	
+	SimpleWorm->Perimeter=Worm->Boundary->total;
 }
 
 
@@ -1464,18 +1527,18 @@ CvPoint ConvertSlidlerToWormSpace(CvPoint SliderOrigin,CvSize gridSize){
 *  PSP PrevStagePosition, SP StagePosition, PT PrevTime, TS TimeStamp.
 */
 double CalculateRTWormSpeed(const CvPoint& PSP, const CvPoint& SP, const long& PT, const unsigned long& TS){
-	double dist; // distance worm traveled in one frame.		   
+	double dist; // distance worm traveled in one frame.
 	unsigned long t; // Time worm traveled in millisecond.
 	double squre_d, speed;
 	squre_d=(PSP.x-SP.x)*(PSP.x-SP.x)+(PSP.y-SP.y)*(PSP.y-SP.y);
 	dist = sqrt(squre_d);
 	t=TS-PT;
-	speed=dist/(double)t;	
+	speed=dist/(double)t;
 	return speed;
 }
 
 
-/*  Calculate the direction of the worm is moving on. 
+/*  Calculate the direction of the worm is moving on.
 	Returns 1 if the worm is moving forward.
 	Returns -1 if the worm is reversing.
 	Returns 0 if the worm pauses.
@@ -1486,11 +1549,11 @@ int IsWormGoingForwardOrReversing(SegmentedWorm* SW,CvPoint PrevCW){
 		return -2;
 	// int NeckNum=0.1*(SW->NumSegments); // Determines where the neck is whcih is counted from head tip.
 	// int NeckNum=10;
-	
+
 	// CvPoint *Neck=(CvPoint*)cvGetSeqElem(SW->Centerline,NeckNum); // Find where the neck is in the coordination.
 	// printf("neck(%d,%d)\n",Neck->x,Neck->y);
-	
-	
+
+
 	if ((SW->Neck->x)<1)
 		return -2;
 	CvPoint HeadingTO=cvPoint(0,0);
@@ -1503,15 +1566,15 @@ int IsWormGoingForwardOrReversing(SegmentedWorm* SW,CvPoint PrevCW){
 	// printf("COW(%d,%d\n)  ",SW->centerOfWorm->x,SW->centerOfWorm->y);
 	// printf("HeadingTO(%d,%d  )  ",HeadingTO.x,HeadingTO.y);
 	// printf("Motion(%d,%d)\n",Motion.x,Motion.y);
-	
+
 	int dirction=0;
 	dirction=(HeadingTO.x)*(Motion.x)+(HeadingTO.y)*(Motion.y);
 	if (dirction>0)
-		return 1;		
+		return 1;
 	else if (dirction<0)
-		return -1;		
-	else	
-		return 0;	
-	
+		return -1;
+	else
+		return 0;
+
 	return -2;
 }

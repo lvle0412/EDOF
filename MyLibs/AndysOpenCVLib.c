@@ -43,8 +43,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-#include "AndysComputations.h"
-
 #include "AndysOpenCVLib.h"
 #include <limits.h>
 
@@ -1202,23 +1200,22 @@ int extractCurvatureOfSeq(const CvSeq* seq, double* curvature, double sigma,CvMe
 }
 
 
-
 /*
- * extractEigenwormOfSeq
+ * extractTangleAngleeOfSeq
  *
  *
- * Find eigenmode coefficients of eigenworms a1, a2, a3, a4, a5
+ * Find tangent angle at each point.
  *
  * seq is sequence of points, CvPoint (int)
- * eigenmodes contains K_MODE basis vectors.
+ * theta is an array of doubles. with one less element than CvPoint.
  *
- * Defined as difference in angle between adjacent tangent vectors.
- * The tangent angle sequence has one less element than the original sequence.
+ * Defined as the angle between adjacent tangent vectors.
+ *
  *
  * Sigma is the size of the gaussian kernal.
  *
  */
-int extractEigenwormOfSeq(const CvSeq *seq, const double *eigenmodes[], CvSeq *delayseq, int k_mode, int k_delay, double sigma, CvMemStorage *mem){
+int extractTangentAngleOfSeq(const CvSeq* seq, double* angle, double sigma,CvMemStorage* mem){
 
 	int DEBUG_FLAG=0;
 
@@ -1268,49 +1265,17 @@ int extractEigenwormOfSeq(const CvSeq *seq, const double *eigenmodes[], CvSeq *d
 	 theta_mean = theta_sum/(N-1);
 
 	 for (i=0; i<N-1; i++){
-		 *(theta+i)=*(theta+i) - theta_mean; /* subtract the mean */
+		 *(theta+i) = *(theta+i) - theta_mean; /* subtract the mean */
 	 }
 
-	 double *a;
-	 for (i=0; i<k_mode; i++){
-		 *(a+i) = cdot(theta,eigenmodes[i],N-1);
-	 }
-
-	 PushMultiToSeqBuffer(delayseq,a,k_mode,k_mode*k_delay);
+	memcpy((void*) angle ,(const void*) theta, (N-1)*sizeof(double) );
 
 	free(theta);
-	free(diff_x);
-	free(diff_y);
 	free(x);
 	free(y);
 	return A_OK;
 }
 
-/*
- *  extract the coefficients of embeddingmodes
- */
-
- int extractTakenEmbeddingDimensions(const CvSeq *delayseq, const double *embeddingmodes[],double *embeddingcoefficients, int embeddingdimensions){
-
-
-	 int N=delayseq->total;
-	 double *x = (double *) malloc (N * sizeof(double));
-	 double *tempPt;
-	 int j;
-	 for (j = 0; j < N; j++) {
-		 tempPt = (double *) cvGetSeqElem(seq, j);
-		 x[j] = *tempPt;
-	 }
-
-	 int i;
-	 for (i=0; i<embeddingdimensions; i++){
-		 *(embeddingcoefficients+i) = cdot(x,embeddingmodes[i],N);
-	 }
-
-	 free(x);
-	 return A_OK;
-
- }
 
 
 /*

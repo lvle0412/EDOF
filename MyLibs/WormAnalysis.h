@@ -47,6 +47,9 @@
  #error "#include AndysOpenCVLib.h" must appear in source files before "#include WormAnalysis.h"
 #endif
 
+#define K_MODE 5
+#define DIMENSIONS 6
+/* number of eigenmodes */
 
 typedef struct WormAnalysisParamStruct{
 	/* WormAnalyisisParam is a structure containing inputs
@@ -109,8 +112,8 @@ typedef struct WormAnalysisParamStruct{
 	int ProtocolUse;
 	int ProtocolStep;
 	int ProtocolTotalSteps;
-	
-	/** Protocol: Timed Step **/ 
+
+	/** Protocol: Timed Step **/
 	// Feature to transiently invoke a secondary protocol stop for a specified amount of time
 	// Then revert back to the primary protocol stop
 	// This is useful for simultaneous calcium imaging with occasional optogoenetic stimuli
@@ -118,11 +121,11 @@ typedef struct WormAnalysisParamStruct{
 	int ProtocolSecondaryStep;
 	int ProtocolSecondaryDuration;
 	int ProtocolSecondaryIsOn;
-	
+
 	/** Timed Protocol Internal Timer Variables **/
 	double ProtocolSecondaryStartTime; //Time that the secondary protocol step began
-	
-	
+
+
 
 	/** Laser Power **/
 	int FirstLaser;
@@ -153,7 +156,7 @@ typedef struct WormAnalysisParamStruct{
 	int stageROIRadius;   // radius of the active zone
 	int stageTargetSegment; //segment along the worms centerline used for targeting
 	int stageRecording;
-	
+
 	/** Record Data Parameters **/
 	int Record;
 
@@ -171,7 +174,7 @@ typedef struct SegmentedWormStruct{
 	CvPoint* Tail;
 	CvMemStorage* MemSegStorage;
 	int NumSegments;
-	CvPoint* centerOfWorm;	
+	CvPoint* centerOfWorm;
 	int Necknum;
 	CvPoint* Neck;
 } SegmentedWorm;
@@ -187,14 +190,17 @@ typedef struct WormTimeEvolutionStruct{
 
 	/** Phase and Curvature Analysis **/
 	CvSeq* MeanHeadCurvatureBuffer;
+	CvSeq* EigenWormBuffer;
 	double derivativeOfHeadCurvature;
 	double currMeanHeadCurvature;
+	double* currEigenModes;
+	double* currPhaseSpaceModes;
 	CvMemStorage* MemTimeEvolutionStorage;
 }WormTimeEvolution;
 
 
 
-/** This is the image and the extracted data related to a worm at a single frame in time **/
+/** This is the image and the Added data related to a worm at a single frame in time **/
 typedef struct WormImageAnalysisStruct{
 	CvSize SizeOfImage;
 
@@ -232,7 +238,7 @@ typedef struct WormImageAnalysisStruct{
 	CvPoint stageVelocity; //compensating velocity of stage.
 	CvPoint stagePosition; //Position of the motorized stage.
 	CvPoint stageFeedbackTarget;//Target of the stage feedback loop as a point in the image
-	double WormSpeed; // Worm speed in real time, in stage unit per millisecond.	
+	double WormSpeed; // Worm speed in real time, in stage unit per millisecond.
 	//WormIlluminationData* Illum;
 	int WormIsMovingForward;
 }WormAnalysisData;
@@ -254,7 +260,7 @@ typedef struct WormImageAnalysisStruct{
  */
 typedef struct WormGeomStruct{
 	CvPoint Head;
-	CvPoint Tail;	
+	CvPoint Tail;
 	int Perimeter;
 }WormGeom;
 
@@ -407,6 +413,18 @@ WormTimeEvolution* CreateWormTimeEvolution();
 int DestroyWormTimeEvolution(WormTimeEvolution** TimeEvolution);
 
 int AddMeanHeadCurvature(WormTimeEvolution* TimeEvolution, double CurrHeadCurvature, WormAnalysisParam* AnalysisParam);
+
+/*
+ * AddEigenmodes to the delay sequences for phase plane analysis
+ */
+
+int AddEigenmodes(WormTimeEvolution* TimeEvolution, WormAnalysisParam* AnalysisParam);
+
+/*
+ * compute the embedding modes based on the delay sequences and embedding vectors derived from SVD.
+ */
+
+int TakenEmbedding(WormTimeEvolution* TimeEvolution, const double *embeddingVectors[]);
 
 
 
@@ -587,11 +605,11 @@ CvPoint ConvertSlidlerToWormSpace(CvPoint SliderOrigin,CvSize gridSize);
 */
 double CalculateRTWormSpeed(const CvPoint& PSP, const CvPoint& SP, const long& PT, const unsigned long& TS);
 
-/*  Calculate the direction of the worm is moving on. 
+/*  Calculate the direction of the worm is moving on.
 	Returns 1 if the worm is moving forward.
 	Returns -1 if the worm is reversing.
 	Returns 0 if the worm pauses.
-	Returns -2 if error.	
+	Returns -2 if error.
 */
 int IsWormGoingForwardOrReversing(SegmentedWorm* SW, CvPoint PrevCW);
 

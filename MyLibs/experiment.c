@@ -190,12 +190,12 @@ Experiment* CreateExperimentStruct() {
 
 	/** MindControl API **/
 	exp->sm=NULL;
-	exp->scratchMem =cvCreateMemStorage(0);	
+	exp->scratchMem =cvCreateMemStorage(0);
 
 	/** Error Handling **/
 	exp->e = 0;
 
-	
+
 	return exp;
 
 }
@@ -324,7 +324,7 @@ int HandleCommandLineArguments(Experiment* exp) {
 		case 'r': /** Set stage recording on **/
 			exp->Params->stageRecording = 1;
 		break;
-			
+
 		case '?':
 			if (optopt == '?') {
 				displayHelp();
@@ -638,6 +638,52 @@ int HandleCurvaturePhaseAnalysis(Experiment* exp){
 	return A_OK;
 }
 
+/*
+ * phase plane analysis using taken embedding methods
+ */
+
+ int HandlePhasePlaneAnalysis(Experiment* exp){
+
+	 int DEBUG_FLAG=0; // print out ?
+
+
+ 	_TICTOC_TIC_FUNC
+ 	TICTOC::timer().tic("_PhasePlaneAnalysis",exp->e);
+
+ 	/** If Curvature Analysis is turned off, just return **/
+ 	if (exp->Params->PhasePlaneAnalyzeOn == 0){
+ 		return EXP_SUCCESS;
+ 	}  /** Otherwise Let's Calculate the Mean Curvature of the Head**/
+
+ 	/** Smoothing parameter**/
+ 	double sigma=5; /** made bigger **/
+
+	int N = exp->Worm->Segmented->Centerline->total -1;
+	/** Extract the tangent angle of the body **/
+	double* angle= (double*) malloc(N* (sizeof(double)));
+	RefreshWormMemStorage(exp->Worm);
+
+	/** Smooth and Extract Curvature **/
+	if (extractTangentAngleOfSeq(exp->Worm->Segmented->Centerline,angle,sigma,exp->Worm->MemScratchStorage)< 0) return EXP_ERROR;
+	RefreshWormMemStorage(exp->Worm);
+
+	int i;
+	for (i=0; i<K_MODE; i++){
+		*(exp->Worm->TimeEvolution->currEigenModes+i) = cdot(angle,eigenwormVectors[i],N);
+		/** need to be revised, eigenwormVectors need to be feeded**/
+	}
+
+	/** Store eigenmodes in buffer for delay embedding**/
+	if (AddEigenmodes(exp->Worm->TimeEvolution,median_curvature,exp->Params)!=A_OK) printf("Error adding new modes!!\n");
+
+	if (TakenEmbedding(exp->Worm->TimeEvolution,embeddingVectors)!=A_OK) printf("Error performing embedding!!\n");
+	/** need to be revised, embedding Vectors need to be feeded**/
+
+	TICTOC::timer().toc("_PhasePlaneAnalysis",exp->e);
+	return A_OK;
+}
+
+
 
 /*
  * Feature to turn on DLP illumination for a specified period of time
@@ -892,7 +938,7 @@ void SetupGUI(Experiment* exp) {
 
 	//Use the minimum DLP On and Refractory Period?
 	cvCreateTrackbar("StayOn&Refract", exp->WinCon2,&(exp->Params->StayOnAndRefract), 1, (int) NULL);
-		
+
 
 	/** If we have loaded a protocol, set up protocol specific sliders **/
 	if (exp->pflag) {
@@ -908,19 +954,19 @@ void SetupGUI(Experiment* exp) {
 			cvCreateTrackbar("Proto2", exp->WinCon2,
 					&(exp->Params->ProtocolSecondaryStep), exp->p->Steps->total - 1,
 					(int) NULL);
-			
+
 			/** Duration for Timed secondary protocol step illumintion **/
 			cvCreateTrackbar("Proto2Dur", exp->WinCon2,
 					&(exp->Params->ProtocolSecondaryDuration), 70,
 					(int) NULL);
-			
+
 			cvCreateTrackbar("Proto2On", exp->WinCon2,
 					&(exp->Params->ProtocolSecondaryIsOn), 1,
 					(int) NULL);
-					
-				
-		}	
-		
+
+
+		}
+
 	}
 
 	/** Stage Related GUI elements **/
@@ -985,17 +1031,17 @@ void UpdateGUI(Experiment* exp) {
 			if (exp->p->Steps->total > 1){
 				cvSetTrackbarPos("ProtoStep", exp->WinCon2,
 						(exp->Params->ProtocolStep));
-						
+
 			/** Secondary Protocol Stop for Timed Switching Applications **/
 			cvSetTrackbarPos("Proto2", exp->WinCon2,
 					(exp->Params->ProtocolSecondaryStep));
-			
+
 			/** Duration for Timed secondary protocol step illumintion **/
 			cvSetTrackbarPos("Proto2Dur", exp->WinCon2,
 					(exp->Params->ProtocolSecondaryDuration));
-			
+
 			cvSetTrackbarPos("Proto2On", exp->WinCon2,
-					(exp->Params->ProtocolSecondaryIsOn));						
+					(exp->Params->ProtocolSecondaryIsOn));
 			}
 		}
 
@@ -1124,7 +1170,7 @@ void InitializeExperiment(Experiment* exp) {
 	WormAnalysisParam* Params = CreateWormAnalysisParam();
 	InitializeEmptyWormImages(Worm, cvSize(NSIZEX, NSIZEY));
 	InitializeWormMemStorage(Worm);
-	
+
 	/** Create SegWormDLP object using memory from the worm object **/
 	exp->segWormDLP = CreateSegmentedWormStruct();
 
@@ -1169,7 +1215,7 @@ void ReleaseExperiment(Experiment* exp) {
 	/** The segmented worm DLP structure **/
 	// Note that the memorystorage for the Cvseq's are in exp->worm->Memorystorage
 	free(exp->segWormDLP);
-	
+
 	/** Free up Worm Objects **/
 	if (exp->Worm != NULL) {
 		DestroyWormAnalysisDataStruct((exp->Worm));
@@ -1428,12 +1474,12 @@ void CalculateAndPrintFrameRateAndInfo(Experiment* exp) {
 
 		if (exp->Params->stageTrackingOn==1){
 			printf("current velocity: %d, %d\n",exp->Worm->stageVelocity.x, exp->Worm->stageVelocity.y);
-			
-			if (exp->Params->stageRecording==1){				
+
+			if (exp->Params->stageRecording==1){
 				printf("Real time worm speed: %.2f SU/ms\n", exp->Worm->WormSpeed);
-				
+
 			}
-			
+
 		}
 		if (exp->Worm->WormIsMovingForward==1){
 			printf("Moving forward.\n");
@@ -1516,8 +1562,8 @@ void DoSegmentation(Experiment* exp) {
 	/** Update PrevWorm Info **/
 	if (!(exp->e))
 		LoadWormGeom(exp->PrevWorm, exp->Worm);
-	
-	
+
+
 	/*** </segmentworm> ***/
 _TICTOC_TOC_FUNC
 }
@@ -1695,7 +1741,7 @@ int HandleKeyStroke(int c, Experiment* exp) {
 	case 'q':
 		Toggle(&(exp->Params->ProtocolSecondaryIsOn));
 		break;
-		
+
 	/** Temporal **/
 	case 't':
 		Toggle(&(exp->Params->TemporalOn));
@@ -1779,7 +1825,7 @@ void SyncAPI(Experiment* exp){
 		exp->Params->SecondLaserName=MC_API_GetSecondLaserName(exp->sm);
 		//printf("DLP is %d \n", exp->Params->DLPOn);
 		//printf("GreenLaser is %d \n", exp->Params->GreenLaser);
-		
+
 
 	} else {
 		exp->Params->FirstLaser=-1;
@@ -1845,7 +1891,7 @@ void DoWriteToDisk(Experiment* exp) {
 int DoOnTheFlyIllumination(Experiment* exp) {
 	CvSeq* montage = CreateIlluminationMontage(exp->Worm->MemScratchStorage);
 	/** Note, out of laziness I am hardcoding the grid dimensions to be Numsegments by number of segments **/
-	
+
 	CvPoint origin = ConvertSlidlerToWormSpace(exp->Params->IllumSquareOrig,exp->Params->DefaultGridSize);
 	int tmp;
 	tmp=GenerateSimpleIllumMontage(montage, origin, exp->Params->IllumSquareRad, exp->Params->DefaultGridSize);
@@ -1853,7 +1899,7 @@ int DoOnTheFlyIllumination(Experiment* exp) {
 	/** ...in camera space **/
 	IllumWorm(exp->Worm->Segmented, montage, exp->IlluminationFrame->iplimg,
 			exp->Params->DefaultGridSize,exp->Params->IllumFlipLR);
-			
+
 	LoadFrameWithImage(exp->IlluminationFrame->iplimg, exp->IlluminationFrame);
 	/** ... in DLP space **/
 	IllumWorm(exp->segWormDLP, montage, exp->forDLP->iplimg,
@@ -2040,7 +2086,7 @@ int HandleStageTracker(Experiment* exp){
 
 			/** Get the Point on the worm some distance along the centerline **/
 			CvPoint* PtOnWorm= (CvPoint*) cvGetSeqElem(exp->Worm->Segmented->Centerline, exp->Params->stageTargetSegment);
-			
+
 			/** Adjust the stage velocity to keep that point centered in the field of view **/
 			exp->Worm->stageVelocity=AdjustStageToKeepObjectAtTarget(exp->stage,PtOnWorm,exp->Worm->stageFeedbackTarget,exp->Params->stageSpeedFactor, exp->Params->stageROIRadius);
 			// findStagePosition(exp->stage, &(exp->Worm->stagePosition.x),&(exp->Worm->stagePosition.y));
@@ -2074,26 +2120,26 @@ int RecordStageTracker(Experiment* exp){
 		if (exp->stage==NULL) return 0;
 
 		if (exp->Params->stageTrackingOn==1){
-	
+
 			if (exp->Params->OnOff==0 && exp->Params->stageRecording){ /** if the analysis system is off **/
-			} 
-			else {				
+			}
+			else {
 				findStagePosition(exp->stage, &(exp->Worm->stagePosition.x),&(exp->Worm->stagePosition.y));
 				exp->Worm->WormSpeed=CalculateRTWormSpeed(exp->PrevStagePosition,exp->Worm->stagePosition,exp->prevTime2, exp->Worm->timestamp);
 				exp->PrevStagePosition=exp->Worm->stagePosition;
 				exp->prevTime2=exp->Worm->timestamp;
-				
+
 			}
 		}
 	}
 	return 0;
-	
+
 }
 
 /* Use a high level function to do the dirction recognition*/
 
 int JudgeMovingDirction(Experiment* exp){
-	exp->Worm->WormIsMovingForward=IsWormGoingForwardOrReversing(exp->Worm->Segmented,exp->PrevcenterOfWorm);		
+	exp->Worm->WormIsMovingForward=IsWormGoingForwardOrReversing(exp->Worm->Segmented,exp->PrevcenterOfWorm);
 	exp->PrevcenterOfWorm=*(exp->Worm->Segmented->centerOfWorm);
 	return 0;
 }

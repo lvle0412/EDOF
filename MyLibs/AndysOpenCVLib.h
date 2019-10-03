@@ -428,26 +428,22 @@ int extractCurvatureOfSeq(const CvSeq* seq, double* curvature, double sigma,CvMe
 int extractCurvatureOfSeqDouble(const CvSeq* seq, double* curvature, double sigma,CvMemStorage* mem);
 
 /*
- * extractEigenwormOfSeq
+ * extractTangleAngleeOfSeq
  *
  *
- * Find eigenmode coefficients of eigenworms such as a1, a2, a3, a4, a5
+ * Find tangent angle at each point.
  *
  * seq is sequence of points, CvPoint (int)
- * eigenmodes contains k_mode basis vectors.
+ * theta is an array of doubles. with one less element than CvPoint.
  *
- * The tangent angle sequence has one less element than the original sequence.
+ * Defined as the angle between adjacent tangent vectors.
+ *
  *
  * Sigma is the size of the gaussian kernal.
  *
  */
- int extractEigenwormOfSeq(const CvSeq *seq, const double *eigenmodes[], CvSeq *delayseq, int k_mode, int k_delay, double sigma, CvMemStorage *mem);
+int extractTangentAngleOfSeq(const CvSeq* seq, double* angle, double sigma,CvMemStorage* mem);
 
- /*
-  *  extract the coefficients of embeddingmodes
-  */
-
-int extractTakenEmbeddingDimensions(const CvSeq *delayseq, const double *embeddingmodes[], double *embeddingcoefficients, int embeddingdimensions);
 
 
 /**** Testing Functions ****/

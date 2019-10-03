@@ -123,18 +123,18 @@ typedef struct ExperimentStruct{
 	WormAnalysisParam* Params;
 
 	/** Information about Our Worm **/
-	WormAnalysisData* Worm;	
-	
+	WormAnalysisData* Worm;
+
 	/** Information about the Previous frame's Worm **/
 	WormGeom* PrevWorm;
 	CvPoint PrevStagePosition;
 	CvPoint PrevcenterOfWorm;
-	
+
 
 	/** Segmented Worm in DLP Space **/
 	SegmentedWorm* segWormDLP;
 
-	/** Segmented Worm 
+	/** Segmented Worm
 
 	/** internal IplImage **/
 	IplImage* SubSampled; // Image used to subsample stuff
@@ -163,7 +163,7 @@ typedef struct ExperimentStruct{
 
 	/** Illum Head-To-Tail Sweep Internal Variables **/
 	double illumSweepHTtimer;
-	
+
 	/** Frame Rate Information **/
 	int nframes;
 	int prevFrames;
@@ -186,7 +186,7 @@ typedef struct ExperimentStruct{
 	/** Scratch CvMemoryStorage **/
 	CvMemStorage* scratchMem;
 
-	
+
 	/** Error Handling **/
 	int e;
 
@@ -232,6 +232,12 @@ int HandleIlluminationSweep(Experiment* exp);
  *
  */
 int HandleCurvaturePhaseAnalysis(Experiment* exp);
+
+/*
+ * phase plane analysis using taken embedding methods
+ */
+
+ int HandlePhasePlaneAnalysis(Experiment* exp);
 
 /** Handle Transient Illumination Timing **/
 int HandleIlluminationTiming(Experiment* exp);

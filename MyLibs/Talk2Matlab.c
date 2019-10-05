@@ -299,9 +299,6 @@ int LoadMatFileData(double *vec[], int *vectorsize, int *numberofvectors, const 
 					vec[j] = p+j*rows;
 				}
 
-
-
-
 			}else{
 				printf("data must be double precision. \n");
 				return -1;

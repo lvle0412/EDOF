@@ -130,6 +130,11 @@ Experiment* CreateExperimentStruct() {
 	/** Calibration Data  Object**/
 	exp->Calib = NULL;
 
+	/** PhasePLane Analysis Parameters **/
+	exp->eigenWormVectors = NULL;
+	exp->embeddingVectors = NULL;
+	exp->k_delay = 0;
+
 	/** User-configurable Worm-related Parameters **/
 	exp->Params = NULL;
 
@@ -669,14 +674,14 @@ int HandleCurvaturePhaseAnalysis(Experiment* exp){
 
 	int i;
 	for (i=0; i<K_MODE; i++){
-		*(exp->Worm->TimeEvolution->currEigenModes+i) = cdot(angle,eigenwormVectors[i],N);
-		/** need to be revised, eigenwormVectors need to be feeded**/
+		*(exp->Worm->TimeEvolution->currEigenModes+i) = cdot(angle,exp->eigenWormVectors[i],N);
+		/** need to be revised, eigenWormVectors need to be feeded**/
 	}
 
 	/** Store eigenmodes in buffer for delay embedding**/
-	if (AddEigenmodes(exp->Worm->TimeEvolution,median_curvature,exp->Params)!=A_OK) printf("Error adding new modes!!\n");
+	if (AddEigenmodes(exp->Worm->TimeEvolution,exp->k_delay)!=A_OK) printf("Error adding new modes!!\n");
 
-	if (TakenEmbedding(exp->Worm->TimeEvolution,embeddingVectors)!=A_OK) printf("Error performing embedding!!\n");
+	if (TakenEmbedding(exp->Worm->TimeEvolution,exp->embeddingVectors)!=A_OK) printf("Error performing embedding!!\n");
 	/** need to be revised, embedding Vectors need to be feeded**/
 
 	TICTOC::timer().toc("_PhasePlaneAnalysis",exp->e);
@@ -892,6 +897,9 @@ void SetupGUI(Experiment* exp) {
 
 	cvCreateTrackbar("DLPOn", exp->WinCon1, &(exp->Params->DLPOn), 1,
 			(int) NULL);
+
+	cvCreateTrackbar("PhaseSpaceOn", exp->WinCon1,
+		&(exp->Params->PhasePlaneAnalyzeOn), 1, (int) NULL);
 
 	/** Record Data **/
 	cvCreateTrackbar("RecordOn", exp->WinCon1, &(exp->Params->Record), 1,
@@ -1133,6 +1141,53 @@ int HandleCalibrationData(Experiment* exp) {
 	return 0;
 
 }
+
+/**** Read phase plane analysis Data ***/
+/*
+ * Load offline data from two MAT files
+ * return -1 if the data from file doesn't exist.
+ */
+
+ int HandlePhasePlaneOffLineAnalysisData(Experiment *exp){
+
+	 int eigenWormVectorLength;
+	 int NumberofEigenModes;
+	 int ret = LoadMatFileData(exp->eigenWormVectors,&eigenWormVectorLength,&NumberofEigenModes,"eigenworm.mat");
+	 if (ret !=0){
+		 printf(
+			 "Error reading in the eigenworm file!!\nNo online phase plane analysis will be done!\n");
+			 return -1;
+		}
+		if (NumberofEigenModes != K_MODE){
+			printf(
+				"The number of eigenworm modes do not match!!\nNo online phase plane analysis will be done!\n");
+			return -1;
+		}
+		if (eigenWormVectorLength != SEGMENTS){
+			printf(
+				"The eigenmode vector sizes do not match!!\nNo online phase plane analysis will be done!\n");
+			return -1;
+		}
+
+
+
+	 int embeddingVectorLength;
+ 	 int NumberofEmbeddingDimensions;
+ 	 int ret = LoadMatFileData(exp->embeddingVectors,&embeddingVectorLength,&NumberofEmbeddingDimensions,"takenembedding.mat");
+ 	 if (ret !=0){
+ 		 printf(
+ 			 "Error reading in the embedding file!!\nNo online phase plane analysis will be done!\n");
+ 			 return -1;
+ 		}
+ 		if (NumberofEmbeddingDimensions != DIMENSION){
+ 			printf(
+ 				"The number of embedding dimensions do not match!!\nNo online phase plane analysis will be done!\n");
+ 			return -1;
+ 		}
+
+		exp->k_delay = embeddingVectorLength/NumberofEigenModes;
+		return 0;
+ }
 
 /*
  * This function allocates images and frames

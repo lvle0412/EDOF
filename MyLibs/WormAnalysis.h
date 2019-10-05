@@ -47,9 +47,11 @@
  #error "#include AndysOpenCVLib.h" must appear in source files before "#include WormAnalysis.h"
 #endif
 
+/* number of eigenworm modes, embedding dimensions and worm segements*/
 #define K_MODE 5
-#define DIMENSIONS 6
-/* number of eigenmodes */
+#define DIMENSION 6
+#define SEGMENTS 100
+
 
 typedef struct WormAnalysisParamStruct{
 	/* WormAnalyisisParam is a structure containing inputs
@@ -149,6 +151,9 @@ typedef struct WormAnalysisParamStruct{
 	/** Timing for Phase & Curvature Based Triggering **/
 	int StayOnAndRefract; //Stay On for the time IllumDuration and wait to turn on again a time specified below
 	int IllumRefractoryPeriod; //Amount of time to wait to turn on again in tenths of Seconds
+
+	/** Real Time Curvature Analysis **/
+	int PhasePlaneAnalyzeOn;
 
 	/** Stage Control Parameters **/
 	int stageTrackingOn;
@@ -418,7 +423,7 @@ int AddMeanHeadCurvature(WormTimeEvolution* TimeEvolution, double CurrHeadCurvat
  * AddEigenmodes to the delay sequences for phase plane analysis
  */
 
-int AddEigenmodes(WormTimeEvolution* TimeEvolution, WormAnalysisParam* AnalysisParam);
+int AddEigenmodes(WormTimeEvolution* TimeEvolution, const int k_delay);
 
 /*
  * compute the embedding modes based on the delay sequences and embedding vectors derived from SVD.

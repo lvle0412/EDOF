@@ -269,7 +269,7 @@ WormAnalysisParam* CreateWormAnalysisParam(){
 	ParamPtr->GaussSize=4;
 	ParamPtr->LengthScale=30;
 	ParamPtr->LengthOffset=ParamPtr->LengthScale/2;
-	ParamPtr->NumSegments=100;
+	ParamPtr->NumSegments=SEGMENTS;
 	ParamPtr->BoundSmoothSize=3;
 	ParamPtr->DilateErode=0;
 
@@ -332,6 +332,7 @@ WormAnalysisParam* CreateWormAnalysisParam(){
 	ParamPtr->IllumRefractoryPeriod= 0; //Amount of time to wait to turn on again in tenths of Seconds
 
 
+
 	/** Illum Head-Tail Sweep **/
 	ParamPtr->IllumSweepHT = 1;
 	ParamPtr->IllumSweepOn=0;
@@ -349,6 +350,10 @@ WormAnalysisParam* CreateWormAnalysisParam(){
 
 	/** Timed Protocol Internal Timer Variables **/
 	ParamPtr->ProtocolSecondaryStartTime=0; //Time that the secondary protocol step began
+
+	/** Real Time Curvature Analysis **/
+ 	ParamPtr->PhasePlaneAnalyzeOn=0;
+
 
 	/** Stage Control Parameters **/
 	ParamPtr->stageTrackingOn=0;
@@ -489,7 +494,7 @@ WormTimeEvolution* CreateWormTimeEvolution(){
 	TimeEv->derivativeOfHeadCurvature=0;
 	TimeEv->currMeanHeadCurvature=0;
 	TimeEv->currEigenModes=(double*) malloc(K_MODE * (sizeof(double)));
-	TimeEv->currPhaseSpaceModes=(double*) malloc(DIMENSIONS * (sizeof(double)));
+	TimeEv->currPhaseSpaceModes=(double*) malloc(DIMENSION * (sizeof(double)));
 
 	return TimeEv;
 }
@@ -535,7 +540,7 @@ int AddMeanHeadCurvature(WormTimeEvolution* TimeEvolution, double CurrHeadCurvat
  * AddEigenmodes to the delay sequences for phase plane analysis
  */
 
-int AddEigenmodes(WormTimeEvolution* TimeEvolution, WormAnalysisParam* AnalysisParam){
+int AddEigenmodes(WormTimeEvolution* TimeEvolution, const int k_delay){
 	if (TimeEvolution==NULL || AnalysisParam==NULL) {
 		printf("AddEigenmodes Error!");
 				return A_ERROR;
@@ -544,12 +549,9 @@ int AddEigenmodes(WormTimeEvolution* TimeEvolution, WormAnalysisParam* AnalysisP
 	int DEBUG_INFO=0; // print out
 
 	int MaxBuff;
-	if (DEBUG_INFO!=0) printf("CurvaturePhaseNumFrames=%d\n",AnalysisParam->CurvaturePhaseNumFrames);
-	if (AnalysisParam->k_delay>0){
-		MaxBuff=AnalysisParam->k_delay * K_MODE;
-	}else{
-		MaxBuff=1;
-	}
+	MaxBuff=k_delay * K_MODE;
+	if (MaxBuff<=0)
+	MaxBuff = 1;
 
 	if (DEBUG_INFO!=0) printf("MaxBuff=%d\n",MaxBuff);
 
@@ -580,7 +582,7 @@ int TakenEmbedding(WormTimeEvolution* TimeEvolution, const double *embeddingVect
 	}
 
 	int i;
-	for (i=0; i<DIMENSIONS; i++){
+	for (i=0; i<DIMENSION; i++){
 		*(TimeEvolution->currPhaseSpaceModes+i) = cdot(x,embeddingVectors[i],N);
 	}
 

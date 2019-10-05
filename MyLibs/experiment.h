@@ -75,6 +75,9 @@
 #define EXP_ERROR -1
 #define EXP_SUCCESS 0
 #define EXP_VIDEO_RAN_OUT 1
+#define MAXIMUM_EIGENWORM_MODES 10
+#define MAXIMUM_EMBEDDING_DIMENSIONS 10
+
 
 typedef struct ExperimentStruct{
 	/** Simulation? True/false **/
@@ -118,6 +121,12 @@ typedef struct ExperimentStruct{
 
 	/** Calibration Data  Object**/
 	CalibData* Calib;
+
+	/** Phase Space Analysis Parameters **/
+	double *eigenWormVectors[MAXIMUM_EIGENWORM_MODES];
+	double *embeddingVectors[MAXIMUM_EMBEDDING_DIMENSIONS];
+	int k_delay;
+
 
 	/** User-configurable Worm-related Parameters **/
 	WormAnalysisParam* Params;

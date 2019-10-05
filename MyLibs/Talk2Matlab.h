@@ -69,6 +69,11 @@ int T2Matlab_GenLookUpTable(CvSeq *CalibPoints, int *CCD2DLPLookUp, int nsizex, 
 /** Test code **/
 void T2Matlab_ArrayTest();
 
+/*
+ * load eigenvecors from mat files
+ */
+
+int LoadMatFileData(double *vec[], const char *file);
+
 
 #endif /* TALK2MATLAB_H_ */
-

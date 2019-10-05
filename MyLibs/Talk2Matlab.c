@@ -44,6 +44,10 @@
 
 #include "engine.h"
 
+#include "mat.h"
+#include "matrx.h"
+#include "mex.h"
+
 #include "Talk2Matlab.h"
 
 #include "AndysOpenCVLib.h"
@@ -233,4 +237,84 @@ void T2Matlab_ArrayTest(){
 
 		}
 
+}
+/*
+ * load eigenvecors from mat files
+ */
+
+int LoadMatFileData(double *vec[], int *vectorsize, int *numberofvectors, const char *file){
+
+	MATFile *pmat;
+  const char **dir;
+  const char *name;
+  int	  ndir;
+  int	  i;
+  mxArray *pa;
+	mwSize j, rows, cols;
+	mxDouble *p;
+
+  printf("Reading file %s...\n\n", file);
+
+  /*
+   * Open file to get directory
+   */
+  pmat = matOpen(file, "r");
+  if (pmat == NULL) {
+    printf("Error opening file %s\n", file);
+    return -1;
+  }
+
+  /*
+   * get directory of MAT-file
+   */
+  dir = (const char **)matGetDir(pmat, &ndir);
+  if (dir == NULL) {
+    printf("Error reading directory of file %s\n", file);
+    return -1;
+  } else {
+    	printf("Directory of %s:\n", file);
+    	for (i=0; i < ndir; i++)
+      	printf("%s\n",dir[i]);
+  	}
+  mxFree(dir);
+
+  /* Read in each array. */
+  printf("\nReading in the actual array contents:\n");
+  for (i=0; i<ndir; i++) {
+      pa = matGetNextVariable(pmat, &name);
+      if (pa == NULL) {
+	  		printf("Error reading in file %s\n", file);
+	  		return -1;
+      }
+
+			if (mxIsDouble(pa)){
+
+				printf("According to its contents, array %s has %d dimensions\n", name, mxGetNumberOfDimensions(pa));
+				p = mxGetDoubles(pa);
+				rows = mxGetM(pa);
+				cols = mxGetN(pa);
+				*vectorsize = (int) rows;
+				*numberofvectors = (int) cols;
+        for (j=0; j<cols; j++){
+					vec[j] = p+j*rows;
+				}
+
+
+
+
+			}else{
+				printf("data must be double precision. \n");
+				return -1;
+			}
+
+
+      mxDestroyArray(pa);
+  }
+
+  if (matClose(pmat) != 0) {
+      printf("Error closing file %s\n",file);
+      return(1);
+  }
+  printf("Done\n");
+  return 0;
 }

@@ -586,6 +586,9 @@ int TakenEmbedding(WormTimeEvolution* TimeEvolution, const double *embeddingVect
 		*(TimeEvolution->currPhaseSpaceModes+i) = cdot(x,embeddingVectors[i],N);
 	}
 
+	printf("the first three embedding modes: c1=%Lf, c2=%Lf, c3=%Lf",
+			*(TimeEvolution->currPhaseSpaceModes),*(TimeEvolution->currPhaseSpaceModes+1),*(TimeEvolution->currPhaseSpaceModes+2));
+
 	free(x);
 	return A_OK;
 }

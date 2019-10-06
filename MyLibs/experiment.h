@@ -178,6 +178,7 @@ typedef struct ExperimentStruct{
 	int prevFrames;
 	unsigned long prevTime;
 	unsigned long prevTime2; // only for calculating wormspeed, update sits different with prevTime.
+	unsigned long prevTimeforPhasePlaneAnalysis; // only used during phase plane analysis;
 	/** Macros **/
 	int RECORDVID;
 	int RECORDDATA;
@@ -302,6 +303,14 @@ int GrabFrame(Experiment* exp);
  * return -1 if the calibration from file doesn't exist.
  */
 int HandleCalibrationData(Experiment* exp);
+
+/**** Read phase plane analysis Data ***/
+/*
+ * Load offline data from two MAT files
+ * return -1 if the data from file doesn't exist.
+ */
+
+int HandlePhasePlaneOffLineAnalysisData(Experiment* exp);
 
 
 

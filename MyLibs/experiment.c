@@ -182,6 +182,7 @@ Experiment* CreateExperimentStruct() {
 	exp->prevFrames = 0;
 	exp->prevTime = 0;
 	exp->prevTime2 = 0;
+	exp->prevTimeforPhasePlaneAnalysis = 0;
 	/** Stage Control **/
 	exp->stageIsPresent=0;
 	exp->stage=NULL;
@@ -250,7 +251,7 @@ int HandleCommandLineArguments(Experiment* exp) {
 	opterr = 0;
 
 	int c;
-	while ((c = getopt(exp->argc, exp->argv, "si:d:o:p:gtx:y:r?")) != -1) {
+	while ((c = getopt(exp->argc, exp->argv, "si:d:o:p:gtx:y:ra?")) != -1) {
 		switch (c) {
 
 		case 'i': /** specify input video file **/
@@ -328,6 +329,10 @@ int HandleCommandLineArguments(Experiment* exp) {
 
 		case 'r': /** Set stage recording on **/
 			exp->Params->stageRecording = 1;
+		break;
+
+		case 'a':
+			exp->Params->PhasePlaneAnalyzeOn = 1;
 		break;
 
 		case '?':
@@ -658,7 +663,13 @@ int HandleCurvaturePhaseAnalysis(Experiment* exp){
  	/** If Curvature Analysis is turned off, just return **/
  	if (exp->Params->PhasePlaneAnalyzeOn == 0){
  		return EXP_SUCCESS;
- 	}  /** Otherwise Let's Calculate the Mean Curvature of the Head**/
+ 	}  /** Otherwise Let's do phase plane analysis**/
+
+	if ((exp->Worm->timestamp - exp->prevTimeforPhasePlaneAnalysis) < CLOCKS_PER_SEC/15){
+		return EXP_SUCCESS;
+	} /** do phase plane analysis every ~ 67 ms **/
+
+	exp->prevTimeforPhasePlaneAnalysis = exp->Worm->timestamp;
 
  	/** Smoothing parameter**/
  	double sigma=5; /** made bigger **/
@@ -681,11 +692,18 @@ int HandleCurvaturePhaseAnalysis(Experiment* exp){
 	/** Store eigenmodes in buffer for delay embedding**/
 	if (AddEigenmodes(exp->Worm->TimeEvolution,exp->k_delay)!=A_OK) printf("Error adding new modes!!\n");
 
+	if (exp->Worm->TimeEvolution->EigenWormBuffer->total < exp->k_delay*K_MODE){
+		printf("Need to store more eigenmodes for delay embedding! \n");
+		return EXP_SUCCESS;
+	}
+
 	if (TakenEmbedding(exp->Worm->TimeEvolution,exp->embeddingVectors)!=A_OK) printf("Error performing embedding!!\n");
+
+
 	/** need to be revised, embedding Vectors need to be feeded**/
 
 	TICTOC::timer().toc("_PhasePlaneAnalysis",exp->e);
-	return A_OK;
+	return EXP_SUCCESS;
 }
 
 
@@ -1148,7 +1166,7 @@ int HandleCalibrationData(Experiment* exp) {
  * return -1 if the data from file doesn't exist.
  */
 
- int HandlePhasePlaneOffLineAnalysisData(Experiment *exp){
+ int HandlePhasePlaneOffLineAnalysisData(Experiment* exp){
 
 	 int eigenWormVectorLength;
 	 int NumberofEigenModes;

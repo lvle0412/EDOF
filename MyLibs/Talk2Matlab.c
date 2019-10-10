@@ -45,7 +45,7 @@
 #include "engine.h"
 
 #include "mat.h"
-#include "matrx.h"
+#include "matrix.h"
 #include "mex.h"
 
 #include "Talk2Matlab.h"

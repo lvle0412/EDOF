@@ -63,6 +63,16 @@ BitFlow_DIR = C:/BitFlow\ SDK\ 5.70/
 GIT=C:/Progra~2/Git/bin/git
 #C:\Users\nji\AppData\Local\Programs\Git\bin\git.exe
 
+#MATLAB 
+MATLABROOT=C:/Program\ Files/MATLAB/R2017b
+MATLABINC=$(MATLABROOT)/extern/include
+MATLABLIB=$(MATLABROOT)/extern/lib/win64/mingw64/mat.lib \
+	$(MATLABROOT)/extern/lib/win64/mingw64/libmx.lib \
+	$(MATLABROOT)/extern/lib/win64/mingw64/libeng.lib \
+	$(MATLABROOT)/extern/lib/win64/mingw64/libmex.lib \
+	$(MATLABROOT)/bin/win64/libmx.dll \
+	$(MATLABROOT)/bin/win64/libmat.dll \
+	$(MATLABROOT)/bin/win64/libeng.dll
 
 #=========================
 # Source Directory Layout
@@ -314,8 +324,10 @@ $(targetDir)/VirtualColbert.exe : VirtualColbert.o \
 		DontTalk2Camera.o \
 		$(openCVobjs) \
 		$(targetDir)/mc_api.dll \
-		$(hw_ind)	
-	$(CXX) $(LINKFLAGS) -o $(targetDir)/VirtualColbert.exe VirtualColbert.o $(targetDir)/mc_api.dll DontTalk2FrameGrabber.o Talk2Stage.o DontTalk2Camera.o DontTalk2DLP.o $(hw_ind) $(LinkerWinAPILibObj) 
+		$(hw_ind) \
+		$(MATLABLIB)
+
+	$(CXX) $(LINKFLAGS) -o $(targetDir)/VirtualColbert.exe VirtualColbert.o $(targetDir)/mc_api.dll DontTalk2FrameGrabber.o Talk2Stage.o DontTalk2Camera.o DontTalk2DLP.o $(hw_ind) $(MATLABLIB) $(LinkerWinAPILibObj) 
 
 
 $(targetDir)/colbert.exe : colbert.o \
@@ -327,8 +339,9 @@ $(targetDir)/colbert.exe : colbert.o \
 		DontTalk2Camera.o \
 		$(openCVobjs) \
 		$(targetDir)/mc_api.dll \
-		$(hw_ind)	
-	$(CXX) $(LINKFLAGS) -o $(targetDir)/colbert.exe  colbert.o $(targetDir)/mc_api.dll Talk2FrameGrabber.o Talk2Stage.o DontTalk2Camera.o $(BFObj) Talk2DLP.o   $(ALP_STATIC) $(hw_ind) $(LinkerWinAPILibObj) 
+		$(hw_ind) \
+		$(MATLABLIB) 
+	$(CXX) $(LINKFLAGS) -o $(targetDir)/colbert.exe  colbert.o $(targetDir)/mc_api.dll Talk2FrameGrabber.o Talk2Stage.o DontTalk2Camera.o $(BFObj) Talk2DLP.o   $(ALP_STATIC) $(hw_ind) $(MATLABLIB) $(LinkerWinAPILibObj) 
 
 
 $(targetDir)/calibrate_colbert_first.exe : calibrate_colbert_first.o \
@@ -340,7 +353,8 @@ $(targetDir)/calibrate_colbert_first.exe : calibrate_colbert_first.o \
 		DontTalk2Camera.o \
 		$(openCVobjs) \
 		$(targetDir)/mc_api.dll \
-		$(hw_ind)	
+		$(hw_ind) \
+		$(MATLABLIB)
 	$(CXX) $(LINKFLAGS) -o $(targetDir)/calibrate_colbert_first.exe \
 		calibrate_colbert_first.o \
 		$(targetDir)/mc_api.dll \
@@ -351,6 +365,7 @@ $(targetDir)/calibrate_colbert_first.exe : calibrate_colbert_first.o \
 		Talk2DLP.o  \
 		$(ALP_STATIC) \
 		$(hw_ind) \
+		$(MATLABLIB) \
 		$(LinkerWinAPILibObj) 
 
 
@@ -386,8 +401,9 @@ VirtualColbert.o : main.cpp  \
 		$(MyLibs)/WriteOutWorm.h \
 		$(MyLibs)/IllumWormProtocol.h \
 		$(MyLibs)/TransformLib.h \
-		$(MyLibs)/experiment.h
-	$(CXX) $(COMPFLAGS) -o VirtualColbert.o main.cpp -I$(MyLibs) $(openCVinc)  -I$(bfIncDir)
+		$(MyLibs)/experiment.h \
+		$(MyLibs)/Talk2Matlab.h
+	$(CXX) $(COMPFLAGS) -o VirtualColbert.o main.cpp -I$(MyLibs) $(openCVinc)  -I$(bfIncDir) -I$(MATLABINC)
 
 colbert.o : main.cpp  \
 		$(MyLibs)/Talk2DLP.h \
@@ -401,8 +417,9 @@ colbert.o : main.cpp  \
 		$(MyLibs)/WriteOutWorm.h \
 		$(MyLibs)/IllumWormProtocol.h \
 		$(MyLibs)/TransformLib.h \
-		$(MyLibs)/experiment.h
-	$(CXX) $(COMPFLAGS) -o colbert.o main.cpp -I$(MyLibs) $(openCVinc) -I$(bfIncDir) 
+		$(MyLibs)/experiment.h \
+		$(MyLibs)/Talk2Matlab.h
+	$(CXX) $(COMPFLAGS) -o colbert.o main.cpp -I$(MyLibs) $(openCVinc) -I$(bfIncDir) -I$(MATLABINC)
 
 calibrate_colbert_first.o : calibrateFG.cpp \
 		$(MyLibs)/Talk2DLP.h \
@@ -416,8 +433,9 @@ calibrate_colbert_first.o : calibrateFG.cpp \
 		$(MyLibs)/WriteOutWorm.h \
 		$(MyLibs)/IllumWormProtocol.h \
 		$(MyLibs)/TransformLib.h \
-		$(MyLibs)/experiment.h
-	$(CXX) $(COMPFLAGS) calibrateFG.cpp -o calibrate_colbert_first.o -I$(MyLibs) -I$(bfIncDir) -I $(openCVinc)
+		$(MyLibs)/experiment.h \
+		$(MyLibs)/Talk2Matlab.h
+	$(CXX) $(COMPFLAGS) calibrateFG.cpp -o calibrate_colbert_first.o -I$(MyLibs) -I$(bfIncDir) -I $(openCVinc) -I$(MATLABINC)
 
 
 testFG.o : $(MyLibs)/Talk2FrameGrabber.h testFG.cpp
@@ -439,7 +457,7 @@ testStage.o: testStage.c
 #=============================
 
 experiment.o: $(MyLibs)/experiment.c $(MyLibs)/experiment.h 
-	$(CCC) $(COMPFLAGS) $(MyLibs)/experiment.c $ -I$(MyLibs) $(openCVinc) -I$(bfIncDir)
+	$(CCC) $(COMPFLAGS) $(MyLibs)/experiment.c $ -I$(MyLibs) $(openCVinc) -I$(bfIncDir) -I$(MATLABINC)
 
 #Note I am using the C++ compiler here
 AndysOpenCVLib.o : $(MyLibs)/AndysOpenCVLib.c $(MyLibs)/AndysOpenCVLib.h 

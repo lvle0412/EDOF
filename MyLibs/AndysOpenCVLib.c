@@ -327,7 +327,7 @@ int PushToSeqBuffer(CvSeq* seq, void* element, int MaxBuffSize){
  * element in the buffer.
  */
 int PushMultiToSeqBuffer(CvSeq* seq, void* elements, int k, int MaxBuffSize){
-	if (seq==0 || element==0 || MaxBuffSize<1) return A_ERROR;
+	if (seq==0 || elements==0 || MaxBuffSize<1) return A_ERROR;
 
 	/** push the value on **/
 	cvSeqPushMulti(seq, elements, k, CV_FRONT);
@@ -1219,7 +1219,7 @@ int extractTangentAngleOfSeq(const CvSeq* seq, double* angle, double sigma,CvMem
 
 	int DEBUG_FLAG=0;
 
-	if (seq== NULL || curvature == NULL) return A_ERROR;
+	if (seq== NULL || angle == NULL) return A_ERROR;
 	if (seq->elem_size!=sizeof(CvPoint)) return A_ERROR;
 
 	if (DEBUG_FLAG) {

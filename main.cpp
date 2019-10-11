@@ -121,9 +121,9 @@ int main (int argc, char** argv){
 	if (HandleCalibrationData(exp)<0) return -1;
 
 	/** Read PhasePlaneAnalysis Parameters **/
-	if (exp->PhasePlaneAnalyzeOn){
+	if (exp->Params->PhasePlaneAnalyzeOn){
 		if (HandlePhasePlaneOffLineAnalysisData(exp)!=0)
-			exp->PhasePlaneAnalyzeOn = 0;
+			exp->Params->PhasePlaneAnalyzeOn = 0;
 	}
 
 	/** Load protocol YAML file **/

@@ -73,7 +73,7 @@ void T2Matlab_ArrayTest();
  * load eigenvecors from mat files
  */
 
-int LoadMatFileData(double *vec[], int *vectorsize, int *numberofvectors, const char *file)；
+int LoadMatFileData(double *vec[], int *vectorsize, int *numberofvectors, const char *file);
 
 
 #endif /* TALK2MATLAB_H_ */

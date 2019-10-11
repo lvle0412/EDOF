@@ -291,7 +291,7 @@ void printDoubleArr(const double* arr, int N){
 double cdot(const double* arr1, const double* arr2, int N){
 
 	double dotproduct = 0;
-
+	int i;
 	for (i=0; i<N; i++){
 		dotproduct += (*(arr1+i)) * (*(arr2+i));
 	}

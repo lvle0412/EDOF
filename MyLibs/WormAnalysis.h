@@ -423,13 +423,13 @@ int AddMeanHeadCurvature(WormTimeEvolution* TimeEvolution, double CurrHeadCurvat
  * AddEigenmodes to the delay sequences for phase plane analysis
  */
 
-int AddEigenmodes(WormTimeEvolution* TimeEvolution, const int k_delay);
+int AddEigenmodes(WormTimeEvolution* TimeEvolution, const int k_delay, WormAnalysisParam* AnalysisParam);
 
 /*
  * compute the embedding modes based on the delay sequences and embedding vectors derived from SVD.
  */
 
-int TakenEmbedding(WormTimeEvolution* TimeEvolution, const double *embeddingVectors[]);
+int TakenEmbedding(WormTimeEvolution* TimeEvolution, const double *embeddingVectors[], WormAnalysisParam* AnalysisParam);
 
 
 

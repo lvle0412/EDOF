@@ -540,7 +540,7 @@ int AddMeanHeadCurvature(WormTimeEvolution* TimeEvolution, double CurrHeadCurvat
  * AddEigenmodes to the delay sequences for phase plane analysis
  */
 
-int AddEigenmodes(WormTimeEvolution* TimeEvolution, const int k_delay){
+int AddEigenmodes(WormTimeEvolution* TimeEvolution, const int k_delay, WormAnalysisParam* AnalysisParam){
 	if (TimeEvolution==NULL || AnalysisParam==NULL) {
 		printf("AddEigenmodes Error!");
 				return A_ERROR;
@@ -565,7 +565,7 @@ int AddEigenmodes(WormTimeEvolution* TimeEvolution, const int k_delay){
  * compute the embedding modes based on the delay sequences and embedding vectors derived from SVD.
  */
 
-int TakenEmbedding(WormTimeEvolution* TimeEvolution, const double *embeddingVectors[]){
+int TakenEmbedding(WormTimeEvolution* TimeEvolution, double *embeddingVectors[], WormAnalysisParam* AnalysisParam){
 
 	if (TimeEvolution==NULL || AnalysisParam==NULL) {
 		printf("TakenEmbedding Error!");

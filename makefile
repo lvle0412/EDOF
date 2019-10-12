@@ -457,7 +457,7 @@ testStage.o: testStage.c
 #=============================
 
 experiment.o: $(MyLibs)/experiment.c $(MyLibs)/experiment.h 
-	$(CCC) $(COMPFLAGS) $(MyLibs)/experiment.c $ -I$(MyLibs) $(openCVinc) -I$(bfIncDir) -I$(MATLABINC)
+	$(CCC) $(COMPFLAGS) $(MyLibs)/experiment.c -I$(MyLibs) $(openCVinc) -I$(bfIncDir) -I$(MATLABINC)
 
 #Note I am using the C++ compiler here
 AndysOpenCVLib.o : $(MyLibs)/AndysOpenCVLib.c $(MyLibs)/AndysOpenCVLib.h 

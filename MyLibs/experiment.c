@@ -131,8 +131,8 @@ Experiment* CreateExperimentStruct() {
 	exp->Calib = NULL;
 
 	/** PhasePLane Analysis Parameters **/
-	exp->eigenWormVectors = NULL;
-	exp->embeddingVectors = NULL;
+	memset(exp->eigenWormVectors[0], 0,MAXIMUM_EIGENWORM_MODES*sizeof(double));
+	memset(exp->embeddingVectors[0],0,MAXIMUM_EMBEDDING_DIMENSIONS*sizeof(double));
 	exp->k_delay = 0;
 
 	/** User-configurable Worm-related Parameters **/
@@ -690,14 +690,14 @@ int HandleCurvaturePhaseAnalysis(Experiment* exp){
 	}
 
 	/** Store eigenmodes in buffer for delay embedding**/
-	if (AddEigenmodes(exp->Worm->TimeEvolution,exp->k_delay)!=A_OK) printf("Error adding new modes!!\n");
+	if (AddEigenmodes(exp->Worm->TimeEvolution,exp->k_delay,exp->Params)!=A_OK) printf("Error adding new modes!!\n");
 
 	if (exp->Worm->TimeEvolution->EigenWormBuffer->total < exp->k_delay*K_MODE){
 		printf("Need to store more eigenmodes for delay embedding! \n");
 		return EXP_SUCCESS;
 	}
 
-	if (TakenEmbedding(exp->Worm->TimeEvolution,exp->embeddingVectors)!=A_OK) printf("Error performing embedding!!\n");
+	if (TakenEmbedding(exp->Worm->TimeEvolution,exp->embeddingVectors, exp->Params)!=A_OK) printf("Error performing embedding!!\n");
 
 
 	/** need to be revised, embedding Vectors need to be feeded**/
@@ -1191,7 +1191,7 @@ int HandleCalibrationData(Experiment* exp) {
 
 	 int embeddingVectorLength;
  	 int NumberofEmbeddingDimensions;
- 	 int ret = LoadMatFileData(exp->embeddingVectors,&embeddingVectorLength,&NumberofEmbeddingDimensions,"takenembedding.mat");
+ 	 ret = LoadMatFileData(exp->embeddingVectors,&embeddingVectorLength,&NumberofEmbeddingDimensions,"takenembedding.mat");
  	 if (ret !=0){
  		 printf(
  			 "Error reading in the embedding file!!\nNo online phase plane analysis will be done!\n");

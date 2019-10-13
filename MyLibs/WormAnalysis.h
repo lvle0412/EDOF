@@ -429,7 +429,7 @@ int AddEigenmodes(WormTimeEvolution* TimeEvolution, const int k_delay, WormAnaly
  * compute the embedding modes based on the delay sequences and embedding vectors derived from SVD.
  */
 
-int TakenEmbedding(WormTimeEvolution* TimeEvolution, const double *embeddingVectors[], WormAnalysisParam* AnalysisParam);
+int TakenEmbedding(WormTimeEvolution* TimeEvolution, double *embeddingVectors[], WormAnalysisParam* AnalysisParam);
 
 
 

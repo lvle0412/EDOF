@@ -288,7 +288,7 @@ myOpenCVlibraries=AndysComputations.o AndysOpenCVLib.o WormAnalysis.o
 TimerLibrary=tictoc.o timer.o
 
 #Hardware Independent linkable objects
-hw_ind= version.o AndysComputations.o AndysOpenCVLib.o TransformLib.o IllumWormProtocol.o  $(WormSpecificLibs) $(TimerLibrary) $(openCVobjs)
+hw_ind= version.o AndysComputations.o AndysOpenCVLib.o TransformLib.o IllumWormProtocol.o Talk2Matlab.o $(WormSpecificLibs) $(TimerLibrary) $(openCVobjs) $(MATLABLIB)
 
 #=========================
 # Top-level Make Targets
@@ -325,9 +325,8 @@ $(targetDir)/VirtualColbert.exe : VirtualColbert.o \
 		$(openCVobjs) \
 		$(targetDir)/mc_api.dll \
 		$(hw_ind) \
-		$(MATLABLIB)
 
-	$(CXX) $(LINKFLAGS) -o $(targetDir)/VirtualColbert.exe VirtualColbert.o $(targetDir)/mc_api.dll DontTalk2FrameGrabber.o Talk2Stage.o DontTalk2Camera.o DontTalk2DLP.o $(hw_ind) $(MATLABLIB) $(LinkerWinAPILibObj) 
+	$(CXX) $(LINKFLAGS) -o $(targetDir)/VirtualColbert.exe VirtualColbert.o $(targetDir)/mc_api.dll DontTalk2FrameGrabber.o Talk2Stage.o DontTalk2Camera.o DontTalk2DLP.o $(hw_ind)  $(LinkerWinAPILibObj) 
 
 
 $(targetDir)/colbert.exe : colbert.o \
@@ -339,9 +338,8 @@ $(targetDir)/colbert.exe : colbert.o \
 		DontTalk2Camera.o \
 		$(openCVobjs) \
 		$(targetDir)/mc_api.dll \
-		$(hw_ind) \
-		$(MATLABLIB) 
-	$(CXX) $(LINKFLAGS) -o $(targetDir)/colbert.exe  colbert.o $(targetDir)/mc_api.dll Talk2FrameGrabber.o Talk2Stage.o DontTalk2Camera.o $(BFObj) Talk2DLP.o   $(ALP_STATIC) $(hw_ind) $(MATLABLIB) $(LinkerWinAPILibObj) 
+		$(hw_ind) \ 
+	$(CXX) $(LINKFLAGS) -o $(targetDir)/colbert.exe  colbert.o $(targetDir)/mc_api.dll Talk2FrameGrabber.o Talk2Stage.o DontTalk2Camera.o $(BFObj) Talk2DLP.o   $(ALP_STATIC) $(hw_ind) $(LinkerWinAPILibObj) 
 
 
 $(targetDir)/calibrate_colbert_first.exe : calibrate_colbert_first.o \
@@ -354,7 +352,7 @@ $(targetDir)/calibrate_colbert_first.exe : calibrate_colbert_first.o \
 		$(openCVobjs) \
 		$(targetDir)/mc_api.dll \
 		$(hw_ind) \
-		$(MATLABLIB)
+		
 	$(CXX) $(LINKFLAGS) -o $(targetDir)/calibrate_colbert_first.exe \
 		calibrate_colbert_first.o \
 		$(targetDir)/mc_api.dll \
@@ -365,7 +363,6 @@ $(targetDir)/calibrate_colbert_first.exe : calibrate_colbert_first.o \
 		Talk2DLP.o  \
 		$(ALP_STATIC) \
 		$(hw_ind) \
-		$(MATLABLIB) \
 		$(LinkerWinAPILibObj) 
 
 
@@ -495,7 +492,8 @@ Talk2FrameGrabber.o: $(MyLibs)/Talk2FrameGrabber.cpp $(MyLibs)/Talk2FrameGrabber
 Talk2DLP.o: $(MyLibs)/Talk2DLP.cpp $(MyLibs)/Talk2DLP.h
 	$(CCC) $(COMPFLAGS) $(MyLibs)/Talk2DLP.cpp -I$(MyLibs) -I$(ALP_INC_DIR)
 
-
+Talk2Matlab.o: $(MyLibs)/Talk2Matlab.c $(MyLibs)/Talk2Matlab.h $(myOpenCVlibraries)
+	$(CCC) $(COMPFLAGS) $(MyLibs)/Talk2Matlab.c -I$(MyLibs) $(openCVinc) -I$(MATLABINC)
 	
 	
 #

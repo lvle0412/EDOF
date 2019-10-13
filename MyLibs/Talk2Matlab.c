@@ -47,7 +47,7 @@
 #include "mat.h"
 #include "matrix.h"
 #include "mex.h"
-
+// #include ""
 #include "Talk2Matlab.h"
 
 #include "AndysOpenCVLib.h"
@@ -290,7 +290,7 @@ int LoadMatFileData(double *vec[], int *vectorsize, int *numberofvectors, const 
 			if (mxIsDouble(pa)){
 
 				printf("According to its contents, array %s has %d dimensions\n", name, mxGetNumberOfDimensions(pa));
-				p = mxGetDoubles(pa);
+				p = mxGetPr(pa);
 				rows = mxGetM(pa);
 				cols = mxGetN(pa);
 				*vectorsize = (int) rows;

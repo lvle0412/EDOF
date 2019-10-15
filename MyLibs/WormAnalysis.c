@@ -1583,3 +1583,5 @@ int IsWormGoingForwardOrReversing(SegmentedWorm* SW,CvPoint PrevCW){
 
 	return -2;
 }
+
+

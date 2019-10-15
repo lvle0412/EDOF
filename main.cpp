@@ -539,7 +539,7 @@ UINT Thread2(LPVOID lpdwParam) {
 					/**Do the Stage Tracking**/
 					TICTOC::timer().tic("HandleStageTracker()");
 					/**Judge the worm is moving forward or reversing**/
-					JudgeMovingDirction(exp);
+					// JudgeMovingDirction(exp);
 					HandleStageTracker(exp);
 					RecordStageTracker(exp);
 					TICTOC::timer().toc("HandleStageTracker()");

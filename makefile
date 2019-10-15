@@ -94,8 +94,8 @@ COMPFLAGS= -v  -O2 -c
 #-c option means compile only (do not link)
 
 CXX = $(CCC)
-#LINKFLAGS=  -v -W  -O2 -DNDEBUG 
-LINKFLAGS=  -v -W  -O2 -g
+LINKFLAGS=  -v -W  -O2 -DNDEBUG 
+
 
 
 #======================

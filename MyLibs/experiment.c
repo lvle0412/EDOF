@@ -131,8 +131,13 @@ Experiment* CreateExperimentStruct() {
 	exp->Calib = NULL;
 
 	/** PhasePLane Analysis Parameters **/
-	memset(exp->eigenWormVectors[0], 0,MAXIMUM_EIGENWORM_MODES*sizeof(double));
-	memset(exp->embeddingVectors[0],0,MAXIMUM_EMBEDDING_DIMENSIONS*sizeof(double));
+	int i;
+	for (i=0;i<MAXIMUM_EIGENWORM_MODES;i++){
+		exp->eigenWormVectors[0]=NULL;
+	}
+	for (i=0;i<MAXIMUM_EMBEDDING_DIMENSIONS;i++){
+		exp->embeddingVectors[0]=NULL;
+	}
 	exp->k_delay = 0;
 
 	/** User-configurable Worm-related Parameters **/

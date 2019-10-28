@@ -49,6 +49,8 @@
 
 #include "AndysOpenCVLib.h"
 
+#include "engine.h"
+
 #include "opencv2/highgui/highgui_c.h"
 //#include <cv.h>
 //#include <cxcore.h>
@@ -68,6 +70,12 @@ int T2Matlab_GenLookUpTable(CvSeq *CalibPoints, int *CCD2DLPLookUp, int nsizex, 
 
 /** Test code **/
 void T2Matlab_ArrayTest();
+
+/** phase plot code **/
+
+void Initiate_MATLAB_Plot(Engine *ep);
+
+void plotphasetrajectory(Engine *ep, double x, double y, double z);
 
 /*
  * load eigenvecors from mat files

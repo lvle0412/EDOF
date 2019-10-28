@@ -239,6 +239,40 @@ void T2Matlab_ArrayTest(){
 
 }
 /*
+ *  Initiate_plot
+ */
+
+ void Initiate_MATLAB_Plot(Engine *ep){
+
+
+ 		printf("Opening Matlab Engine. If crash, have you run matlab /regserver (on windows)?\n");
+ 		ep = engOpen(NULL);
+ 		if (!(ep)) {
+ 			printf("Can't start MATLAB engine\n");
+ 		}
+ 		engSetVisible(ep, 0);
+ 		engEvalString(ep, "clear all; close all;");
+		engEvalString(ep, "h = animatedline('Color',[0 0.4470 0.7410],'LineWidth',1);");
+		printf("Create phase space plot!");
+
+ }
+
+ void plotphasetrajectory(Engine *ep, double x, double y, double z){
+
+	 mxArray *mx = mxCreateDoubleMatrix(1, 1, mxREAL);
+ 	 mxArray *my = mxCreateDoubleMatrix(1, 1, mxREAL);
+	 mxArray *mz = mxCreateDoubleMatrix(1, 1, mxREAL);
+	 *mxGetPr(mx) = x;
+	 *mxGetPr(my) = y;
+	 *mxGetPr(mz) = z;
+	 engPutVariable(ep, "x", x);
+ 	 engPutVariable(ep, "y", y);
+	 engPutVariable(ep, "z", z);
+	 engEvalString(ep, "addpoints(h,x,y,z)");
+	 engEvalString(ep, "drawnow");
+ }
+
+/*
  * load eigenvecors from mat files
  */
 

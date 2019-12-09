@@ -133,10 +133,10 @@ Experiment* CreateExperimentStruct() {
 	/** PhasePLane Analysis Parameters **/
 	int i;
 	for (i=0;i<MAXIMUM_EIGENWORM_MODES;i++){
-		exp->eigenWormVectors[0]=NULL;
+		exp->eigenWormVectors[i]=NULL;
 	}
 	for (i=0;i<MAXIMUM_EMBEDDING_DIMENSIONS;i++){
-		exp->embeddingVectors[0]=NULL;
+		exp->embeddingVectors[i]=NULL;
 	}
 	exp->k_delay = 0;
 

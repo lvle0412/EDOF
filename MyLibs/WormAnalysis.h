@@ -49,7 +49,7 @@
 
 /* number of eigenworm modes, embedding dimensions and worm segements*/
 #define K_MODE 5
-#define DIMENSION 6
+#define DIMENSION 7
 #define SEGMENTS 100
 
 

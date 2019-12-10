@@ -489,6 +489,7 @@ int HandleIlluminationSweep(Experiment* exp){
 int HandleCurvaturePhaseAnalysis(Experiment* exp){
 
 	int DEBUG_FLAG=0; // print out ?
+	printf("Start operating HandleCurvaturePhaseAnalysis...\n");
 
 
 	_TICTOC_TIC_FUNC
@@ -660,6 +661,7 @@ int HandleCurvaturePhaseAnalysis(Experiment* exp){
  int HandlePhasePlaneAnalysis(Experiment* exp){
 
 	 int DEBUG_FLAG=0; // print out ?
+	 printf("Start operating HandlePhasePlaneAnalysis...\n");
 
 
  	_TICTOC_TIC_FUNC
@@ -671,6 +673,7 @@ int HandleCurvaturePhaseAnalysis(Experiment* exp){
  	}  /** Otherwise Let's do phase plane analysis**/
 
 	if ((exp->Worm->timestamp - exp->prevTimeforPhasePlaneAnalysis) < CLOCKS_PER_SEC/15){
+		printf("Waiting till its time for phase plane analysis...\n");
 		return EXP_SUCCESS;
 	} /** do phase plane analysis every ~ 67 ms **/
 
@@ -685,7 +688,9 @@ int HandleCurvaturePhaseAnalysis(Experiment* exp){
 	RefreshWormMemStorage(exp->Worm);
 
 	/** Smooth and Extract Curvature **/
-	if (extractTangentAngleOfSeq(exp->Worm->Segmented->Centerline,angle,sigma,exp->Worm->MemScratchStorage)< 0) return EXP_ERROR;
+	if (extractTangentAngleOfSeq(exp->Worm->Segmented->Centerline,angle,sigma,exp->Worm->MemScratchStorage)< 0){
+		printf("Error in operating extractTangentAngleOfSeq!\n");
+	} 
 	RefreshWormMemStorage(exp->Worm);
 
 	int i;
@@ -699,6 +704,7 @@ int HandleCurvaturePhaseAnalysis(Experiment* exp){
 
 	if (exp->Worm->TimeEvolution->EigenWormBuffer->total < exp->k_delay*K_MODE){
 		printf("Need to store more eigenmodes for delay embedding! \n");
+		printf("%d total eigenmodes\n", exp->Worm->TimeEvolution->EigenWormBuffer->total);
 		return EXP_SUCCESS;
 	}
 
@@ -790,6 +796,7 @@ int HandleIlluminationTiming(Experiment* exp) {
  *
  */
 void AssignWindowNames(Experiment* exp) {
+	printf("Start AssignWindowNames...\n");
 
 	char* disp1 = (char*) malloc(strlen("Display"));
 	char* control1 = (char*) malloc(strlen("Controls"));
@@ -1209,6 +1216,7 @@ int HandleCalibrationData(Experiment* exp) {
  		}
 
 		exp->k_delay = embeddingVectorLength/NumberofEigenModes;
+		printf("Success in operating HandlePhasePlaneOffLineAnalysisData.\n");
 		return 0;
  }
 
@@ -1530,7 +1538,12 @@ void StartFrameRateTimer(Experiment* exp) {
  */
 void CalculateAndPrintFrameRateAndInfo(Experiment* exp) {
 	/*** Print out Frame Rate ***/
-	int fps,factor;
+	int fps,factor,timediff;
+
+	timediff = exp->Worm->timestamp - exp->prevTime;
+	printf("%d timediff\n", timediff);
+	printf("%d timestamp\n", exp->Worm->timestamp);
+
 	if ((exp->Worm->timestamp - exp->prevTime) > CLOCKS_PER_SEC) {
 
 		/** Simply count the frames given in the last second **/

@@ -218,7 +218,7 @@ int main (int argc, char** argv){
 
 			/** Do we even bother doing analysis?**/
 			if (exp->Params->OnOff==0){
-				/**Don't perform any analysis**/;
+				printf("Don't perform any analysis!\n");
 				continue;
 			}
 

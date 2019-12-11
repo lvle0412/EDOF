@@ -696,8 +696,14 @@ int HandleCurvaturePhaseAnalysis(Experiment* exp){
 	int i;
 	for (i=0; i<K_MODE; i++){
 		*(exp->Worm->TimeEvolution->currEigenModes+i) = cdot(angle,exp->eigenWormVectors[i],N);
+		printf("angle is %Lf...\n", *(angle+i));
+		printf("eigenWormVectors is %Lf...\n", *(exp->eigenWormVectors[i]));
+		printf("currEigenModes is %Lf...\n", *(exp->Worm->TimeEvolution->currEigenModes+i));
 		/** need to be revised, eigenWormVectors need to be feeded**/
 	}
+
+
+	free(angle);
 
 	/** Store eigenmodes in buffer for delay embedding**/
 	if (AddEigenmodes(exp->Worm->TimeEvolution,exp->k_delay,exp->Params)!=A_OK) printf("Error adding new modes!!\n");

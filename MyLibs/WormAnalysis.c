@@ -580,9 +580,10 @@ int TakenEmbedding(WormTimeEvolution* TimeEvolution, double *embeddingVectors[],
 		tempPt = (double *) cvGetSeqElem(TimeEvolution->EigenWormBuffer, j);
 		x[j] = *tempPt;
 	}
-
+	printf("x is %Lf...\n", *x);
 	int i;
 	for (i=0; i<DIMENSION; i++){
+		printf("embeddingVectors is %Lf...\n", *(embeddingVectors[i]));
 		*(TimeEvolution->currPhaseSpaceModes+i) = cdot(x,embeddingVectors[i],N);
 	}
 
@@ -1168,6 +1169,7 @@ int CreateWormHUDS(IplImage* TempImage, WormAnalysisData* Worm, WormAnalysisPara
 
 	int CircleDiameterSize=10;
 
+
 	/** Overly a translucent image of the illumination pattern**/
 
 	double weighting=0.20; //Alpha blend weighting
@@ -1182,8 +1184,8 @@ int CreateWormHUDS(IplImage* TempImage, WormAnalysisData* Worm, WormAnalysisPara
 //	DrawSequence(&TempImage,Worm->Segmented->LeftBound);
 //	DrawSequence(&TempImage,Worm->Segmented->RightBound);
 
-	cvCircle(TempImage,*(Worm->Tail),CircleDiameterSize,cvScalar(255,255,255),1,CV_AA,0);
-	cvCircle(TempImage,*(Worm->Head),CircleDiameterSize/2,cvScalar(255,255,255),1,CV_AA,0);
+	// cvCircle(TempImage,*(Worm->Tail),CircleDiameterSize,cvScalar(255,255,255),1,CV_AA,0);
+	// cvCircle(TempImage,*(Worm->Head),CircleDiameterSize/2,cvScalar(255,255,255),1,CV_AA,0);
 
 	/** Prepare Text **/
 	CvFont font;
@@ -1218,7 +1220,7 @@ int CreateWormHUDS(IplImage* TempImage, WormAnalysisData* Worm, WormAnalysisPara
 	char frame[30]; // these are freed automatically
 					// SEE http://stackoverflow.com/questions/1335230/is-the-memory-of-a-character-array-freed-by-going-out-of-scope
 	sprintf(frame,"%d",Worm->frameNum);
-	cvPutText(TempImage,frame,cvPoint(Worm->SizeOfImage.width- 200,Worm->SizeOfImage.height - 10),&font,cvScalar(255,255,255) );
+	//cvPutText(TempImage,frame,cvPoint(Worm->SizeOfImage.width- 200,Worm->SizeOfImage.height - 10),&font,cvScalar(255,255,255) );
 
 	/** Print laser shutter status **/
 	if (Params->FirstLaser>0){
@@ -1236,6 +1238,7 @@ int CreateWormHUDS(IplImage* TempImage, WormAnalysisData* Worm, WormAnalysisPara
 				cvPutText(TempImage,"FirstLaserOn",cvPoint(Worm->SizeOfImage.width- 250,70),&font,cvScalar(255,255,255));
 		}
 	}
+
 	if (Params->SecondLaser>0){
 		switch(Params->SecondLaserName){
 			case 0:

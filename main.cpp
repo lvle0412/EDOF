@@ -248,9 +248,11 @@ int main (int argc, char** argv){
 			/** Real-Time Phase Space Analysis **/	
 
 				HandlePhasePlaneAnalysis(exp);
+				printf("HandlePhasePlaneAnalysis Done!\n");
 
 			/** If the DLP is not displaying right now, than turn off the mirrors */
 			ClearDLPifNotDisplayingNow(exp);
+				printf("ClearDLPifNotDisplayingNow Done!\n");
 
 			/* Transform the segmented worm coordinates into DLP space */
 			/* Note that this is much more computationally efficient than to transform the original image
@@ -264,6 +266,7 @@ int main (int argc, char** argv){
 			/** Handle the Choise of Illumination Protocol Here**/
 			/** ANDY: write this here **/
 			 HandleTimedSecondaryProtocolStep(exp->p,exp->Params);
+			 printf("HandleTimedSecondaryProtocolStep Done!\n");
 
 			/*** Do Some Illumination ***/
 			if (exp->e == 0) {
@@ -302,12 +305,14 @@ int main (int argc, char** argv){
 				printf("Error in exp->e in the mainloop! code line 295\n");
 			}
 
+
 			TICTOC::timer().tic("SendFrameToDLP");
 			if (exp->e == 0 && exp->Params->DLPOn && !(exp->SimDLP)) T2DLP_SendFrame((unsigned char *) exp->forDLP->binary, exp->myDLP); // Send image to DLP
 			TICTOC::timer().toc("SendFrameToDLP");
 
 			/*** DIsplay Some Monitoring Output ***/
 			if (exp->e == 0) CreateWormHUDS(exp->HUDS,exp->Worm,exp->Params,exp->IlluminationFrame);
+
 			if (exp->e==0 && exp->stageIsPresent==1) MarkRecenteringTarget(exp);
 
 			if (exp->e == 0 &&  EverySoOften(exp->Worm->frameNum,exp->Params->DispRate) ){
@@ -335,10 +340,10 @@ int main (int argc, char** argv){
 				printf("\nError in main loop. :(\n");
 				//where emergency stage shutoff used to go
 			}
-
 		}
 		if (UserWantsToStop) break;
 			TICTOC::timer().toc("OneLoop");
+	printf("loop complete!\n");
 	}
 	/** Shut down the main thread **/
 

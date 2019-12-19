@@ -37,6 +37,8 @@
 //Matlab Engine Header
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "opencv2/highgui/highgui_c.h"
 //#include <cv.h>
 //#include <cxcore.h>
@@ -253,11 +255,15 @@ int LoadMatFileData(double *vec[], int *vectorsize, int *numberofvectors, const 
 	mwSize j, rows, cols;
 	mxDouble *p;
 
+
   printf("Reading file %s...\n\n", file);
+
+
 
   /*
    * Open file to get directory
    */
+
   pmat = matOpen(file, "r");
   if (pmat == NULL) {
     printf("Error opening file %s\n", file);
@@ -312,6 +318,9 @@ int LoadMatFileData(double *vec[], int *vectorsize, int *numberofvectors, const 
     printf("Error closing file %s\n",file);
     return -1;
   }
+
+
+
   pmat = matOpen(file, "r");
   if (pmat == NULL) {
     printf("Error reopening file %s\n", file);
@@ -322,6 +331,7 @@ int LoadMatFileData(double *vec[], int *vectorsize, int *numberofvectors, const 
   printf("\nReading in the actual array contents:\n");
   for (i=0; i<ndir; i++) {
       pa = matGetNextVariable(pmat, &name);
+
       if (pa == NULL) {
 	  		printf("Error reading in file %s\n", file);
 	  		return -1;
@@ -331,13 +341,21 @@ int LoadMatFileData(double *vec[], int *vectorsize, int *numberofvectors, const 
 
 				printf("According to its contents, array %s has %d dimensions\n", name, mxGetNumberOfDimensions(pa));
 				p = mxGetPr(pa);
+				printf("According to its contents, the first pointer of array %s is on\n %p \n", name, p);
 				rows = mxGetM(pa);
+				printf("According to its contents, the first dimension of array %s is %d \n", name, rows);
 				cols = mxGetN(pa);
+				printf("According to its contents, the product of array %s's second to last dimensions is %d \n", name, cols);
 				*vectorsize = (int) rows;
 				*numberofvectors = (int) cols;
+
         for (j=0; j<cols; j++){
+
 					vec[j] = p+j*rows;
+					printf("vec[%d] = %Lf\n", j, *vec[j]);
 				}
+
+
 
 			}else{
 				printf("data must be double precision. \n");
@@ -345,7 +363,9 @@ int LoadMatFileData(double *vec[], int *vectorsize, int *numberofvectors, const 
 			}
 
 
-      mxDestroyArray(pa);
+      //mxDestroyArray(pa); //This will cause data of the second mat file covers the first one
+
+
   }
 
   if (matClose(pmat) != 0) {

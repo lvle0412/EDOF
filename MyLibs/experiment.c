@@ -46,6 +46,7 @@
 #include <math.h>
 #include <assert.h>
 #include <sys/time.h>
+#include <stdlib.h>//for system("pause") to debug
 
 //OpenCV Headers
 #include "opencv2/highgui/highgui_c.h"
@@ -489,8 +490,10 @@ int HandleIlluminationSweep(Experiment* exp){
 int HandleCurvaturePhaseAnalysis(Experiment* exp){
 
 	int DEBUG_FLAG=0; // print out ?
-	printf("Start operating HandleCurvaturePhaseAnalysis...\n");
 
+	if (DEBUG_FLAG!=0) {
+	printf("Start operating HandleCurvaturePhaseAnalysis...\n");
+	}
 
 	_TICTOC_TIC_FUNC
 	TICTOC::timer().tic("_CurvaturePhaseAnalysis",exp->e);
@@ -661,7 +664,10 @@ int HandleCurvaturePhaseAnalysis(Experiment* exp){
  int HandlePhasePlaneAnalysis(Experiment* exp){
 
 	 int DEBUG_FLAG=0; // print out ?
+
+	 if (DEBUG_FLAG!=0) {
 	 printf("Start operating HandlePhasePlaneAnalysis...\n");
+	}
 
 
  	_TICTOC_TIC_FUNC
@@ -683,6 +689,10 @@ int HandleCurvaturePhaseAnalysis(Experiment* exp){
  	double sigma=5; /** made bigger **/
 
 	int N = exp->Worm->Segmented->Centerline->total -1;
+	if (DEBUG_FLAG!=0) {
+		printf("angle has %d segments.\n", N-1);
+	}
+
 	/** Extract the tangent angle of the body **/
 	double* angle= (double*) malloc(N* (sizeof(double)));
 	RefreshWormMemStorage(exp->Worm);
@@ -695,10 +705,17 @@ int HandleCurvaturePhaseAnalysis(Experiment* exp){
 
 	int i;
 	for (i=0; i<K_MODE; i++){
-		*(exp->Worm->TimeEvolution->currEigenModes+i) = cdot(angle,exp->eigenWormVectors[i],N);
-		printf("angle is %Lf...\n", *(angle+i));
-		printf("eigenWormVectors is %Lf...\n", *(exp->eigenWormVectors[i]));
+		*(exp->Worm->TimeEvolution->currEigenModes+i) = cdot(angle,exp->eigenWormVectors[i],N-1);
+		
+		if (DEBUG_FLAG!=0) {
+		printf("angle1 is %Lf...\nangle99 is %Lf...\n", *(angle),*(angle+98));
+		printf("eigenWormVectors1 is on %p...\n", exp->eigenWormVectors[i]);
+		printf("eigenWormVectors1 is %Lf...\neigenWormVectors100 is %Lf...\n", *(exp->eigenWormVectors[i]),*(exp->eigenWormVectors[i]+99));
 		printf("currEigenModes is %Lf...\n", *(exp->Worm->TimeEvolution->currEigenModes+i));
+		//system("pause");//For testing
+		}
+
+
 		/** need to be revised, eigenWormVectors need to be feeded**/
 	}
 
@@ -1185,7 +1202,7 @@ int HandleCalibrationData(Experiment* exp) {
  */
 
  int HandlePhasePlaneOffLineAnalysisData(Experiment* exp){
-
+	 int DEBUG_FLAG=0;
 	 int eigenWormVectorLength;
 	 int NumberofEigenModes;
 	 int ret = LoadMatFileData(exp->eigenWormVectors,&eigenWormVectorLength,&NumberofEigenModes,"eigenworm.mat");
@@ -1205,6 +1222,20 @@ int HandleCalibrationData(Experiment* exp) {
 			return -1;
 		}
 
+		if (DEBUG_FLAG!=0) {
+		printf("\noffline eigenWormVectors1 is on %p...\n", exp->eigenWormVectors[0]);
+		printf("offline eigenWormVectors1 is %Lf...\n", *(exp->eigenWormVectors[0]));
+		printf("\noffline eigenWormVectors2 is on %p...\n", exp->eigenWormVectors[1]);
+		printf("offline eigenWormVectors2 is %Lf...\n", *(exp->eigenWormVectors[1]));
+		printf("\noffline eigenWormVectors3 is on %p...\n", exp->eigenWormVectors[2]);
+		printf("offline eigenWormVectors3 is %Lf...\n", *(exp->eigenWormVectors[2]));
+		printf("\noffline eigenWormVectors4 is on %p...\n", exp->eigenWormVectors[3]);
+		printf("offline eigenWormVectors4 is %Lf...\n", *(exp->eigenWormVectors[3]));
+		printf("\noffline eigenWormVectors5 is on %p...\n", exp->eigenWormVectors[4]);
+		printf("offline eigenWormVectors5 is %Lf...\n", *(exp->eigenWormVectors[4]));
+		}
+
+
 
 
 	 int embeddingVectorLength;
@@ -1221,7 +1252,37 @@ int HandleCalibrationData(Experiment* exp) {
  			return -1;
  		}
 
+		if (DEBUG_FLAG!=0) {
+ 		printf("\noffline embeddingVectors1 is on %p...\n", exp->embeddingVectors[0]);
+		printf("offline embeddingVectors1 is %Lf...\n", *(exp->embeddingVectors[0]));
+		printf("\noffline embeddingVectors2 is on %p...\n", exp->embeddingVectors[1]);
+		printf("offline embeddingVectors2 is %Lf...\n", *(exp->embeddingVectors[1]));
+		printf("\noffline embeddingVectors3 is on %p...\n", exp->embeddingVectors[2]);
+		printf("offline embeddingVectors3 is %Lf...\n", *(exp->embeddingVectors[2]));
+		printf("\noffline embeddingVectors4 is on %p...\n", exp->embeddingVectors[3]);
+		printf("offline embeddingVectors4 is %Lf...\n", *(exp->embeddingVectors[3]));
+		printf("\noffline embeddingVectors5 is on %p...\n", exp->embeddingVectors[4]);
+		printf("offline embeddingVectors5 is %Lf...\n", *(exp->embeddingVectors[4]));
+		printf("\noffline embeddingVectors6 is on %p...\n", exp->embeddingVectors[5]);
+		printf("offline embeddingVectors6 is %Lf...\n", *(exp->embeddingVectors[5]));
+		printf("\noffline embeddingVectors7 is on %p...\n", exp->embeddingVectors[6]);
+		printf("offline embeddingVectors7 is %Lf...\n", *(exp->embeddingVectors[6]));
+
+		printf("\noffline eigenWormVectors1 is on %p...\n", exp->eigenWormVectors[0]);
+		printf("offline eigenWormVectors1 is %Lf...\n", *(exp->eigenWormVectors[0]));
+		printf("\noffline eigenWormVectors2 is on %p...\n", exp->eigenWormVectors[1]);
+		printf("offline eigenWormVectors2 is %Lf...\n", *(exp->eigenWormVectors[1]));
+		printf("\noffline eigenWormVectors3 is on %p...\n", exp->eigenWormVectors[2]);
+		printf("offline eigenWormVectors3 is %Lf...\n", *(exp->eigenWormVectors[2]));
+		printf("\noffline eigenWormVectors4 is on %p...\n", exp->eigenWormVectors[3]);
+		printf("offline eigenWormVectors4 is %Lf...\n", *(exp->eigenWormVectors[3]));
+		printf("\noffline eigenWormVectors5 is on %p...\n", exp->eigenWormVectors[4]);
+		printf("offline eigenWormVectors5 is %Lf...\n", *(exp->eigenWormVectors[4]));
+		}
+
+
 		exp->k_delay = embeddingVectorLength/NumberofEigenModes;
+
 		printf("Success in operating HandlePhasePlaneOffLineAnalysisData.\n");
 		return 0;
  }
@@ -1547,8 +1608,6 @@ void CalculateAndPrintFrameRateAndInfo(Experiment* exp) {
 	int fps,factor,timediff;
 
 	timediff = exp->Worm->timestamp - exp->prevTime;
-	printf("%d timediff\n", timediff);
-	printf("%d timestamp\n", exp->Worm->timestamp);
 
 	if ((exp->Worm->timestamp - exp->prevTime) > CLOCKS_PER_SEC) {
 

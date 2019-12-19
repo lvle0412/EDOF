@@ -566,7 +566,7 @@ int AddEigenmodes(WormTimeEvolution* TimeEvolution, const int k_delay, WormAnaly
  */
 
 int TakenEmbedding(WormTimeEvolution* TimeEvolution, double *embeddingVectors[], WormAnalysisParam* AnalysisParam){
-
+int DEBUG_FLAG=0;
 	if (TimeEvolution==NULL || AnalysisParam==NULL) {
 		printf("TakenEmbedding Error!");
 				return A_ERROR;
@@ -580,15 +580,23 @@ int TakenEmbedding(WormTimeEvolution* TimeEvolution, double *embeddingVectors[],
 		tempPt = (double *) cvGetSeqElem(TimeEvolution->EigenWormBuffer, j);
 		x[j] = *tempPt;
 	}
-	printf("x is %Lf...\n", *x);
+	if (DEBUG_FLAG!=0) {
+		printf("x is %Lf...\n", *x);
+	}
 	int i;
 	for (i=0; i<DIMENSION; i++){
-		printf("embeddingVectors is %Lf...\n", *(embeddingVectors[i]));
 		*(TimeEvolution->currPhaseSpaceModes+i) = cdot(x,embeddingVectors[i],N);
+
+		if (DEBUG_FLAG!=0) {
+			printf("embeddingVectors is on %p...\n", embeddingVectors[i]);
+			printf("embeddingVectors is %Lf...\n", *(embeddingVectors[i]));
+		}
+	
 	}
 
-	printf("the first three embedding modes: c1=%Lf, c2=%Lf, c3=%Lf.\n",
-			*(TimeEvolution->currPhaseSpaceModes),*(TimeEvolution->currPhaseSpaceModes+1),*(TimeEvolution->currPhaseSpaceModes+2));
+	printf("the embedding modes are: c1=%Lf, c2=%Lf, c3=%Lf,c4=%Lf,\nc5=%Lf,c6=%Lf,c7=%Lf.\n",
+			*(TimeEvolution->currPhaseSpaceModes),*(TimeEvolution->currPhaseSpaceModes+1),*(TimeEvolution->currPhaseSpaceModes+2),
+			*(TimeEvolution->currPhaseSpaceModes+3),*(TimeEvolution->currPhaseSpaceModes+4),*(TimeEvolution->currPhaseSpaceModes+5),*(TimeEvolution->currPhaseSpaceModes+6));
 
 	free(x);
 	return A_OK;

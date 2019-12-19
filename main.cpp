@@ -217,10 +217,10 @@ int main (int argc, char** argv){
 			CalculateAndPrintFrameRateAndInfo(exp);
 
 			/** Do we even bother doing analysis?**/
-			if (exp->Params->OnOff==0){
-				printf("Don't perform any analysis!\n");
-				continue;
-			}
+			//if (exp->Params->OnOff==0){
+				/** Don't perform any analysis**/
+			//	continue;
+			//}
 
 			/**** Functions to decide if Illumination Should be on Or Off ***/
 			/** Handle Transient Illumination Timing **/
@@ -248,11 +248,11 @@ int main (int argc, char** argv){
 			/** Real-Time Phase Space Analysis **/	
 
 				HandlePhasePlaneAnalysis(exp);
-				printf("HandlePhasePlaneAnalysis Done!\n");
+				//printf("HandlePhasePlaneAnalysis Done!\n");
 
 			/** If the DLP is not displaying right now, than turn off the mirrors */
 			ClearDLPifNotDisplayingNow(exp);
-				printf("ClearDLPifNotDisplayingNow Done!\n");
+				//printf("ClearDLPifNotDisplayingNow Done!\n");
 
 			/* Transform the segmented worm coordinates into DLP space */
 			/* Note that this is much more computationally efficient than to transform the original image
@@ -266,7 +266,7 @@ int main (int argc, char** argv){
 			/** Handle the Choise of Illumination Protocol Here**/
 			/** ANDY: write this here **/
 			 HandleTimedSecondaryProtocolStep(exp->p,exp->Params);
-			 printf("HandleTimedSecondaryProtocolStep Done!\n");
+			 //printf("HandleTimedSecondaryProtocolStep Done!\n");
 
 			/*** Do Some Illumination ***/
 			if (exp->e == 0) {
@@ -343,7 +343,7 @@ int main (int argc, char** argv){
 		}
 		if (UserWantsToStop) break;
 			TICTOC::timer().toc("OneLoop");
-	printf("loop complete!\n");
+	//printf("loop complete!\n");
 	}
 	/** Shut down the main thread **/
 

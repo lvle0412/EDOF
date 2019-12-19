@@ -679,7 +679,7 @@ int HandleCurvaturePhaseAnalysis(Experiment* exp){
  	/** Smoothing parameter**/
  	double sigma=5; /** made bigger **/
 
-	int N = exp->Worm->Segmented->Centerline->total;
+	int N = exp->Worm->Segmented->Centerline->total -1;
 	/** Extract the tangent angle of the body **/
 	double* angle= (double*) malloc(N* (sizeof(double)));
 	RefreshWormMemStorage(exp->Worm);

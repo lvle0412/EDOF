@@ -75,5 +75,11 @@ void T2Matlab_ArrayTest();
 
 int LoadMatFileData(double *vec[], int *vectorsize, int *numberofvectors, const char *file);
 
+/*Plot Phase trajectory*/
+void Initiate_MATLAB_Plot(Engine *ep);
+
+void plotphasetrajectory(Engine *ep, double t1, double t3, double f1, double f2, double t2, double r1, double r2 );
+
+
 
 #endif /* TALK2MATLAB_H_ */

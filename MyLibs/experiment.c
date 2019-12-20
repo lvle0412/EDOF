@@ -1283,6 +1283,9 @@ int HandleCalibrationData(Experiment* exp) {
 
 		exp->k_delay = embeddingVectorLength/NumberofEigenModes;
 
+		//initiate matlab plot
+		Initiate_MATLAB_Plot(Engine *ep);
+
 		printf("Success in operating HandlePhasePlaneOffLineAnalysisData.\n");
 		return 0;
  }

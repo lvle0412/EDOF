@@ -598,8 +598,7 @@ int DEBUG_FLAG=0;
 			*(TimeEvolution->currPhaseSpaceModes),*(TimeEvolution->currPhaseSpaceModes+1),*(TimeEvolution->currPhaseSpaceModes+2),
 			*(TimeEvolution->currPhaseSpaceModes+3),*(TimeEvolution->currPhaseSpaceModes+4),*(TimeEvolution->currPhaseSpaceModes+5),*(TimeEvolution->currPhaseSpaceModes+6));
 	
-	plotphasetrajectory(Engine *ep, *(TimeEvolution->currPhaseSpaceModes),*(TimeEvolution->currPhaseSpaceModes+1),*(TimeEvolution->currPhaseSpaceModes+2),
-			*(TimeEvolution->currPhaseSpaceModes+3),*(TimeEvolution->currPhaseSpaceModes+4),*(TimeEvolution->currPhaseSpaceModes+5),*(TimeEvolution->currPhaseSpaceModes+6));
+	
 	free(x);
 	return A_OK;
 }

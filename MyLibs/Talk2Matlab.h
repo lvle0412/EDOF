@@ -47,6 +47,8 @@
 #ifndef TALK2MATLAB_H_
 #define TALK2MATLAB_H_
 
+#include "engine.h"
+
 #include "AndysOpenCVLib.h"
 
 #include "opencv2/highgui/highgui_c.h"

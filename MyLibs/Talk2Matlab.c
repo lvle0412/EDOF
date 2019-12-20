@@ -394,23 +394,28 @@ int LoadMatFileData(double *vec[], int *vectorsize, int *numberofvectors, const 
 		//clear plot and variable
  		engEvalString(ep, "clear all; close all; clc;");
 		//set camera position
-		engEvalString("cpos=[15.8106; 83.3113;18.0871];");
+		engEvalString(ep, "cpos=[15.8106; 83.3113;18.0871];");
 		//set axis and animatedline
-		engEvalString("axislimf = 6;");
-		engEvalString("axislimr = 6;");
-		engEvalString("axislimt = 6;");
-		engEvalString("axf=subplot(1,3,1); axis([-axislimf,axislimf,-axislimf,axislimf]); title('forward');"):
-		engEvalString("axr=subplot(1,3,2); axis([-axislimr,axislimr,-axislimr,axislimr]); title('reversal');");
-		engEvalString("axt=subplot(1,3,3); axis([-axislimt,axislimt,-axislimt,axislimt,-axislimt,axislimt]); title('turn'); campos(cpos);");
-		engEvalString("hf = animatedline(axf,'Color',[0 0.4470 0.7410],'LineWidth',1);");
-		engEvalString("hr = animatedline(axr,'Color',[0 0.4470 0.7410],'LineWidth',1);");
-		engEvalString("ht = animatedline(axt,'Color',[0 0.4470 0.7410],'LineWidth',1);");
+		engEvalString(ep, "axislimf = 4;");
+		engEvalString(ep, "axislimr = 4;");
+		engEvalString(ep, "axislimt = 4;");
+		engEvalString(ep, "axf=subplot(1,3,1); axis([-axislimf,axislimf,-axislimf,axislimf]); title('forward');");
+		engEvalString(ep, "axr=subplot(1,3,2); axis([-axislimr,axislimr,-axislimr,axislimr]); title('reversal');");
+		engEvalString(ep, "axt=subplot(1,3,3); axis([-axislimt,axislimt,-axislimt,axislimt,-axislimt,axislimt]); title('turn'); campos(cpos);");
+		engEvalString(ep, "hf = animatedline(axf,'Color',[0 0.4470 0.7410],'LineWidth',1);");
+		engEvalString(ep, "hr = animatedline(axr,'Color',[0 0.4470 0.7410],'LineWidth',1);");
+		engEvalString(ep, "ht = animatedline(axt,'Color',[0 0.4470 0.7410],'LineWidth',1);");
 
 		printf("Create phase space plot!");
+		printf("Matlab engine ep during = %p.\n", ep);
 
  }
 
  void plotphasetrajectory(Engine *ep, double t1, double t3, double f1, double f2, double t2, double r1, double r2 ){
+ep = engOpen(NULL);
+	if (!(ep)) {
+ 			printf("Can't find MATLAB engine\n");
+ 	}
 
 	 mxArray *mt1 = mxCreateDoubleMatrix(1, 1, mxREAL);
  	 mxArray *mt3 = mxCreateDoubleMatrix(1, 1, mxREAL);
@@ -426,13 +431,13 @@ int LoadMatFileData(double *vec[], int *vectorsize, int *numberofvectors, const 
 	 *mxGetPr(mt2) = t2;
 	 *mxGetPr(mr1) = r1;
 	 *mxGetPr(mr2) = r2;
-	 engPutVariable(ep, "t1", t1);
- 	 engPutVariable(ep, "t3", t3);
-	 engPutVariable(ep, "f1", f1);
-	 engPutVariable(ep, "f2", f2);
-	 engPutVariable(ep, "t2", t2);
-	 engPutVariable(ep, "r1", r1);
-	 engPutVariable(ep, "r2", r2);
+	 engPutVariable(ep, "t1", mt1);
+ 	 engPutVariable(ep, "t3", mt3);
+	 engPutVariable(ep, "f1", mf1);
+	 engPutVariable(ep, "f2", mf2);
+	 engPutVariable(ep, "t2", mt2);
+	 engPutVariable(ep, "r1", mr1);
+	 engPutVariable(ep, "r2", mr2);
 
 	engEvalString(ep, "addpoints(hf,f1,f2); drawnow;");
     engEvalString(ep, "addpoints(hr,r1,r2); drawnow;");

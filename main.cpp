@@ -67,6 +67,12 @@ using namespace std;
 //OpenCV Headers
 #include "opencv2/highgui/highgui_c.h"
 
+//Matlab Headers
+#include "engine.h"
+#include "mat.h"
+#include "matrix.h"
+#include "mex.h"
+
 //Andy's Personal Headers
 #include "MyLibs/AndysOpenCVLib.h"
 #include "MyLibs/Talk2Camera.h"
@@ -96,6 +102,7 @@ bool MainThreadHasStopped;
 bool DispThreadHasStopped;
 bool TrackThreadHasStopped;
 bool UserWantsToStop;
+Engine *ep = NULL;
 
 int main (int argc, char** argv){
 	int DEBUG=0;
@@ -125,6 +132,9 @@ int main (int argc, char** argv){
 		if (HandlePhasePlaneOffLineAnalysisData(exp)!=0)
 			exp->Params->PhasePlaneAnalyzeOn = 0;
 	}
+	//initiate matlab plot
+		Initiate_MATLAB_Plot(ep);
+		printf("Matlab engine ep after = %p.\n", ep);
 
 	/** Load protocol YAML file **/
 	if (exp->pflag) LoadProtocol(exp);
@@ -217,10 +227,10 @@ int main (int argc, char** argv){
 			CalculateAndPrintFrameRateAndInfo(exp);
 
 			/** Do we even bother doing analysis?**/
-			//if (exp->Params->OnOff==0){
+			if (exp->Params->OnOff==0){
 				/** Don't perform any analysis**/
-			//	continue;
-			//}
+				continue;
+			}
 
 			/**** Functions to decide if Illumination Should be on Or Off ***/
 			/** Handle Transient Illumination Timing **/
@@ -228,6 +238,9 @@ int main (int argc, char** argv){
 
 			/** Handle head-tail illumination sweep **/
 			HandleIlluminationSweep(exp);
+
+			plotphasetrajectory(ep, *(exp->Worm->TimeEvolution->currPhaseSpaceModes),*(exp->Worm->TimeEvolution->currPhaseSpaceModes+1),*(exp->Worm->TimeEvolution->currPhaseSpaceModes+2),
+			*(exp->Worm->TimeEvolution->currPhaseSpaceModes+3),*(exp->Worm->TimeEvolution->currPhaseSpaceModes+4),*(exp->Worm->TimeEvolution->currPhaseSpaceModes+5),*(exp->Worm->TimeEvolution->currPhaseSpaceModes+6));
 
 			/** Load Image into Our Worm Objects **/
 			if (exp->e == 0) exp->e=RefreshWormMemStorage(exp->Worm);

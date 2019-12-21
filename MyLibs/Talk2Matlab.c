@@ -407,12 +407,15 @@ int LoadMatFileData(double *vec[], int *vectorsize, int *numberofvectors, const 
 		engEvalString(ep, "ht = animatedline(axt,'Color',[0 0.4470 0.7410],'LineWidth',1);");
 
 		printf("Create phase space plot!");
-		printf("Matlab engine ep during = %p.\n", ep);
+		printf("Matlab engine ep offline = %p.\n", ep);
 
  }
 
- void plotphasetrajectory(Engine *ep, double t1, double t3, double f1, double f2, double t2, double r1, double r2 ){
-ep = engOpen(NULL);
+ void PlotPhaseTrajectory(Engine *ep, double t1, double t3, double f1, double f2, double t2, double r1, double r2 ){
+
+	ep = engOpen(NULL);
+	//printf("Matlab engine ep online = %p.\n", ep);
+
 	if (!(ep)) {
  			printf("Can't find MATLAB engine\n");
  	}

@@ -1178,7 +1178,6 @@ int CreateWormHUDS(IplImage* TempImage, WormAnalysisData* Worm, WormAnalysisPara
 
 	int CircleDiameterSize=10;
 
-
 	/** Overly a translucent image of the illumination pattern**/
 
 	double weighting=0.20; //Alpha blend weighting
@@ -1193,7 +1192,10 @@ int CreateWormHUDS(IplImage* TempImage, WormAnalysisData* Worm, WormAnalysisPara
 //	DrawSequence(&TempImage,Worm->Segmented->LeftBound);
 //	DrawSequence(&TempImage,Worm->Segmented->RightBound);
 
-	// cvCircle(TempImage,*(Worm->Tail),CircleDiameterSize,cvScalar(255,255,255),1,CV_AA,0);
+	//printf("Tail.x = %d.\n",Worm->Tail->x);
+	//printf("Tail.y = %d.\n",Worm->Tail->y);
+
+	//cvCircle(TempImage,Worm->Tail,CircleDiameterSize,cvScalar(255,255,255),1,CV_AA,0);
 	// cvCircle(TempImage,*(Worm->Head),CircleDiameterSize/2,cvScalar(255,255,255),1,CV_AA,0);
 
 	/** Prepare Text **/

@@ -80,7 +80,7 @@ int LoadMatFileData(double *vec[], int *vectorsize, int *numberofvectors, const 
 /*Plot Phase trajectory*/
 void Initiate_MATLAB_Plot(Engine *ep);
 
-void plotphasetrajectory(Engine *ep, double t1, double t3, double f1, double f2, double t2, double r1, double r2 );
+void PlotPhaseTrajectory(Engine *ep, double t1, double t3, double f1, double f2, double t2, double r1, double r2 );
 
 
 

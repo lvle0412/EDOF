@@ -131,10 +131,11 @@ int main (int argc, char** argv){
 	if (exp->Params->PhasePlaneAnalyzeOn){
 		if (HandlePhasePlaneOffLineAnalysisData(exp)!=0)
 			exp->Params->PhasePlaneAnalyzeOn = 0;
-	}
-	//initiate matlab plot
+
 		Initiate_MATLAB_Plot(ep);
-		printf("Matlab engine ep after = %p.\n", ep);
+
+	}
+
 
 	/** Load protocol YAML file **/
 	if (exp->pflag) LoadProtocol(exp);
@@ -239,9 +240,7 @@ int main (int argc, char** argv){
 			/** Handle head-tail illumination sweep **/
 			HandleIlluminationSweep(exp);
 
-			plotphasetrajectory(ep, *(exp->Worm->TimeEvolution->currPhaseSpaceModes),*(exp->Worm->TimeEvolution->currPhaseSpaceModes+1),*(exp->Worm->TimeEvolution->currPhaseSpaceModes+2),
-			*(exp->Worm->TimeEvolution->currPhaseSpaceModes+3),*(exp->Worm->TimeEvolution->currPhaseSpaceModes+4),*(exp->Worm->TimeEvolution->currPhaseSpaceModes+5),*(exp->Worm->TimeEvolution->currPhaseSpaceModes+6));
-
+			
 			/** Load Image into Our Worm Objects **/
 			if (exp->e == 0) exp->e=RefreshWormMemStorage(exp->Worm);
 			if (exp->e == 0) exp->e=LoadWormImg(exp->Worm,exp->fromCCD->iplimg);
@@ -262,6 +261,16 @@ int main (int argc, char** argv){
 
 				HandlePhasePlaneAnalysis(exp);
 				//printf("HandlePhasePlaneAnalysis Done!\n");
+				if (exp->Params->PhasePlaneAnalyzeOn){
+
+					TICTOC::timer().tic("PlotPhaseTrajectory");
+
+					PlotPhaseTrajectory(ep, *(exp->Worm->TimeEvolution->currPhaseSpaceModes),*(exp->Worm->TimeEvolution->currPhaseSpaceModes+1),*(exp->Worm->TimeEvolution->currPhaseSpaceModes+2),
+					*(exp->Worm->TimeEvolution->currPhaseSpaceModes+3),*(exp->Worm->TimeEvolution->currPhaseSpaceModes+4),*(exp->Worm->TimeEvolution->currPhaseSpaceModes+5),*(exp->Worm->TimeEvolution->currPhaseSpaceModes+6));
+					
+					TICTOC::timer().toc("PlotPhaseTrajectory");
+				}
+
 
 			/** If the DLP is not displaying right now, than turn off the mirrors */
 			ClearDLPifNotDisplayingNow(exp);

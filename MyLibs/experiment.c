@@ -705,7 +705,7 @@ int HandleCurvaturePhaseAnalysis(Experiment* exp){
 
 	int i;
 	for (i=0; i<K_MODE; i++){
-		printf("beforeEigenModes is %Lf...\n", *(exp->Worm->TimeEvolution->currEigenModes+i));
+		//printf("beforeEigenModes is %Lf...\n", *(exp->Worm->TimeEvolution->currEigenModes+i));
 		*(exp->Worm->TimeEvolution->currEigenModes+i) = cdot(angle,exp->eigenWormVectors[i],N);
 		
 		if (DEBUG_FLAG!=0) {
@@ -1903,6 +1903,9 @@ int HandleKeyStroke(int c, Experiment* exp) {
 		break;
 	case 'F':
 		Toggle(&(exp->Params->InduceHeadTailFlip));
+		break;
+	case 'C':
+		Toggle(&(exp->Params->DisplayCenterline));
 		break;
 
 

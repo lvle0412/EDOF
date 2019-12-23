@@ -505,6 +505,14 @@ void DrawSequence(IplImage** image, CvSeq* Seq) {
 	}
 }
 
+void DrawSequenceBlack(IplImage** image, CvSeq* Seq) {
+	int i;
+	for (i = 0; i < Seq->total; i++) {
+		CvPoint* tempPt = (CvPoint*) cvGetSeqElem(Seq, i);
+		cvCircle(*image, *tempPt, 1, cvScalar(0, 0, 0), 1);
+
+	}
+}
 
 
 

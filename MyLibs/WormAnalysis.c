@@ -1193,11 +1193,11 @@ int CreateWormHUDS(IplImage* TempImage, WormAnalysisData* Worm, WormAnalysisPara
 	cvAddWeighted(Worm->ImgOrig,1,IlluminationFrame->iplimg,weighting,0,TempImage);
 
 	//Want to also display boundary!
-	//cvDrawContours(TempImage, Worm->Boundary, cvScalar(255,0,0),cvScalar(0,255,0),100);
+	//cvDrawContours(TempImage, Worm->Segmented->Centerline, cvScalar(255,0,0),cvScalar(0,255,0),100);
 
 	DrawSequence(&TempImage,Worm->Boundary);
 
-	//DrawSequence(&TempImage,Worm->Segmented->LeftBound);
+	if (Params->DisplayCenterline) DrawSequenceBlack(&TempImage,Worm->Segmented->Centerline);
 	//DrawSequence(&TempImage,Worm->Segmented->RightBound);
 
 	//printf("Tail.x = %d.\n",Worm->Tail->x);

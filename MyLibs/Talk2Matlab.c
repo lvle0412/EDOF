@@ -42,7 +42,8 @@
 #include "opencv2/highgui/highgui_c.h"
 //#include <cv.h>
 //#include <cxcore.h>
-
+//Timer Libray
+#include "../3rdPartyLibs/tictoc.h"
 
 #include "engine.h"
 
@@ -412,9 +413,12 @@ int LoadMatFileData(double *vec[], int *vectorsize, int *numberofvectors, const 
  }
 
  void PlotPhaseTrajectory(Engine *ep, double t1, double t3, double f1, double f2, double t2, double r1, double r2 ){
-
+	
+	_TICTOC_TIC_FUNC
+ 	TICTOC::timer().tic("OpenMatlabEngine");
 	ep = engOpen(NULL);
 	//printf("Matlab engine ep online = %p.\n", ep);
+    TICTOC::timer().toc("OpenMatlabEngine");
 
 	if (!(ep)) {
  			printf("Can't find MATLAB engine\n");
@@ -445,5 +449,7 @@ int LoadMatFileData(double *vec[], int *vectorsize, int *numberofvectors, const 
 	engEvalString(ep, "addpoints(hf,f1,f2); drawnow;");
     engEvalString(ep, "addpoints(hr,r1,r2); drawnow;");
     engEvalString(ep, "addpoints(ht,t1,t3,t2); drawnow;");
+
+
 
  }

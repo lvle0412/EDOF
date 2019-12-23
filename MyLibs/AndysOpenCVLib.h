@@ -220,7 +220,7 @@ float NormPointDot(CvPoint* VecA, CvPoint* VecB);
  */
 
 void DrawSequence(IplImage** image, CvSeq* Seq);
-
+void DrawSequenceBlack(IplImage** image, CvSeq* Seq);
 
 /*
  *

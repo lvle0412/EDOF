@@ -84,6 +84,7 @@ typedef struct WormAnalysisParamStruct{
 	/** Display Stuff**/
 	int DispRate; //Deprecated
 	int Display;
+	int DisplayCenterline;
 
 	/** Defaul Wormspace GridSize for illumination **/
 	CvSize DefaultGridSize;

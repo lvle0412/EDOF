@@ -573,16 +573,24 @@ int DEBUG_FLAG=0;
 	}
 
 	int N=TimeEvolution->EigenWormBuffer->total;
+
+	if (DEBUG_FLAG!=0) {
+	printf("EigenWormBuffer has %d elements.\n", N);
+	}
+
 	double *x = (double *) malloc (N * sizeof(double));
 	double *tempPt;
 	int j;
 	for (j = 0; j < N; j++) {
 		tempPt = (double *) cvGetSeqElem(TimeEvolution->EigenWormBuffer, j);
 		x[j] = *tempPt;
+		if (DEBUG_FLAG!=0) {
+			printf("x%d = %Lf,\n", j+1, x[j] );
+		}
+
 	}
-	if (DEBUG_FLAG!=0) {
-		printf("x is %Lf...\n", *x);
-	}
+
+	
 	int i;
 	for (i=0; i<DIMENSION; i++){
 		*(TimeEvolution->currPhaseSpaceModes+i) = cdot(x,embeddingVectors[i],N);
@@ -598,10 +606,10 @@ int DEBUG_FLAG=0;
 			*(TimeEvolution->currPhaseSpaceModes),*(TimeEvolution->currPhaseSpaceModes+1),*(TimeEvolution->currPhaseSpaceModes+2),
 			*(TimeEvolution->currPhaseSpaceModes+3),*(TimeEvolution->currPhaseSpaceModes+4),*(TimeEvolution->currPhaseSpaceModes+5),*(TimeEvolution->currPhaseSpaceModes+6));
 	
-	
 	free(x);
 	return A_OK;
 }
+
 
 
 
@@ -1189,18 +1197,21 @@ int CreateWormHUDS(IplImage* TempImage, WormAnalysisData* Worm, WormAnalysisPara
 
 	DrawSequence(&TempImage,Worm->Boundary);
 
-//	DrawSequence(&TempImage,Worm->Segmented->LeftBound);
-//	DrawSequence(&TempImage,Worm->Segmented->RightBound);
+	//DrawSequence(&TempImage,Worm->Segmented->LeftBound);
+	//DrawSequence(&TempImage,Worm->Segmented->RightBound);
 
 	//printf("Tail.x = %d.\n",Worm->Tail->x);
 	//printf("Tail.y = %d.\n",Worm->Tail->y);
+	//printf("Head.x = %d.\n",Worm->Head->x);
+	//printf("Head.y = %d.\n",Worm->Head->y);
 
-	//cvCircle(TempImage,Worm->Tail,CircleDiameterSize,cvScalar(255,255,255),1,CV_AA,0);
-	// cvCircle(TempImage,*(Worm->Head),CircleDiameterSize/2,cvScalar(255,255,255),1,CV_AA,0);
+
+	cvCircle(TempImage,*(Worm->Tail),CircleDiameterSize,cvScalar(255,255,255),1,8,0);
+	cvCircle(TempImage,*(Worm->Head),CircleDiameterSize/2,cvScalar(255,255,255),1,8,0);
 
 	/** Prepare Text **/
 	CvFont font;
-	cvInitFont(&font,CV_FONT_HERSHEY_TRIPLEX ,1.0,1.0,0,2,CV_AA);
+	cvInitFont(&font,CV_FONT_HERSHEY_TRIPLEX ,1.0,1.0,0,2,8);
 
 	/** Display DLP On Off **/
 	if (Params->DLPOn) {
@@ -1231,7 +1242,7 @@ int CreateWormHUDS(IplImage* TempImage, WormAnalysisData* Worm, WormAnalysisPara
 	char frame[30]; // these are freed automatically
 					// SEE http://stackoverflow.com/questions/1335230/is-the-memory-of-a-character-array-freed-by-going-out-of-scope
 	sprintf(frame,"%d",Worm->frameNum);
-	//cvPutText(TempImage,frame,cvPoint(Worm->SizeOfImage.width- 200,Worm->SizeOfImage.height - 10),&font,cvScalar(255,255,255) );
+	cvPutText(TempImage,frame,cvPoint(Worm->SizeOfImage.width- 200,Worm->SizeOfImage.height - 10),&font,cvScalar(255,255,255) );
 
 	/** Print laser shutter status **/
 	if (Params->FirstLaser>0){

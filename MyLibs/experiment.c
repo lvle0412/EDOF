@@ -690,7 +690,7 @@ int HandleCurvaturePhaseAnalysis(Experiment* exp){
 
 	int N = exp->Worm->Segmented->Centerline->total -1;
 	if (DEBUG_FLAG!=0) {
-		printf("angle has %d segments.\n", N-1);
+		printf("angle has %d segments.\n", N);
 	}
 
 	/** Extract the tangent angle of the body **/
@@ -705,14 +705,14 @@ int HandleCurvaturePhaseAnalysis(Experiment* exp){
 
 	int i;
 	for (i=0; i<K_MODE; i++){
-		*(exp->Worm->TimeEvolution->currEigenModes+i) = cdot(angle,exp->eigenWormVectors[i],N-1);
+		printf("beforeEigenModes is %Lf...\n", *(exp->Worm->TimeEvolution->currEigenModes+i));
+		*(exp->Worm->TimeEvolution->currEigenModes+i) = cdot(angle,exp->eigenWormVectors[i],N);
 		
 		if (DEBUG_FLAG!=0) {
-		printf("angle1 is %Lf...\nangle99 is %Lf...\n", *(angle),*(angle+98));
 		printf("eigenWormVectors1 is on %p...\n", exp->eigenWormVectors[i]);
-		printf("eigenWormVectors1 is %Lf...\neigenWormVectors100 is %Lf...\n", *(exp->eigenWormVectors[i]),*(exp->eigenWormVectors[i]+99));
+		printf("eigenWormVectors1 is %Lf...\neigenWormVectors99 is %Lf...\n", *(exp->eigenWormVectors[i]),*(exp->eigenWormVectors[i]+98));
 		printf("currEigenModes is %Lf...\n", *(exp->Worm->TimeEvolution->currEigenModes+i));
-		//system("pause");//For testing
+		system("pause");//For testing
 		}
 
 

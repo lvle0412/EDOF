@@ -396,9 +396,9 @@ int LoadMatFileData(double *vec[], int *vectorsize, int *numberofvectors, const 
 		//set camera position
 		engEvalString(ep, "cpos=[15.8106; 83.3113;18.0871];");
 		//set axis and animatedline
-		engEvalString(ep, "axislimf = 4;");
-		engEvalString(ep, "axislimr = 4;");
-		engEvalString(ep, "axislimt = 4;");
+		engEvalString(ep, "axislimf = 6;");
+		engEvalString(ep, "axislimr = 6;");
+		engEvalString(ep, "axislimt = 6;");
 		engEvalString(ep, "axf=subplot(1,3,1); axis([-axislimf,axislimf,-axislimf,axislimf]); title('forward');");
 		engEvalString(ep, "axr=subplot(1,3,2); axis([-axislimr,axislimr,-axislimr,axislimr]); title('reversal');");
 		engEvalString(ep, "axt=subplot(1,3,3); axis([-axislimt,axislimt,-axislimt,axislimt,-axislimt,axislimt]); title('turn'); campos(cpos);");

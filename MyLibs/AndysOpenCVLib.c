@@ -1266,6 +1266,7 @@ int extractTangentAngleOfSeq(const CvSeq* seq, double* angle, double sigma,CvMem
 
 	 for (i=0; i<N-1; i++){
 		 *(theta+i) = *(theta+i) - theta_mean; /* subtract the mean */
+	 	 if (DEBUG_FLAG) printf("angle %d: %f,\n",i, *(theta+i));
 	 }
 
 	memcpy((void*) angle ,(const void*) theta, (N-1)*sizeof(double) );

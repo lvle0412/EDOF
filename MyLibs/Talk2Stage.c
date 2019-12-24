@@ -170,10 +170,7 @@ void clearStageBuffer(HANDLE s){
 	//Begin Buffer Clearing Fix from rzingel
 		DWORD dwErrors; 
 		DWORD Length;
-
-
         COMSTAT Status; 
-        
         ClearCommError( s, &dwErrors, &Status); 
         Length = Status.cbInQue;        // get the rx data length in buffer 
         // Get data and put it in to iBuffer 
@@ -181,7 +178,9 @@ void clearStageBuffer(HANDLE s){
         char * pText; 
         pText = (char *)malloc(sizeof(char)*(Length + 2)); 
         ReadFile(s,pText, Length, &nRead,NULL); 
+        printf("Starting free(pText)... \n");
         free(pText); 
+        printf("free(pText) Success!\n");
  		return;
 
 }
@@ -309,9 +308,13 @@ int findStagePosition(HANDLE s, int* x, int* y){
 
 
 int haltStage(HANDLE s){
+
 		DWORD Length;
+
 		WriteFile(s, "HALT\r", strlen("HALT\r"), &Length, NULL);
+printf("Start clearStageBuffer...\n");
 		clearStageBuffer(s);
+printf("clearStageBuffer Success!\n");
 		return 0;
 
 }

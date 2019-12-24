@@ -429,6 +429,7 @@ UINT Thread(LPVOID lpdwParam) {
 	MSG Msg;
 
 	SetupGUI(exp);
+
 	cvWaitKey(30);
 	//SetPriorityClass(GetCurrentProcess(), BELOW_NORMAL_PRIORITY_CLASS);
 

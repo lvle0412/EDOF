@@ -679,7 +679,7 @@ int HandleCurvaturePhaseAnalysis(Experiment* exp){
  	}  /** Otherwise Let's do phase plane analysis**/
 
 	if ((exp->Worm->timestamp - exp->prevTimeforPhasePlaneAnalysis) < CLOCKS_PER_SEC/15){
-		printf("Waiting till its time for phase plane analysis...\n");
+		//printf("Waiting till its time for phase plane analysis...\n");
 		return EXP_SUCCESS;
 	} /** do phase plane analysis every ~ 67 ms **/
 
@@ -904,11 +904,9 @@ void SetupGUI(Experiment* exp) {
 
 	/** On Off **/
 	cvCreateTrackbar("On", exp->WinCon1, &(exp->Params->OnOff), 1, (int) NULL);
-
 	/** Temporal Coding **/
 	cvCreateTrackbar("TemporalIQ", exp->WinCon1, &(exp->Params->TemporalOn), 1,
 			(int) NULL);
-
 	/** Segmentation Parameters**/
 	cvCreateTrackbar("Threshold", exp->WinCon1, &(exp->Params->BinThresh), 255,
 			(int) NULL);
@@ -2211,6 +2209,7 @@ int InvokeStage(Experiment* exp){
 	} else {
 		printf("Telling stage to HALT.\n");
 		haltStage(exp->stage);
+
 	}
 
 }

@@ -261,16 +261,6 @@ int main (int argc, char** argv){
 
 				HandlePhasePlaneAnalysis(exp);
 				//printf("HandlePhasePlaneAnalysis Done!\n");
-				if (exp->Params->PhasePlaneAnalyzeOn){
-
-					TICTOC::timer().tic("PlotPhaseTrajectory");
-
-					PlotPhaseTrajectory(ep, *(exp->Worm->TimeEvolution->currPhaseSpaceModes),*(exp->Worm->TimeEvolution->currPhaseSpaceModes+1),*(exp->Worm->TimeEvolution->currPhaseSpaceModes+2),
-					*(exp->Worm->TimeEvolution->currPhaseSpaceModes+3),*(exp->Worm->TimeEvolution->currPhaseSpaceModes+4),*(exp->Worm->TimeEvolution->currPhaseSpaceModes+5),*(exp->Worm->TimeEvolution->currPhaseSpaceModes+6));
-					
-					TICTOC::timer().toc("PlotPhaseTrajectory");
-				}
-
 
 			/** If the DLP is not displaying right now, than turn off the mirrors */
 			ClearDLPifNotDisplayingNow(exp);
@@ -481,7 +471,7 @@ UINT Thread(LPVOID lpdwParam) {
 
 		if (MainThreadHasStopped==1) continue;
 
-		/** If we are using protocols and we havec chosen a new protocol step **/
+		/** If we are using protocols and we have chosen a new protocol step **/
 		if (exp->Params->ProtocolUse &&  ( (prevProtocolStep!= exp->Params->ProtocolStep) || prevIllumFlipLR != exp->Params->IllumFlipLR  ) )  {
 			cvZero(rectWorm);
 			IllumRectWorm(rectWorm,exp->p,exp->Params->ProtocolStep,exp->Params->IllumFlipLR);
@@ -492,6 +482,15 @@ UINT Thread(LPVOID lpdwParam) {
 		}
 
 		TICTOC::timer().toc("DisplayThreadGuts");
+
+		if (exp->Params->PhasePlaneAnalyzeOn && exp->Params->OnOff){
+			TICTOC::timer().tic("PlotPhaseTrajectory");
+			PlotPhaseTrajectory(ep, *(exp->Worm->TimeEvolution->currPhaseSpaceModes),*(exp->Worm->TimeEvolution->currPhaseSpaceModes+1),*(exp->Worm->TimeEvolution->currPhaseSpaceModes+2),
+			*(exp->Worm->TimeEvolution->currPhaseSpaceModes+3),*(exp->Worm->TimeEvolution->currPhaseSpaceModes+4),*(exp->Worm->TimeEvolution->currPhaseSpaceModes+5),*(exp->Worm->TimeEvolution->currPhaseSpaceModes+6));
+			TICTOC::timer().toc("PlotPhaseTrajectory");
+		}
+
+
 		UpdateGUI(exp);
 
 		key=cvWaitKey(20); //This controls how often the stage and GUI get updated

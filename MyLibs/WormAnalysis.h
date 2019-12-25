@@ -169,6 +169,9 @@ typedef struct WormAnalysisParamStruct{
 	/** Labview **/
 	int Labview;
 
+	/** Reopen Matlab Figure for PhasePlaneTrajectory **/
+	int ReopenPhasePlanePlot;
+
 } WormAnalysisParam;
 
 /** These are computed and segmented information about the worm at the current frame**/

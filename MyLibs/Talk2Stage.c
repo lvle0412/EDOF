@@ -173,14 +173,18 @@ void clearStageBuffer(HANDLE s){
         COMSTAT Status; 
         ClearCommError( s, &dwErrors, &Status); 
         Length = Status.cbInQue;        // get the rx data length in buffer 
+        if (Length ==0) {
+        	printf("\nThe length of data in buffer is zero!\nDon't clearStageBuffer!\n");
+			return;
+        } 
         // Get data and put it in to iBuffer 
         DWORD nRead; 
         char * pText; 
-        pText = (char *)malloc(sizeof(char)*(Length + 2)); 
-        ReadFile(s,pText, Length, &nRead,NULL); 
-        printf("Starting free(pText)... \n");
+        pText = (char *)malloc(sizeof(char)*(Length + 8)); 
+        if (ReadFile(s,pText, Length, &nRead,NULL) == 0) printf("Error ReadFile!\n");
+        //printf("Starting free pText: %p ... \n", pText);
         free(pText); 
-        printf("free(pText) Success!\n");
+        //printf("free(pText) Success!\n");
  		return;
 
 }

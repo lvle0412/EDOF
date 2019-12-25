@@ -483,7 +483,10 @@ UINT Thread(LPVOID lpdwParam) {
 		}
 
 		TICTOC::timer().toc("DisplayThreadGuts");
-
+		if (exp->Params->ReopenPhasePlanePlot){
+			Initiate_MATLAB_Plot(ep);
+			exp->Params->ReopenPhasePlanePlot = 0;
+		}
 		if (exp->Params->PhasePlaneAnalyzeOn && exp->Params->OnOff){
 			TICTOC::timer().tic("PlotPhaseTrajectory");
 			PlotPhaseTrajectory(ep, *(exp->Worm->TimeEvolution->currPhaseSpaceModes),*(exp->Worm->TimeEvolution->currPhaseSpaceModes+1),*(exp->Worm->TimeEvolution->currPhaseSpaceModes+2),

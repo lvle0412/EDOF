@@ -1905,6 +1905,9 @@ int HandleKeyStroke(int c, Experiment* exp) {
 	case 'C':
 		Toggle(&(exp->Params->DisplayCenterline));
 		break;
+	case 'R':
+		Toggle(&(exp->Params->ReopenPhasePlanePlot));
+		break;
 
 
 

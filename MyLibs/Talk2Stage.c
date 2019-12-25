@@ -174,7 +174,7 @@ void clearStageBuffer(HANDLE s){
         ClearCommError( s, &dwErrors, &Status); 
         Length = Status.cbInQue;        // get the rx data length in buffer 
         if (Length ==0) {
-        	printf("\nThe length of data in buffer is zero!\nDon't clearStageBuffer!\n");
+        	//printf("\n The length of data in buffer is zero!\n Don't clearStageBuffer!\n");
 			return;
         } 
         // Get data and put it in to iBuffer 

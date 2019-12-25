@@ -1030,10 +1030,10 @@ void SetupGUI(Experiment* exp) {
 	/** Stage Related GUI elements **/
 	if (exp->stageIsPresent){
 		/* Slider to set Gain Factor akak StageSpeed */
-		cvCreateTrackbar("StageSpeed",exp->WinCon1,&(exp->Params->stageSpeedFactor),300, (int) NULL);
+		cvCreateTrackbar("StageSpeed",exp->WinCon2,&(exp->Params->stageSpeedFactor),300, (int) NULL);
 		/* Within the Activezone, the gain on the feedback is linear with distance, outside it is  flat */
-		cvCreateTrackbar("ActiveZone",exp->WinCon1,&(exp->Params->stageROIRadius),300, (int) NULL);
-		cvCreateTrackbar("TargetSeg",exp->WinCon1,&(exp->Params->stageTargetSegment),99, (int) NULL);
+		cvCreateTrackbar("ActiveZone",exp->WinCon2,&(exp->Params->stageROIRadius),300, (int) NULL);
+		cvCreateTrackbar("TargetSeg",exp->WinCon2,&(exp->Params->stageTargetSegment),99, (int) NULL);
 
 
 		 /** Specifiy the target for trackign by double clicking on the image **/

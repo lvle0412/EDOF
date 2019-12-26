@@ -330,6 +330,16 @@ int AppendWormFrameToDisk(WormAnalysisData* Worm, WormAnalysisParam* Params, Wri
 			cvWriteReal(fs,"HeadCurv",(float) Worm->TimeEvolution->currMeanHeadCurvature);
 			cvWriteReal(fs,"HeadCurvDeriv",(float) Worm->TimeEvolution->derivativeOfHeadCurvature);
 		}
+		/** Phase Plane Analysis Information **/
+		if (Params->PhasePlaneAnalyzeOn && Params->OnOff){
+			cvWriteReal(fs,"PhaseSpaceMode_t1",(float) Worm->TimeEvolution->currPhaseSpaceModes);
+			cvWriteReal(fs,"PhaseSpaceMode_t3",(float) Worm->TimeEvolution->currPhaseSpaceModes+1);
+			cvWriteReal(fs,"PhaseSpaceMode_f1",(float) Worm->TimeEvolution->currPhaseSpaceModes+2);
+			cvWriteReal(fs,"PhaseSpaceMode_f2",(float) Worm->TimeEvolution->currPhaseSpaceModes+3);
+			cvWriteReal(fs,"PhaseSpaceMode_t2",(float) Worm->TimeEvolution->currPhaseSpaceModes+4);
+			cvWriteReal(fs,"PhaseSpaceMode_r1",(float) Worm->TimeEvolution->currPhaseSpaceModes+5);
+			cvWriteReal(fs,"PhaseSpaceMode_r2",(float) Worm->TimeEvolution->currPhaseSpaceModes+6);		
+		}
 
 		/** Protocol Information **/
 
